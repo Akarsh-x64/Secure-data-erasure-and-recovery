@@ -28,12 +28,27 @@ private:
     bool WriteFatEntry(uint32_t cluster, uint32_t value);
     bool ClearBitmapBit(uint32_t cluster);
 
+    // Recursive Traversal Helpers
+    std::vector<std::wstring> TokenizePath(const std::wstring& path) const;
+    std::vector<uint32_t> GetClusterChain(uint32_t startCluster, uint64_t dataLength, bool noFatChain) const;
+    
+    struct SearchResult {
+        bool found;
+        bool isDirectory;
+        uint32_t firstCluster;
+        uint64_t dataLength;
+        bool noFatChain;
+        size_t entryIndex;      // Memory offset to the 0x85 entry so we can wipe it
+    };
+
+    SearchResult FindEntryInDirectory(const std::vector<uint32_t>& dirClusters, const std::wstring& targetName, std::vector<uint8_t>& outDirBuffer) const;
+
 public:
     explicit ExFatDriver(Core::IHardwareController* hardware);
     ~ExFatDriver() override = default;
 
     bool Mount() override;
-    bool DeleteFile(const std::string& relativePath) override;
+    bool EraseFile(const std::string& relativePath) override;
     bool WipeVolume() override;
 
     // Test function to verify VBR parsing

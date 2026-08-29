@@ -37,6 +37,20 @@ int main() {
     // 2. Create the Hardware Layer and pass it the OS pipe
     Erasure::Hardware::HDDController hardware(&osDevice);
 
+    // AGGRESSIVELY LOCK AND DISMOUNT THE VOLUME
+    // If we don't do this, Windows OS will aggressively cache the file in RAM,
+    // intercept our writes, and possibly even overwrite our erased sectors with its cached copy!
+    std::cout << "\nAttempting to lock and dismount volume to bypass Windows Cache...\n";
+    if (osDevice.LockVolume()) {
+        std::cout << "  -> Volume Locked!\n";
+    } else {
+        std::cout << "  -> WARNING: Could not lock volume (It might be in use, or not a mounted partition).\n";
+    }
+    
+    if (osDevice.DismountVolume()) {
+        std::cout << "  -> Volume Dismounted! Windows Cache dropped.\n";
+    }
+
     // 3. Create the File System Layer and pass it the Hardware Demolition expert
     Erasure::FileSystems::ExFatDriver exFatFs(&hardware);
 
@@ -50,7 +64,8 @@ int main() {
     std::cout << "[SUCCESS] Valid exFAT Volume Boot Record found!\n";
     exFatFs.PrintVBRInfo();
 
-    std::cout << "\nEnter the exact filename to securely delete (e.g., test.txt): ";
+    std::cout << "\nEnter the exact filename to securely delete (e.g., target.txt)\n";
+    std::cout << "Or type 'WIPE' to obliterate the entire volume: ";
     std::string filename;
     std::getline(std::cin, filename);
 
@@ -59,11 +74,20 @@ int main() {
         return 0;
     }
 
-    std::cout << "\nNow attempting to securely delete '" << filename << "'...\n";
-    if (exFatFs.DeleteFile(filename)) {
-        std::cout << "[SUCCESS] " << filename << " was completely obliterated from the drive!\n";
+    if (filename == "WIPE") {
+        std::cout << "\nWARNING: Initiating Full Volume Wipe!\n";
+        if (exFatFs.WipeVolume()) {
+            std::cout << "[SUCCESS] The drive is now an empty wasteland.\n";
+        } else {
+            std::cout << "[FAILED] WipeVolume failed.\n";
+        }
     } else {
-        std::cout << "[FAILED] Could not delete " << filename << " (Does it exist in the root?)\n";
+        std::cout << "\nNow attempting to securely delete '" << filename << "'...\n";
+        if (exFatFs.EraseFile(filename)) {
+            std::cout << "[SUCCESS] " << filename << " was completely obliterated from the drive!\n";
+        } else {
+            std::cout << "[FAILED] Could not delete " << filename << "\n";
+        }
     }
 
     return 0;

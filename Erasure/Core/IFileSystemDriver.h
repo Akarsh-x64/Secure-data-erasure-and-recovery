@@ -18,7 +18,7 @@ namespace Core {
         virtual bool Mount() = 0;
 
         // Locates the file, tells Hardware to erase its sectors, and zeroes out metadata
-        virtual bool DeleteFile(const std::string& relativePath) = 0;
+        virtual bool EraseFile(const std::string& relativePath) = 0;
 
         // Traverses the entire directory tree and obliterates all file metadata and data
         virtual bool WipeVolume() = 0;

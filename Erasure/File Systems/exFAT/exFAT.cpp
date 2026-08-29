@@ -1,6 +1,7 @@
 #include "exFAT.h"
 #include <iostream>
 #include <cstring>
+#include <sstream>
 
 namespace Erasure {
 namespace FileSystems {
@@ -108,32 +109,81 @@ bool ExFatDriver::ClearBitmapBit(uint32_t cluster) {
     return m_hardware->WriteSectors(bitmapSector, 1, sector.data());
 }
 
-bool ExFatDriver::DeleteFile(const std::string& relativePath) {
-    if (m_bytesPerSector == 0) return false;
-
-    std::wstring targetName(relativePath.begin(), relativePath.end());
-    std::cout << "\n--- Initiating DeleteFile for: " << relativePath << " ---\n";
-
-    uint64_t rootDirSector = ClusterToSector(m_vbr.rootDirectoryFirstCluster);
-    std::vector<uint8_t> rootDirBuffer(m_bytesPerSector * m_sectorsPerCluster);
+std::vector<std::wstring> ExFatDriver::TokenizePath(const std::wstring& path) const {
+    std::vector<std::wstring> tokens;
+    std::wstring token;
     
-    if (!m_hardware->ReadSectors(rootDirSector, m_sectorsPerCluster, rootDirBuffer.data())) {
-        return false;
+    std::wstring normalizedPath = path;
+    for (auto& c : normalizedPath) {
+        if (c == L'/') c = L'\\';
+    }
+
+    std::wstringstream wss(normalizedPath);
+    while (std::getline(wss, token, L'\\')) {
+        if (!token.empty()) {
+            tokens.push_back(token);
+        }
+    }
+    return tokens;
+}
+
+std::vector<uint32_t> ExFatDriver::GetClusterChain(uint32_t startCluster, uint64_t dataLength, bool noFatChain) const {
+    std::vector<uint32_t> clusters;
+    if (startCluster < 2) return clusters;
+
+    uint32_t currentCluster = startCluster;
+
+    if (dataLength == 0) {
+        // Unknown length (e.g. Root Directory). Must follow FAT chain until EOF.
+        while (currentCluster >= 2 && currentCluster < 0xFFFFFFF8) {
+            clusters.push_back(currentCluster);
+            currentCluster = ReadFatEntry(currentCluster);
+        }
+    } else {
+        uint32_t clusterCount = (dataLength + (m_bytesPerSector * m_sectorsPerCluster) - 1) / (m_bytesPerSector * m_sectorsPerCluster);
+        for (uint32_t i = 0; i < clusterCount; ++i) {
+            clusters.push_back(currentCluster);
+            if (!noFatChain) {
+                uint32_t nextCluster = ReadFatEntry(currentCluster);
+                if (nextCluster >= 0xFFFFFFF8) break;
+                currentCluster = nextCluster;
+            } else {
+                currentCluster++;
+            }
+        }
+    }
+    return clusters;
+}
+
+ExFatDriver::SearchResult ExFatDriver::FindEntryInDirectory(const std::vector<uint32_t>& dirClusters, const std::wstring& targetName, std::vector<uint8_t>& outDirBuffer) const {
+    SearchResult result = { false, false, 0, 0, false, 0 };
+    if (dirClusters.empty()) return result;
+
+    size_t clusterSizeBytes = m_bytesPerSector * m_sectorsPerCluster;
+    outDirBuffer.resize(dirClusters.size() * clusterSizeBytes);
+
+    for (size_t i = 0; i < dirClusters.size(); ++i) {
+        uint64_t sector = ClusterToSector(dirClusters[i]);
+        if (!m_hardware->ReadSectors(sector, m_sectorsPerCluster, outDirBuffer.data() + (i * clusterSizeBytes))) {
+            return result;
+        }
     }
 
     std::wstring currentFileName = L"";
+    size_t tempEntryIndex = 0;
+    bool isDir = false;
     uint32_t targetFirstCluster = 0;
     uint64_t targetDataLength = 0;
     bool targetNoFatChain = false;
-    size_t fileEntryIndex = 0;
-    bool found = false;
 
-    for (size_t i = 0; i < rootDirBuffer.size(); i += 32) {
-        ExFatDirectoryEntry* genericEntry = reinterpret_cast<ExFatDirectoryEntry*>(&rootDirBuffer[i]);
+    for (size_t i = 0; i < outDirBuffer.size(); i += 32) {
+        ExFatDirectoryEntry* genericEntry = reinterpret_cast<ExFatDirectoryEntry*>(&outDirBuffer[i]);
         
         if (genericEntry->entryType == 0x85) { 
             currentFileName = L"";
-            fileEntryIndex = i; // Mark where the metadata starts
+            tempEntryIndex = i;
+            ExFatFileDirectoryEntry* fileEntry = reinterpret_cast<ExFatFileDirectoryEntry*>(genericEntry);
+            isDir = (fileEntry->fileAttributes & 0x10) != 0; 
         } 
         else if (genericEntry->entryType == 0xC0) { 
             ExFatStreamExtensionDirectoryEntry* stream = reinterpret_cast<ExFatStreamExtensionDirectoryEntry*>(genericEntry);
@@ -148,68 +198,227 @@ bool ExFatDriver::DeleteFile(const std::string& relativePath) {
             }
             
             if (currentFileName == targetName) {
-                found = true;
-                std::cout << "[Parser] Found File! Start Cluster: " << targetFirstCluster 
-                          << ", Length: " << targetDataLength << " bytes"
-                          << ", NoFATChain: " << (targetNoFatChain ? "True" : "False") << "\n";
-                
-                // Erase the metadata from our RAM buffer immediately
-                std::memset(&rootDirBuffer[fileEntryIndex], 0, (i + 32) - fileEntryIndex);
+                result.found = true;
+                result.isDirectory = isDir;
+                result.firstCluster = targetFirstCluster;
+                result.dataLength = targetDataLength;
+                result.noFatChain = targetNoFatChain;
+                result.entryIndex = tempEntryIndex;
                 break;
             }
         }
         else if (genericEntry->entryType == 0x00) {
-            break; // End of directory
+            break; 
         }
     }
+    return result;
+}
 
-    if (!found) {
-        std::cout << "[Parser] File not found in root directory.\n";
+bool ExFatDriver::EraseFile(const std::string& relativePath) {
+    if (m_bytesPerSector == 0) return false;
+
+    std::wstring wRelativePath(relativePath.begin(), relativePath.end());
+    std::vector<std::wstring> pathTokens = TokenizePath(wRelativePath);
+    
+    if (pathTokens.empty()) {
+        std::cout << "[ERROR] Invalid path provided.\n";
         return false;
     }
 
-    if (targetFirstCluster >= 2 && targetDataLength > 0) {
-        uint32_t currentCluster = targetFirstCluster;
-        uint32_t clusterCount = (targetDataLength + (m_bytesPerSector * m_sectorsPerCluster) - 1) / (m_bytesPerSector * m_sectorsPerCluster);
+    std::cout << "\n--- Initiating Recursive EraseFile for: " << relativePath << " ---\n";
+
+    std::vector<uint32_t> currentDirClusters = GetClusterChain(m_vbr.rootDirectoryFirstCluster, 0, false);
+    std::vector<uint8_t> currentDirBuffer;
+    SearchResult searchRes;
+    
+    for (size_t i = 0; i < pathTokens.size(); ++i) {
+        const std::wstring& targetName = pathTokens[i];
+        bool isLastToken = (i == pathTokens.size() - 1);
         
-        std::cout << "[Erasure] File occupies " << clusterCount << " clusters. Beginning Data wipe...\n";
+        std::cout << "[Parser] Searching for '" << std::string(targetName.begin(), targetName.end()) << "'...\n";
+        
+        searchRes = FindEntryInDirectory(currentDirClusters, targetName, currentDirBuffer);
+        
+        if (!searchRes.found) {
+            std::cout << "[Parser] ERROR: '" << std::string(targetName.begin(), targetName.end()) << "' not found!\n";
+            return false;
+        }
 
-        for (uint32_t i = 0; i < clusterCount; ++i) {
-            uint64_t sector = ClusterToSector(currentCluster);
-            std::cout << "  -> Wiping Data Cluster " << currentCluster << " (Sector " << sector << ")\n";
+        if (!isLastToken) {
+            if (!searchRes.isDirectory) {
+                std::cout << "[Parser] ERROR: '" << std::string(targetName.begin(), targetName.end()) << "' is a file, not a folder!\n";
+                return false;
+            }
+            currentDirClusters = GetClusterChain(searchRes.firstCluster, searchRes.dataLength, searchRes.noFatChain);
+            std::cout << "  -> Entered directory. New Start Cluster: " << searchRes.firstCluster << "\n";
+        }
+    }
+
+    if (searchRes.firstCluster >= 2 && searchRes.dataLength > 0) {
+        std::vector<uint32_t> targetClusters = GetClusterChain(searchRes.firstCluster, searchRes.dataLength, searchRes.noFatChain);
+        
+        std::cout << "[Erasure] Target occupies " << targetClusters.size() << " clusters. Beginning Data wipe...\n";
+
+        for (uint32_t cluster : targetClusters) {
+            uint64_t sector = ClusterToSector(cluster);
+            std::cout << "  -> Wiping Data Cluster " << cluster << " (Sector " << sector << ")\n";
             
-            // 1. Wipe Physical Data
             m_hardware->SecureEraseSectors(sector, m_sectorsPerCluster);
-            
-            // 2. Free Bitmap
-            ClearBitmapBit(currentCluster);
+            ClearBitmapBit(cluster);
 
-            // 3. Clear FAT Chain
-            if (!targetNoFatChain) {
-                uint32_t nextCluster = ReadFatEntry(currentCluster);
-                std::cout << "  -> Freeing FAT Entry for Cluster " << currentCluster << "\n";
-                WriteFatEntry(currentCluster, 0x00000000); 
-                
-                if (nextCluster >= 0xFFFFFFF8) break; 
-                currentCluster = nextCluster;
-            } else {
-                currentCluster++; 
+            if (!searchRes.noFatChain) {
+                std::cout << "  -> Freeing FAT Entry for Cluster " << cluster << "\n";
+                WriteFatEntry(cluster, 0x00000000); 
             }
         }
     }
 
-    // 4. Wipe Metadata on physical disk
-    std::cout << "[Erasure] Committing wiped Directory Metadata to disk...\n";
-    m_hardware->WriteSectors(rootDirSector, m_sectorsPerCluster, rootDirBuffer.data());
+    // Erase the metadata in RAM
+    size_t wipeLength = 32; 
+    for (size_t offset = searchRes.entryIndex + 32; offset < currentDirBuffer.size(); offset += 32) {
+        uint8_t type = currentDirBuffer[offset];
+        if (type == 0xC0 || type == 0xC1) {
+            wipeLength += 32;
+        } else {
+            break;
+        }
+    }
+
+    std::memset(&currentDirBuffer[searchRes.entryIndex], 0, wipeLength);
+    std::cout << "[Erasure] Wiping Directory Metadata (" << wipeLength << " bytes)...\n";
     
-    std::cout << "--- DeleteFile Securely Completed! ---\n";
+    // Write the dirty directory buffer back to disk
+    for (size_t i = 0; i < currentDirClusters.size(); ++i) {
+        uint64_t sector = ClusterToSector(currentDirClusters[i]);
+        size_t offset = i * (m_bytesPerSector * m_sectorsPerCluster);
+        m_hardware->WriteSectors(sector, m_sectorsPerCluster, &currentDirBuffer[offset]);
+    }
+    
+    std::cout << "--- Recursive EraseFile Securely Completed! ---\n";
     return true;
 }
 
 bool ExFatDriver::WipeVolume() {
-    // [STUB] 
-    // Systematically walk every folder and delete every file logically.
-    return false;
+    if (m_bytesPerSector == 0) return false;
+    
+    std::cout << "\n=== INITIATING SURGICAL VOLUME WIPE ===\n";
+    std::cout << "[Quarantine] Mapping critical filesystem structures...\n";
+
+    std::vector<uint32_t> quarantinedClusters;
+    
+    // 1. Root Directory
+    std::vector<uint32_t> rootDirClusters = GetClusterChain(m_vbr.rootDirectoryFirstCluster, 0, false);
+    quarantinedClusters.insert(quarantinedClusters.end(), rootDirClusters.begin(), rootDirClusters.end());
+
+    size_t clusterSizeBytes = m_bytesPerSector * m_sectorsPerCluster;
+    std::vector<uint8_t> rootDirBuffer(rootDirClusters.size() * clusterSizeBytes);
+
+    for (size_t i = 0; i < rootDirClusters.size(); ++i) {
+        uint64_t sector = ClusterToSector(rootDirClusters[i]);
+        m_hardware->ReadSectors(sector, m_sectorsPerCluster, rootDirBuffer.data() + (i * clusterSizeBytes));
+    }
+
+    uint32_t upcaseFirstCluster = 0;
+    uint64_t upcaseDataLength = 0;
+
+    for (size_t i = 0; i < rootDirBuffer.size(); i += 32) {
+        uint8_t entryType = rootDirBuffer[i];
+        if (entryType == 0x82) { // Upcase Table
+            std::memcpy(&upcaseFirstCluster, &rootDirBuffer[i + 20], sizeof(uint32_t));
+            std::memcpy(&upcaseDataLength, &rootDirBuffer[i + 24], sizeof(uint64_t));
+        }
+    }
+
+    // 2. Allocation Bitmap
+    std::vector<uint32_t> bmap = GetClusterChain(m_bitmapFirstCluster, m_bitmapDataLength, false);
+    quarantinedClusters.insert(quarantinedClusters.end(), bmap.begin(), bmap.end());
+
+    // 3. Upcase Table
+    std::vector<uint32_t> upcase;
+    if (upcaseFirstCluster >= 2) {
+        upcase = GetClusterChain(upcaseFirstCluster, upcaseDataLength, false);
+        quarantinedClusters.insert(quarantinedClusters.end(), upcase.begin(), upcase.end());
+    }
+
+    auto isQuarantined = [&](uint32_t c) {
+        for (uint32_t q : quarantinedClusters) {
+            if (q == c) return true;
+        }
+        return false;
+    };
+
+    std::cout << "[Erasure] Carpet Bombing " << m_vbr.clusterCount << " data clusters...\n";
+    uint32_t wipeCount = 0;
+    
+    // Secure Erase all non-quarantined clusters
+    for (uint32_t cluster = 2; cluster <= m_vbr.clusterCount + 1; ++cluster) {
+        if (isQuarantined(cluster)) continue;
+
+        uint64_t sector = ClusterToSector(cluster);
+        m_hardware->SecureEraseSectors(sector, m_sectorsPerCluster);
+        wipeCount++;
+
+        if (wipeCount % 1000 == 0) {
+            std::cout << "  -> Wiped " << wipeCount << " clusters...\r";
+            std::cout.flush();
+        }
+    }
+    std::cout << "\n[Erasure] Successfully wiped " << wipeCount << " user data clusters!\n";
+
+    std::cout << "[System] Rebuilding FAT and Allocation Bitmap...\n";
+    
+    // Zero entire FAT
+    std::vector<uint8_t> zeroFat(m_bytesPerSector, 0);
+    for (uint32_t i = 0; i < m_vbr.fatLengthSectors; ++i) {
+        m_hardware->WriteSectors(m_vbr.fatOffsetSectors + i, 1, zeroFat.data());
+    }
+
+    // Re-link FAT
+    WriteFatEntry(0, 0xFFFFFFF8);
+    WriteFatEntry(1, 0xFFFFFFFF);
+
+    auto rebuildFat = [&](const std::vector<uint32_t>& chain) {
+        if (chain.empty()) return;
+        for (size_t i = 0; i < chain.size() - 1; ++i) {
+            WriteFatEntry(chain[i], chain[i+1]);
+        }
+        WriteFatEntry(chain.back(), 0xFFFFFFFF);
+    };
+
+    rebuildFat(rootDirClusters);
+    rebuildFat(bmap);
+    rebuildFat(upcase);
+
+    // Rebuild Bitmap entirely in RAM, then flush
+    std::vector<uint8_t> bitmapData(bmap.size() * clusterSizeBytes, 0); 
+    auto fastSetBit = [&](uint32_t cluster) {
+        if (cluster < 2) return;
+        uint32_t bitOffset = cluster - 2;
+        bitmapData[bitOffset / 8] |= (1 << (bitOffset % 8));
+    };
+
+    for (uint32_t c : quarantinedClusters) {
+        fastSetBit(c);
+    }
+
+    for (size_t i = 0; i < bmap.size(); ++i) {
+        m_hardware->WriteSectors(ClusterToSector(bmap[i]), m_sectorsPerCluster, bitmapData.data() + (i * clusterSizeBytes));
+    }
+
+    std::cout << "[System] Scrubbing Root Directory Metadata...\n";
+    for (size_t i = 0; i < rootDirBuffer.size(); i += 32) {
+        uint8_t type = rootDirBuffer[i];
+        if (type != 0x81 && type != 0x82 && type != 0x83) { // Preserve Bitmap, Upcase, Vol Label
+            std::memset(&rootDirBuffer[i], 0, 32);
+        }
+    }
+
+    for (size_t i = 0; i < rootDirClusters.size(); ++i) {
+        m_hardware->WriteSectors(ClusterToSector(rootDirClusters[i]), m_sectorsPerCluster, rootDirBuffer.data() + (i * clusterSizeBytes));
+    }
+
+    std::cout << "=== SURGICAL WIPE SECURELY COMPLETED! ===\n";
+    return true;
 }
 
 void ExFatDriver::PrintVBRInfo() const {
