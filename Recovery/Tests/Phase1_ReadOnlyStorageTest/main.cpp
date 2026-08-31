@@ -5,14 +5,20 @@
 #include <cstdint>
 
 // Recovery Module — Phase 1
-#include "../../Acquisition/WindowsReadOnlyStorage.h"
+// Platform-specific storage implementation
+#ifdef _WIN32
+    #include "../../Acquisition/WindowsReadOnlyStorage.h"
+#else
+    #include "../../Acquisition/LinuxReadOnlyStorage.h"
+#endif
+
 #include "../../Core/ByteReader.h"
 
 /**
  * @brief Phase 1 Test: Read-Only Storage Foundation
  *
  * Demonstrates that the Recovery module can:
- *   1. Open a Windows physical drive or volume in read-only mode
+ *   1. Open a physical drive or volume in read-only mode
  *   2. Query its geometry (sector size, total size)
  *   3. Read raw bytes from sector 0 (the boot record)
  *   4. Read from an arbitrary offset via ByteReader
@@ -60,9 +66,19 @@ int main() {
     std::cout << "This test opens a device in READ-ONLY mode.\n";
     std::cout << "No data will be written. No volume locks.\n\n";
 
+#ifdef _WIN32
+    std::cout << "Platform: Windows\n";
     std::cout << "Path Formats:\n";
     std::cout << "  Physical drive: \\\\.\\PhysicalDrive0\n";
     std::cout << "  Volume:         \\\\.\\E:\n\n";
+#else
+    std::cout << "Platform: Linux\n";
+    std::cout << "Path Formats:\n";
+    std::cout << "  Whole disk:     /dev/sda\n";
+    std::cout << "  Partition:      /dev/sda1\n";
+    std::cout << "  NVMe:           /dev/nvme0n1\n";
+    std::cout << "  Disk image:     /path/to/image.dd\n\n";
+#endif
 
     std::cout << "Enter device path: ";
     std::string path;
@@ -74,7 +90,11 @@ int main() {
     }
 
     // ---- Step 1: Open the device (read-only) ----
+#ifdef _WIN32
     Recovery::Acquisition::WindowsReadOnlyStorage storage;
+#else
+    Recovery::Acquisition::LinuxReadOnlyStorage storage;
+#endif
 
     std::cout << "\n[1] Opening device in READ-ONLY mode...\n";
     if (!storage.Open(path)) {
@@ -129,7 +149,11 @@ int main() {
     std::cout << "\n[5] Safety Verification:\n";
     std::cout << "    IReadOnlyStorage exposes: Open, Close, Read, GetSize, GetSectorSize\n";
     std::cout << "    NO WriteSectors, NO LockVolume, NO DismountVolume, NO SendDeviceCommand\n";
+#ifdef _WIN32
     std::cout << "    Win32 handle opened with GENERIC_READ only (no GENERIC_WRITE)\n";
+#else
+    std::cout << "    POSIX fd opened with O_RDONLY (no write access)\n";
+#endif
     std::cout << "    [OK] Write operations are impossible at both API and OS kernel level.\n";
 
     // ---- Step 6: Close ----

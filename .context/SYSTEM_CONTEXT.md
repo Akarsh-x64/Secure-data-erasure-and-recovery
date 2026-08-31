@@ -98,9 +98,13 @@ The safety guarantee is **two-layered**:
 
 [WindowsReadOnlyStorage::Open()](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Acquisition/WindowsReadOnlyStorage.cpp#L15-L51) calls `CreateFileA` with `GENERIC_READ` (compare to Erasure's `GENERIC_READ | GENERIC_WRITE`). On success, it calls `UpdateGeometry()` to populate sector size and total bytes via `IOCTL_DISK_GET_DRIVE_GEOMETRY_EX`, with a fallback chain to `IOCTL_DISK_GET_LENGTH_INFO` + `IOCTL_DISK_GET_DRIVE_GEOMETRY`.
 
+[LinuxReadOnlyStorage::Open()](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Acquisition/LinuxReadOnlyStorage.cpp#L18-L43) calls `::open()` with `O_RDONLY` (no write access). On success, it calls `UpdateGeometry()` to populate sector size and total bytes via `ioctl` calls.
+
 ### 2. Raw reading
 
 [WindowsReadOnlyStorage::Read()](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Acquisition/WindowsReadOnlyStorage.cpp#L109-L124) takes a **byte offset** and byte count (not sector-based like the Erasure side). Uses `SetFilePointerEx` + `ReadFile`. The caller must provide sector-aligned parameters at this level.
+
+[LinuxReadOnlyStorage::Read()](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Acquisition/LinuxReadOnlyStorage.cpp#L57-L69) takes a **byte offset** and byte count. Uses `pread()` which reads at a given offset without changing the file position. The caller must provide sector-aligned parameters at this level.
 
 ### 3. Arbitrary byte reads via ByteReader
 
@@ -192,9 +196,7 @@ Enter device path: \\.\E:
 
 ## Known Limitations
 
-1. **Windows only** — `WindowsReadOnlyStorage` uses Win32 API. A `LinuxReadOnlyStorage` would be needed for POSIX (same interface, different implementation).
-2. **Cannot run on Linux** — The test binary is a Windows PE executable. It must be run on a Windows machine (or under Wine with raw device access, which is impractical).
-3. **Requires Administrator** — Raw device access on Windows requires elevation.
-4. **No image file support** — Only physical drives and mounted volumes are supported. A future `ImageFileSource` could implement `IReadOnlyStorage` for `.dd` / `.raw` images.
-5. **No partition awareness** — This phase reads raw byte offsets. It doesn't know where partitions start. That's Phase 2.
-6. **Large unaligned reads** — `ByteReader` uses a single `std::vector` for the aligned buffer. Very large unaligned reads could allocate significant temporary memory. For Phase 1 this is fine; later phases may want chunked reads.
+1. **Requires Administrator** — Raw device access on Windows requires elevation.
+2. **No image file support** — Only physical drives and mounted volumes are supported. A future `ImageFileSource` could implement `IReadOnlyStorage` for `.dd` / `.raw` images.
+3. **No partition awareness** — This phase reads raw byte offsets. It doesn't know where partitions start. That's Phase 2.
+4. **Large unaligned reads** — `ByteReader` uses a single `std::vector` for the aligned buffer. Very large unaligned reads could allocate significant temporary memory. For Phase 1 this is fine; later phases may want chunked reads.
