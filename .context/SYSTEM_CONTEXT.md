@@ -200,3 +200,54 @@ Enter device path: \\.\E:
 2. **No image file support** — Only physical drives and mounted volumes are supported. A future `ImageFileSource` could implement `IReadOnlyStorage` for `.dd` / `.raw` images.
 3. **No partition awareness** — This phase reads raw byte offsets. It doesn't know where partitions start. That's Phase 2.
 4. **Large unaligned reads** — `ByteReader` uses a single `std::vector` for the aligned buffer. Very large unaligned reads could allocate significant temporary memory. For Phase 1 this is fine; later phases may want chunked reads.
+
+---
+
+# Phase 2 — Partition Detection: Walkthrough
+
+## What Was Implemented
+
+A read-only partition-detection layer that can discover MBR and GPT partitions on any storage source exposed through `IReadOnlyStorage` + `ByteReader`.
+
+### New Core Type
+
+| File | Purpose |
+|---|---|
+| [PartitionInfo.h](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Core/PartitionInfo.h) | Filesystem-independent partition descriptor (`index`, `startLBA`, `sectorCount`, `startOffset`, `sizeBytes`, `scheme`, MBR-specific fields, GPT-specific fields incl. GUIDs & UTF-8 name) |
+
+`PartitionScheme` enum distinguishes `MBR` vs `GPT` origin.
+
+### Partition Parser Interface & Implementations
+
+| File | Purpose |
+|---|---|
+| [IPartitionParser.h](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Partitions/IPartitionParser.h) | Abstract interface: `CanParse()` (signature check) + `Parse()` (returns `vector<PartitionInfo>`) |
+| [MBRParser.h/.cpp](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Partitions/MBRParser.h) | Reads LBA 0, validates `0x55AA` boot signature, extracts up to 4 primary entries from the 64-byte partition table at offset `0x1BE`. Detects protective MBR (`0xEE`) and exposes `HasProtectiveMBR()` to signal GPT fallback. Maps type bytes to human-readable descriptions. |
+| [GPTParser.h/.cpp](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Partitions/GPTParser.h) | Reads LBA 1 for the GPT header (`"EFI PART"` signature), then walks the partition entry array. Skips zero-GUID entries. Converts UTF-16LE partition names to UTF-8. Maps well-known type GUIDs to descriptions (Microsoft Basic Data, EFI System, Linux filesystem, etc.). |
+
+### Detection Flow
+
+```text
+ByteReader
+    ↓
+MBRParser::CanParse()  →  checks 0x55AA at offset 0x1FE
+    ↓
+MBRParser::Parse()     →  extracts entries, flags protective MBR
+    ↓ if HasProtectiveMBR()
+GPTParser::CanParse()  →  checks "EFI PART" at LBA 1
+    ↓
+GPTParser::Parse()     →  reads header + entry array → PartitionInfo[]
+```
+
+### Test
+
+| File | Purpose |
+|---|---|
+| [test_partitions.cpp](file:///home/ishaan/dev/sihv3/Secure-data-erasure-and-recovery/Recovery/Tests/Phase2_PartitionTest/test_partitions.cpp) | Programmatic synthetic tests — constructs in-memory MBR and GPT disk images via a `MockReadOnlyStorage`, runs the parsers, and asserts correctness without needing a physical disk. |
+
+### Known Limitations
+
+1. **No extended-partition chain walking** — MBR extended entries (0x05, 0x0F, 0x85) are reported but their logical partitions are not recursively enumerated.
+2. **No CRC32 validation** — GPT header and entry-array CRC32 fields are not verified in V1.
+3. **No backup GPT header fallback** — Only the primary header at LBA 1 is read.
+4. **BMP-only UTF-16** — GPT partition names outside the Basic Multilingual Plane are not decoded.
