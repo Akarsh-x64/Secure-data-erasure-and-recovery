@@ -59,7 +59,7 @@ void WindowsStorageDevice::Close() {
 }
 
 bool WindowsStorageDevice::UpdateGeometry() {
-  DISK_GEOMETRY_EX diskGeometry = {0}; // Struct to hold the hardware response
+  DISK_GEOMETRY_EX diskGeometry{}; // Struct to hold the hardware response
   DWORD bytesReturned = 0; // How many bytes Windows actually gave back to us
 
   // Send the IOCTL_DISK_GET_DRIVE_GEOMETRY_EX command to the hardware to ask
