@@ -251,3 +251,54 @@ GPTParser::Parse()     →  reads header + entry array → PartitionInfo[]
 2. **No CRC32 validation** — GPT header and entry-array CRC32 fields are not verified in V1.
 3. **No backup GPT header fallback** — Only the primary header at LBA 1 is read.
 4. **BMP-only UTF-16** — GPT partition names outside the Basic Multilingual Plane are not decoded.
+
+---
+
+# Phase 3 — ext4 Filesystem Engine: Walkthrough
+
+## What Was Implemented
+
+Support for Linux `ext4` filesystems across both the **Erasure** and **Recovery** modules.
+
+### 1. Erasure Module (`Erasure/File Systems/ext4/`)
+
+- **`ext4_Structures.h`**: Strictly packed (`#pragma pack(push, 1)`) on-disk structures matching the Linux kernel:
+  - `Ext4Superblock`: 1024-byte superblock at offset 1024, magic `0xEF53`, block sizes, group counts, feature incompat flags (`EXTENTS`, `64BIT`, `FILETYPE`).
+  - `Ext4GroupDesc` / `Ext4GroupDesc64`: Block group descriptor tables (bitmaps, inode table offsets).
+  - `Ext4Inode`: 128/256-byte inode structures, timestamps, link counts, deletion time (`i_dtime`), extent roots in `i_block`.
+  - `Ext4ExtentHeader`, `Ext4Extent`, `Ext4ExtentIdx`: Extent tree parsing (magic `0xF30A`) for multi-level index and leaf blocks.
+  - `Ext4DirEntry2`: Variable-length directory entries with name length and file type.
+- **`ext4.h` / `ext4.cpp` (`Ext4Driver`)**: Implements `Core::IFileSystemDriver`:
+  - `Mount()`: Reads superblock, validates `0xEF53`, loads GDT into memory, calculates dynamic geometries.
+  - `EraseFile()`: Traverses path tokens from root inode 2, resolves extent trees to physical blocks, overwrites data sectors with `SecureEraseSectors`, clears block and inode allocation bitmap bits, zeroes inode record in inode table, and zeroes directory entry in parent directory block.
+  - `WipeVolume()`: Quarantines vital structures (Superblock, GDT, bitmaps, inode tables, root inode 2), erases all user-allocated blocks, resets bitmaps, and zeroes user directory records.
+  - `PrintSuperblockInfo()`: Diagnostic summary of mounted ext4 volume.
+
+### 2. Recovery Module (`Recovery/Filesystems/`)
+
+- **`Ext4Detector.h` / `Ext4Detector.cpp`**: Forensic read-only detector using `ByteReader` and `StorageRegion`:
+  - Probes offset `1024` for the ext4 magic `0xEF53`.
+  - Extracts forensic metadata: Volume Name, UUID, Block Size, Total Blocks, Free Blocks, Total Inodes, Free Inodes, Extents flag, and 64-bit flag.
+
+### 3. Inode Sanitization & Inline Data Handling
+
+- **Inline Data (`EXT4_INLINE_DATA_FL = 0x10000000`) & Fast Symlinks:**
+  - When files are small (< 60 bytes), ext4 does not allocate external data blocks (`i_blocks_lo == 0`). Data is stored directly inside the inode's 60-byte `i_block` array, with potential overflow into the 128..255 byte extended attribute space of 256-byte inodes.
+  - `GetInodeAllocatedBlocks()` explicitly recognizes inline data and zero-block inodes, returning 0 external blocks to avoid treating inline character bytes as block pointers.
+- **`WipeInodeOnDisk()`:**
+  - Rather than zeroing only the 128-byte base inode struct in memory, `WipeInodeOnDisk()` reads the physical Inode Table sector and zeroes all `m_inodeSize` bytes (all 256 bytes) directly on disk.
+  - Obliterates:
+    1. Inode payload in `i_block[60]` (for inline files).
+    2. Extent tree root headers (`0xF30A`) and physical block pointers (`ee_start_lo`) (for regular files).
+    3. Extended security attributes (xattrs) and inline overflow in bytes 128..255.
+    4. File mode, link count (`i_links_count = 0`), and size (`i_size = 0`), while setting the deletion timestamp `i_dtime`.
+
+### 4. Verification & Testing Suites
+
+- **Automated Synthetic Unit Tests (`Tests/test_ext4.cpp`)**:
+  - In-memory disk image (`MemoryDiskDevice`), running 27 assertions covering mount, traversal, single file erasure, recursive directory erasure, bitmap bit clearing, and volume wipe.
+- **Disk-Backed Demonstration & Byte-Level Inspection (`Tests/demo_erasure_xxd.cpp`)**:
+  - Constructs a 4MB on-disk ext4 image (`demo_test_disk.img`) with mixed file hierarchies (inline data, regular extent files, nested directories).
+  - Uses `xxd` to verify exact before-and-after byte states of inodes, data blocks, directory blocks, and allocation bitmaps.
+
+
