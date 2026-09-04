@@ -3,6 +3,7 @@ import type { ReactElement } from 'react'
 import { FileSystemTree } from './components/filetree/FileSystemTree'
 import AppShell from './components/layout/Appshell'
 import type { NavItem } from './components/layout/ActivityBar'
+import { DriveEraseTab } from './components/modules/drive-erase/DriveEraseTab'
 import { FileEraseTab } from './components/modules/file-erase/FileEraseTab'
 
 function App() {
@@ -13,19 +14,26 @@ function App() {
     if (activeTab === 'file-erase') {
       return (
         <div className="flex h-full min-h-0 gap-4">
-          {explorerOpen && (
-            <aside className="hidden w-72 shrink-0 lg:block">
-              <FileSystemTree panel />
-            </aside>
-          )}
-          <section className="min-w-0 flex-1">
-            <FileEraseTab
+          <aside className={`hidden shrink-0 lg:block ${explorerOpen ? 'w-72' : 'w-10'}`}>
+            <FileSystemTree
+              panel
               explorerOpen={explorerOpen}
               onToggleExplorer={() => setExplorerOpen((open) => !open)}
             />
+          </aside>
+          <section className="min-w-0 flex-1">
+            <FileEraseTab />
           </section>
         </div>
       )
+    }
+
+    if (activeTab === 'explorer') {
+      return <FileSystemTree />
+    }
+
+    if (activeTab === 'drive-erase') {
+      return <DriveEraseTab />
     }
 
     return (

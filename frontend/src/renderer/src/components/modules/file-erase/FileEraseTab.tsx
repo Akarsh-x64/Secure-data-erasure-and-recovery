@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { ReactElement } from 'react'
-import { FolderPlus, PanelLeftClose, PanelLeftOpen, Plus } from 'lucide-react'
+import { FolderPlus, Plus } from 'lucide-react'
 import { EraseConfirmDialog } from './EraseConfirmDialog'
 import { EraseConfigPanel, type EraseConfig } from './EraseConfigPanel'
 import { SelectedFilesPanel, type EraseTarget, type FileSystemType } from './SelectedFilesPanel'
@@ -43,12 +43,7 @@ function guessFileSystem(path: string): FileSystemType {
   return path.startsWith('/') ? 'ext4' : 'NTFS'
 }
 
-interface FileEraseTabProps {
-  explorerOpen: boolean
-  onToggleExplorer: () => void
-}
-
-export function FileEraseTab({ explorerOpen, onToggleExplorer }: FileEraseTabProps): ReactElement {
+export function FileEraseTab(): ReactElement {
   const [targets, setTargets] = useState<EraseTarget[]>(INITIAL_TARGETS)
   const [config, setConfig] = useState<EraseConfig>(INITIAL_CONFIG)
   const [pathInput, setPathInput] = useState('')
@@ -105,16 +100,6 @@ export function FileEraseTab({ explorerOpen, onToggleExplorer }: FileEraseTabPro
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs text-text-muted">
-          <button
-            type="button"
-            onClick={onToggleExplorer}
-            title={explorerOpen ? 'Hide explorer' : 'Show explorer'}
-            aria-label={explorerOpen ? 'Hide explorer' : 'Show explorer'}
-            className="flex items-center gap-1.5 border border-ui-outline px-2 py-1.5 transition-colors hover:bg-ui-selection hover:text-text-pure"
-          >
-            {explorerOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
-            <span className="hidden sm:inline">Explorer</span>
-          </button>
           <span className={`h-1.5 w-1.5 rounded-full ${statusColor}`} />
           <span>{statusLabel}</span>
         </div>

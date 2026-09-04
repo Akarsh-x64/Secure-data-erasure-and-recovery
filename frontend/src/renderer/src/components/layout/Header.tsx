@@ -1,29 +1,45 @@
 import React from 'react';
 
-interface HeaderProps {
-  breadcrumbs?: string[];
-}
+const menuItems = {
+  File: ['New Case', 'Open Evidence', 'Save Case'],
+  Edit: ['Undo', 'Redo'],
+  View: ['Explorer', 'Activity Bar', 'Status Bar'],
+};
 
-export default function Header({ breadcrumbs = ['root', 'target_drive', 'unallocated'] }: HeaderProps) {
+export default function Header() {
   return (
     <header 
       style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
       className="h-8 w-full bg-background-sidebar border-b border-ui-outline flex items-center justify-between px-3 select-none"
     >
-      {/* Left: App Title / Identifier */}
-      <div className="flex items-center gap-2">
+      {/* Left: App Title / Menu Bar */}
+      <div style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties} className="flex items-center gap-3">
         <span className="font-sans text-xs font-bold tracking-wider text-text-pure">NTRO</span>
         <span className="text-ui-outline font-sans text-xs">|</span>
-        
-        {/* Breadcrumb Path */}
-        <nav className="flex items-center gap-1.5 font-sans text-xs">
-          {breadcrumbs.map((crumb, idx) => (
-            <React.Fragment key={crumb}>
-              {idx > 0 && <span className="text-text-muted/40 font-sans">&gt;</span>}
-              <span className={idx === breadcrumbs.length - 1 ? 'text-text-pure' : 'text-text-muted'}>
-                {crumb}
-              </span>
-            </React.Fragment>
+
+        <nav className="flex h-full items-center gap-1 font-sans text-xs" aria-label="Application menu">
+          {(Object.entries(menuItems) as [keyof typeof menuItems, string[]][]).map(([label, items]) => (
+            <div key={label} className="group relative h-full">
+              <button
+                type="button"
+                className="flex h-full items-center gap-1 rounded-md px-2 text-text-muted hover:bg-ui-selection hover:text-text-pure"
+                aria-haspopup="true"
+              >
+                {label}
+              </button>
+
+              <div className="invisible absolute left-0 top-full z-50 min-w-40 rounded-md border border-ui-outline bg-ui-selection py-2 opacity-0 shadow-lg transition-opacity group-hover:visible group-hover:opacity-100">
+                {items.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className="block w-full whitespace-nowrap rounded-sm px-3 py-1.5 text-left text-xs text-text-muted hover:bg-ui-selection hover:text-text-pure"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
       </div>

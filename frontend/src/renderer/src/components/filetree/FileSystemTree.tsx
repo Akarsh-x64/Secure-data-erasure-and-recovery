@@ -5,7 +5,9 @@ import {
   RefreshCw,
   Flame,
   Scissors,
-  SlidersHorizontal
+  SlidersHorizontal,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { TreeNode, ForensicNode } from './TreeNode';
 import { FilePreview } from '../shared/FilePreview';
@@ -125,9 +127,15 @@ const filterTreeNodes = (
 
 interface FileSystemTreeProps {
   panel?: boolean;
+  explorerOpen?: boolean;
+  onToggleExplorer?: () => void;
 }
 
-export const FileSystemTree: React.FC<FileSystemTreeProps> = ({ panel = false }) => {
+export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
+  panel = false,
+  explorerOpen = true,
+  onToggleExplorer,
+}) => {
   const [treeData, setTreeData] = useState<ForensicNode[]>(INITIAL_TREE_DATA);
   const [selectedNode, setSelectedNode] = useState<ForensicNode | null>(
     INITIAL_TREE_DATA[0].children![0].children![1] // Default selection: IMG_0921.raw
@@ -144,8 +152,24 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({ panel = false })
     [treeData, searchQuery, flagFilter]
   );
 
+  if (panel && !explorerOpen && onToggleExplorer) {
+    return (
+      <div className="flex h-full w-full items-start justify-center rounded-lg border border-[var(--ui-outline)] bg-[var(--bg-sidebar)] pt-2">
+        <button
+          type="button"
+          onClick={onToggleExplorer}
+          title="Show explorer"
+          aria-label="Show explorer"
+          className="p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--ui-selection)] hover:text-[var(--text-pure)]"
+        >
+          <PanelLeftOpen className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className={`grid grid-cols-1 ${panel ? '' : 'lg:grid-cols-12'} h-full w-full bg-[var(--bg-main)] text-[var(--text-pure)] font-sans select-none overflow-hidden border border-[var(--ui-outline)]`}>
+    <div className={`grid grid-cols-1 ${panel ? '' : 'lg:grid-cols-12'} h-full w-full overflow-hidden rounded-lg border border-[var(--ui-outline)] bg-[var(--bg-main)] font-sans text-[var(--text-pure)] select-none`}>
       {/* Sidebar / Explorer Tree Container (5 columns on LG) */}
       <div className="lg:col-span-5 flex flex-col h-full bg-[var(--bg-sidebar)] border-r border-[var(--ui-outline)]">
         {/* Explorer Header */}
@@ -158,6 +182,17 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({ panel = false })
           </div>
 
           <div className="flex items-center space-x-2 text-[var(--text-muted)]">
+            {panel && onToggleExplorer && (
+              <button
+                type="button"
+                onClick={onToggleExplorer}
+                title={explorerOpen ? 'Hide explorer' : 'Show explorer'}
+                aria-label={explorerOpen ? 'Hide explorer' : 'Show explorer'}
+                className="p-1 hover:bg-[var(--ui-selection)] hover:text-[var(--text-pure)] transition-colors"
+              >
+                {explorerOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
+              </button>
+            )}
             <button
               onClick={() => setTreeData(INITIAL_TREE_DATA)}
               title="Reset Tree View"
@@ -177,7 +212,7 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({ panel = false })
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Filter nodes or paths..."
-              className="w-full bg-[var(--bg-main)] border border-[var(--ui-outline)] pl-7 pr-2 py-1 text-xs text-[var(--text-pure)] focus:outline-none focus:border-[var(--status-valid)] placeholder:text-[var(--text-muted)]"
+              className="w-full rounded-md border border-[var(--ui-outline)] bg-[var(--bg-main)] py-1 pl-7 pr-2 text-xs text-[var(--text-pure)] placeholder:text-[var(--text-muted)] focus:border-[var(--status-valid)] focus:outline-none"
             />
           </div>
 
@@ -189,8 +224,8 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({ panel = false })
                 onClick={() => setFlagFilter('all')}
                 className={`px-1.5 py-0.5 ${
                   flagFilter === 'all'
-                    ? 'bg-[var(--ui-selection)] text-[var(--text-pure)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-pure)]'
+                    ? 'rounded-md bg-[var(--ui-selection)] text-[var(--text-pure)]'
+                    : 'rounded-md text-[var(--text-muted)] hover:text-[var(--text-pure)]'
                 }`}
               >
                 All
@@ -199,8 +234,8 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({ panel = false })
                 onClick={() => setFlagFilter('carve')}
                 className={`px-1.5 py-0.5 flex items-center space-x-1 ${
                   flagFilter === 'carve'
-                    ? 'bg-[var(--status-warning)]/20 text-[var(--status-warning)] border border-[var(--status-warning)]/40'
-                    : 'text-[var(--text-muted)] hover:text-[var(--status-warning)]'
+                    ? 'rounded-md border border-[var(--status-warning)]/40 bg-[var(--status-warning)]/20 text-[var(--status-warning)]'
+                    : 'rounded-md text-[var(--text-muted)] hover:text-[var(--status-warning)]'
                 }`}
               >
                 <Scissors className="w-2.5 h-2.5" />
@@ -210,8 +245,8 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({ panel = false })
                 onClick={() => setFlagFilter('erase')}
                 className={`px-1.5 py-0.5 flex items-center space-x-1 ${
                   flagFilter === 'erase'
-                    ? 'bg-[var(--status-error)]/20 text-[var(--status-error)] border border-[var(--status-error)]/40'
-                    : 'text-[var(--text-muted)] hover:text-[var(--status-error)]'
+                    ? 'rounded-md border border-[var(--status-error)]/40 bg-[var(--status-error)]/20 text-[var(--status-error)]'
+                    : 'rounded-md text-[var(--text-muted)] hover:text-[var(--status-error)]'
                 }`}
               >
                 <Flame className="w-2.5 h-2.5" />
