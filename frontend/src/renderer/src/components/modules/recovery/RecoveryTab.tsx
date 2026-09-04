@@ -109,7 +109,7 @@ export function RecoveryTab(): React.ReactElement {
             type="button"
             disabled={!canScan}
             onClick={runScan}
-            className="flex items-center justify-center gap-2 rounded-md bg-status-valid px-3 py-3 text-sm font-medium text-background-main transition-colors hover:bg-status-valid/85 disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
+            className="flex items-center justify-center gap-2 rounded-md border border-button-primary bg-button-primary px-3 py-3 text-sm font-medium text-button-primary-text transition-colors hover:bg-button-primary/85 disabled:cursor-not-allowed disabled:border-ui-outline disabled:bg-ui-selection disabled:text-text-muted"
           >
             <Search className="h-4 w-4" />
             {scanning ? 'Scanning image...' : `Scan with ${enabledCount} signature${enabledCount === 1 ? '' : 's'}`}

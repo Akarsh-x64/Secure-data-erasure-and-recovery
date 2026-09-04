@@ -12,6 +12,10 @@
     /* UI Elements */
     --ui-selection: #2C2D2E;
     --ui-outline: #373839;
+
+    /* Primary Actions */
+    --button-primary-bg: #FFFFFF;
+    --button-primary-text: #3A3A3A;
     
     /* Typography */
     --text-pure: #FFFFFF;

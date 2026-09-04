@@ -92,7 +92,7 @@ export function EraseConfirmDialog({
               type="button"
               disabled={!canConfirm}
               onClick={onConfirm}
-              className="rounded-md border border-ui-outline bg-ui-selection px-3 py-2 text-sm font-medium text-text-pure transition-colors hover:border-text-pure hover:bg-text-pure hover:text-background-main disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
+              className="rounded-md border border-button-primary bg-button-primary px-3 py-2 text-sm font-medium text-button-primary-text transition-colors hover:bg-button-primary/85 disabled:cursor-not-allowed disabled:border-ui-outline disabled:bg-ui-selection disabled:text-text-muted"
             >
               Execute erase
             </button>

@@ -15,6 +15,12 @@ module.exports = {
           selection: "var(--ui-selection)",
           outline: "var(--ui-outline)",
         },
+        button: {
+          primary: {
+            DEFAULT: "var(--button-primary-bg)",
+            text: "var(--button-primary-text)",
+          },
+        },
         text: {
           pure: "var(--text-pure)",
           muted: "var(--text-muted)",

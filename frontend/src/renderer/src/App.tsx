@@ -29,10 +29,6 @@ function App() {
       )
     }
 
-    if (activeTab === 'explorer') {
-      return <FileSystemTree />
-    }
-
     if (activeTab === 'drive-erase') {
       return <DriveEraseTab />
     }

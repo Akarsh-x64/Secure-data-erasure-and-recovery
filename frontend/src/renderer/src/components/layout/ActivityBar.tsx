@@ -1,6 +1,6 @@
 import { FileText, Folder, HardDrive, RefreshCw, Settings, Trash2, type LucideIcon } from 'lucide-react';
 
-export type NavItem = 'explorer' | 'drive-erase' | 'file-erase' | 'recovery' | 'audit' | 'settings';
+export type NavItem = 'drive-erase' | 'file-erase' | 'recovery' | 'audit' | 'settings';
 
 interface ActivityBarProps {
   activeTab: NavItem;
@@ -10,11 +10,7 @@ interface ActivityBarProps {
 export default function ActivityBar({ activeTab, onTabChange }: ActivityBarProps) {
 
   const navItems: { id: NavItem; label: string; icon: LucideIcon }[] = [
-    {
-      id: 'explorer',
-      label: 'Explorer',
-      icon: Folder,
-    },
+    
     {
       id: 'drive-erase',
       label: 'Drive Erase',
