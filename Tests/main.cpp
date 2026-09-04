@@ -1,12 +1,14 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <algorithm>
 
 // Include our Engine Layers
 #include "../Erasure/OS/Windows/WindowsStorageDevice.h"
 #include "../Erasure/Hardware/Magnetic/HDDController.h"
 #include "../Erasure/File Systems/exFAT/exFAT.h"
 #include "../Erasure/File Systems/ext4/ext4.h"
+#include "../Erasure/File Systems/XFS/XFS.h"
 
 int main() {
     std::cout << "==========================================\n";
@@ -57,12 +59,16 @@ int main() {
     std::cout << "\nSelect Filesystem Driver:\n";
     std::cout << "  [1] exFAT\n";
     std::cout << "  [2] ext4\n";
+    std::cout << "  [3] XFS\n";
     std::cout << "Enter choice (default 1): ";
     std::string choice;
     std::getline(std::cin, choice);
 
+    std::string normChoice = choice;
+    std::transform(normChoice.begin(), normChoice.end(), normChoice.begin(), ::tolower);
+
     std::unique_ptr<Erasure::Core::IFileSystemDriver> fsDriver;
-    if (choice == "2") {
+    if (normChoice == "2" || normChoice == "ext4" || normChoice == "ext") {
         auto ext4 = std::make_unique<Erasure::FileSystems::Ext4Driver>(&hardware);
         std::cout << "\nAttempting to Mount ext4 and parse Superblock...\n";
         if (!ext4->Mount()) {
@@ -72,6 +78,16 @@ int main() {
         std::cout << "[SUCCESS] Valid ext4 filesystem found!\n";
         ext4->PrintSuperblockInfo();
         fsDriver = std::move(ext4);
+    } else if (normChoice == "3" || normChoice == "xfs") {
+        auto xfs = std::make_unique<Erasure::FileSystems::XfsDriver>(&hardware);
+        std::cout << "\nAttempting to Mount XFS and parse Superblock...\n";
+        if (!xfs->Mount()) {
+            std::cout << "[ERROR] Failed to mount. Ensure the target contains a valid XFS filesystem.\n";
+            return 1;
+        }
+        std::cout << "[SUCCESS] Valid XFS filesystem found!\n";
+        xfs->PrintSuperblockInfo();
+        fsDriver = std::move(xfs);
     } else {
         auto exFat = std::make_unique<Erasure::FileSystems::ExFatDriver>(&hardware);
         std::cout << "\nAttempting to Mount exFAT and read Sector 0 (VBR)...\n";
@@ -84,29 +100,60 @@ int main() {
         fsDriver = std::move(exFat);
     }
 
-    std::cout << "\nEnter the exact relative path to securely delete (e.g. target.txt or docs/secret.pdf)\n";
-    std::cout << "Or type 'WIPE' to obliterate the entire volume: ";
-    std::string filename;
-    std::getline(std::cin, filename);
+    // 4. Interactive Erasure Command Loop
+    std::cout << "\n============================================================\n";
+    std::cout << "           FILESYSTEM DRIVER READY FOR ERASURE              \n";
+    std::cout << "============================================================\n";
 
-    if (filename.empty()) {
-        std::cout << "No filename provided. Exiting.\n";
-        return 0;
-    }
+    while (true) {
+        std::cout << "\nCommands:\n";
+        std::cout << "  - Enter relative file path (e.g. secret.txt or docs/data.pdf)\n";
+        std::cout << "  - Type 'WIPE' to execute surgical volume-wide sanitization\n";
+        std::cout << "  - Type 'EXIT' or 'QUIT' to close the device and exit\n";
+        std::cout << "Action: ";
 
-    if (filename == "WIPE") {
-        std::cout << "\nWARNING: Initiating Full Volume Wipe!\n";
-        if (fsDriver->WipeVolume()) {
-            std::cout << "[SUCCESS] Volume wiped cleanly while preserving core filesystem structures.\n";
-        } else {
-            std::cout << "[FAILED] WipeVolume failed.\n";
+        std::string command;
+        if (!std::getline(std::cin, command) || command.empty()) {
+            std::cout << "No action provided. Exiting session.\n";
+            break;
         }
-    } else {
-        std::cout << "\nNow attempting to securely delete '" << filename << "'...\n";
-        if (fsDriver->EraseFile(filename)) {
-            std::cout << "[SUCCESS] '" << filename << "' was completely obliterated from the drive!\n";
+
+        // Trim leading and trailing whitespace
+        while (!command.empty() && (command.front() == ' ' || command.front() == '\t')) command.erase(command.begin());
+        while (!command.empty() && (command.back() == ' ' || command.back() == '\t' || command.back() == '\r')) command.pop_back();
+
+        if (command == "EXIT" || command == "exit" || command == "QUIT" || command == "quit") {
+            std::cout << "\nClosing device handle and terminating session. Goodbye!\n";
+            break;
+        }
+
+        if (command == "WIPE" || command == "wipe") {
+            std::cout << "\n************************************************************\n";
+            std::cout << "  CRITICAL WARNING: FULL SURGICAL VOLUME WIPE REQUESTED!\n";
+            std::cout << "  This will overwrite all user data blocks across the disk.\n";
+            std::cout << "************************************************************\n";
+            std::cout << "Type 'YES' to confirm full volume destruction: ";
+            std::string confirm;
+            std::getline(std::cin, confirm);
+
+            if (confirm != "YES") {
+                std::cout << "  -> Volume wipe aborted by user.\n";
+                continue;
+            }
+
+            std::cout << "\nExecuting Surgical Volume Wipe...\n";
+            if (fsDriver->WipeVolume()) {
+                std::cout << "[SUCCESS] Volume wiped cleanly while preserving core filesystem structures.\n";
+            } else {
+                std::cout << "[FAILED] WipeVolume failed.\n";
+            }
         } else {
-            std::cout << "[FAILED] Could not delete " << filename << "\n";
+            std::cout << "\nAttempting to securely delete '" << command << "'...\n";
+            if (fsDriver->EraseFile(command)) {
+                std::cout << "[SUCCESS] '" << command << "' was completely obliterated from the drive!\n";
+            } else {
+                std::cout << "[FAILED] Could not securely delete '" << command << "'.\n";
+            }
         }
     }
 
