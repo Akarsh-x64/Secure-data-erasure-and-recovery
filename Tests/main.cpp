@@ -8,6 +8,7 @@
 #include "../Erasure/Core/IFileSystemDriver.h"
 #include "../Erasure/File Systems/exFAT/exFAT.h"
 #include "../Erasure/File Systems/ext3/ext3.h"
+#include "../Erasure/File Systems/ext2/ext2.h"
 
 int main() {
     std::cout << "==========================================\n";
@@ -57,7 +58,8 @@ int main() {
     std::cout << "\nSelect Filesystem Driver:\n";
     std::cout << "  [1] exFAT\n";
     std::cout << "  [2] Ext3\n";
-    std::cout << "Enter choice (1 or 2): ";
+    std::cout << "  [3] Ext2\n";
+    std::cout << "Enter choice (1, 2, or 3): ";
     std::string choice;
     std::getline(std::cin, choice);
 
@@ -75,6 +77,18 @@ int main() {
         std::cout << "[SUCCESS] Valid Ext3 filesystem found!\n";
         ext3Fs->PrintSuperBlockInfo();
         fsDriver = std::move(ext3Fs);
+    } else if (choice == "3") {
+        auto ext2Fs = std::make_unique<Erasure::FileSystems::Ext2Driver>(&hardware);
+
+        std::cout << "\nAttempting to Mount Ext2 and read SuperBlock...\n";
+        if (!ext2Fs->Mount()) {
+            std::cout << "[ERROR] Failed to mount Ext2. Ensure the drive is formatted as Ext2.\n";
+            return 1;
+        }
+
+        std::cout << "[SUCCESS] Valid Ext2 filesystem found!\n";
+        ext2Fs->PrintSuperBlockInfo();
+        fsDriver = std::move(ext2Fs);
     } else {
         auto exFatFs = std::make_unique<Erasure::FileSystems::ExFatDriver>(&hardware);
 

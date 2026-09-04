@@ -1,7 +1,7 @@
 # Multi-Filesystem Secure Deletion Engine - Architecture & System Context
 
 ## System Architecture & Philosophy
-* **Goal:** A modular C++ engine for low-level, surgical file destruction across diverse storage hardware (HDD, SATA SSD, NVMe) and file systems (exFAT, NTFS, FAT32, etc.).
+* **Goal:** A modular C++ engine for low-level, surgical file destruction across diverse storage hardware (HDD, SATA SSD, NVMe) and file systems (exFAT, NTFS, FAT32, ext2, ext3, etc.).
 * **Decoupled Design:** Separates Operating System I/O (`IStorageDevice`), specific Hardware erasure commands (`IHardwareController`), and logical file system operations (`IFileSystemDriver`).
 
 ## Core Abstraction Layers (The 3-Layer Architecture)
@@ -20,7 +20,7 @@
 ### 3. `IFileSystemDriver` (File System Layer / Detective)
 * **Responsibility:** Parses the raw sectors to understand the logical file system layout.
 * **Role:** When asked to `DeleteFile(path)`, it locates the exact physical sectors of the file, commands the `IHardwareController` to zap those specific sectors, and finally overwrites the metadata (directory entries, allocation bitmaps).
-* **Implementation Details:** Operates purely on abstractions. Drivers like `ExFatDriver` handle VBR parsing, FAT chains, and directory traversal privately.
+* **Implementation Details:** Operates purely on abstractions. Drivers like `ExFatDriver`, `Ext2Driver`, and `Ext3Driver` handle volume parsing (VBR/Superblocks), allocation chains, inode mappings, and directory traversal privately.
 
 ## Engine Safety & Memory Guidelines
 * **Zero Hardcoded Offsets:** Never assume table layouts or cluster sizes. Drivers must compute offsets dynamically from the volume boot record or superblock.

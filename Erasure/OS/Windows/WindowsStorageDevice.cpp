@@ -37,6 +37,7 @@ bool WindowsStorageDevice::Open(const std::string &devicePath) {
   );
 
   if (m_hDevice == INVALID_HANDLE_VALUE) {
+    std::cout << "[DEBUG] CreateFileA failed. GetLastError: " << GetLastError() << "\n";
     return false;
   }
 
@@ -78,18 +79,20 @@ bool WindowsStorageDevice::UpdateGeometry() {
   );
 
   if (success) {
-    // Successfully got the geometry! Now we translate it into our custom
-    // struct.
+    // Successfully got the geometry! Now we translate it into our custom struct.
     m_geometry.bytesPerSector = diskGeometry.Geometry.BytesPerSector;
-
-    // DiskSize is the total capacity in bytes.
-    // We divide by bytesPerSector to calculate exactly how many sectors exist
-    // on the drive.
-    m_geometry.totalSectors =
-        diskGeometry.DiskSize.QuadPart / diskGeometry.Geometry.BytesPerSector;
-
+    m_geometry.totalSectors = diskGeometry.DiskSize.QuadPart / diskGeometry.Geometry.BytesPerSector;
     m_geometry.devicePath = m_devicePath;
     return true;
+  } else {
+    // Fallback for regular file testing
+    LARGE_INTEGER fileSize;
+    if (GetFileSizeEx(m_hDevice, &fileSize)) {
+      m_geometry.bytesPerSector = 512;
+      m_geometry.totalSectors = fileSize.QuadPart / 512;
+      m_geometry.devicePath = m_devicePath;
+      return true;
+    }
   }
 
   return false;

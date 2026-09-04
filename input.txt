@@ -1,0 +1,3 @@
+C:\CS\Projects\Secure Erasure and Recovery\Secure-data-erasure-and-recovery\ext3.img
+2
+WIPE
