@@ -42,7 +42,7 @@ int main() {
     // AGGRESSIVELY LOCK AND DISMOUNT THE VOLUME
     // If we don't do this, Windows OS will aggressively cache the file in RAM,
     // intercept our writes, and possibly even overwrite our erased sectors with its cached copy!
-    std::cout << "\nAttempting to lock and dismount volume to bypass Windows Cache...\n";
+    std::cout << "\nAttempting to lock and dismount volume to bypass OS Cache...\n";
     if (osDevice.LockVolume()) {
         std::cout << "  -> Volume Locked!\n";
     } else {
@@ -50,7 +50,7 @@ int main() {
     }
 
     if (osDevice.DismountVolume()) {
-        std::cout << "  -> Volume Dismounted! Windows Cache dropped.\n";
+        std::cout << "  -> Volume Dismounted! OS Cache dropped.\n";
     }
 
     // Select Filesystem

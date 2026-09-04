@@ -6,6 +6,8 @@
 #include <linux/fs.h>
 #include <sys/file.h>
 #include <sys/mount.h>
+#include <cstdlib>   // For posix_memalign and free
+#include <cstring>   // For std::memcpy
 
 namespace Erasure {
 namespace OS {
@@ -25,11 +27,9 @@ bool LinuxStorageDevice::Open(const std::string &devicePath) {
 
     m_devicePath = devicePath;
 
-    // Open handle to physical drive (e.g., "/dev/sda" or "/dev/nvme0n1")
-    // O_RDWR: Read and Write access
-    // Note: O_DIRECT can be added to bypass kernel caches, but it requires 
-    // memory buffers to be strictly sector-aligned via posix_memalign().
-    m_fd = open(devicePath.c_str(), O_RDWR);
+    // Open handle to physical drive with O_DIRECT (bypass page cache) 
+    // and O_SYNC (synchronous physical writes)
+    m_fd = open(devicePath.c_str(), O_RDWR | O_DIRECT | O_SYNC);
 
     if (m_fd < 0) {
         return false;
@@ -79,9 +79,21 @@ bool LinuxStorageDevice::ReadSectors(uint64_t startSector, uint32_t sectorCount,
     uint64_t offset = startSector * m_geometry.bytesPerSector;
     size_t bytesToRead = sectorCount * m_geometry.bytesPerSector;
 
-    // pread64 reads from a specific offset without changing the global file pointer
-    ssize_t bytesRead = pread64(m_fd, buffer, bytesToRead, offset);
+    // O_DIRECT requires strictly aligned memory buffers
+    void* alignedBuffer = nullptr;
+    if (posix_memalign(&alignedBuffer, m_geometry.bytesPerSector, bytesToRead) != 0) {
+        return false; // Memory allocation failed
+    }
 
+    // pread64 reads directly from metal into the aligned buffer
+    ssize_t bytesRead = pread64(m_fd, alignedBuffer, bytesToRead, offset);
+
+    // If successful, copy it back into the parser's unaligned buffer
+    if (bytesRead == static_cast<ssize_t>(bytesToRead)) {
+        std::memcpy(buffer, alignedBuffer, bytesToRead);
+    }
+
+    free(alignedBuffer);
     return (bytesRead == static_cast<ssize_t>(bytesToRead));
 }
 
@@ -91,9 +103,19 @@ bool LinuxStorageDevice::WriteSectors(uint64_t startSector, uint32_t sectorCount
     uint64_t offset = startSector * m_geometry.bytesPerSector;
     size_t bytesToWrite = sectorCount * m_geometry.bytesPerSector;
 
-    // pwrite64 writes to a specific offset safely
-    ssize_t bytesWritten = pwrite64(m_fd, buffer, bytesToWrite, offset);
+    // O_DIRECT requires strictly aligned memory buffers
+    void* alignedBuffer = nullptr;
+    if (posix_memalign(&alignedBuffer, m_geometry.bytesPerSector, bytesToWrite) != 0) {
+        return false; 
+    }
 
+    // Copy the parser's unaligned data INTO the aligned buffer before writing
+    std::memcpy(alignedBuffer, buffer, bytesToWrite);
+
+    // Write directly to metal, bypassing the OS cache
+    ssize_t bytesWritten = pwrite64(m_fd, alignedBuffer, bytesToWrite, offset);
+
+    free(alignedBuffer);
     return (bytesWritten == static_cast<ssize_t>(bytesToWrite));
 }
 
@@ -111,19 +133,12 @@ bool LinuxStorageDevice::UnlockVolume() {
 
 bool LinuxStorageDevice::DismountVolume() {
     if (m_fd < 0) return false;
-    
-    // In Linux, we flush the block device's kernel buffers before raw wiping.
-    // To literally unmount an active filesystem, you would use umount(m_devicePath.c_str()), 
-    // but flushing the block buffer is the equivalent safety step for a raw device handle.
+    // Flush any lingering kernel block buffers before raw wiping
     return ioctl(m_fd, BLKFLSBUF, 0) == 0;
 }
 
 bool LinuxStorageDevice::SendDeviceCommand(uint32_t controlCode, void *inBuffer, uint32_t inSize, void *outBuffer, uint32_t outSize) {
     if (m_fd < 0) return false;
-    
-    // Linux ioctl APIs typically pack all arguments (input and output) 
-    // into a single struct pointer (e.g., nvme_passthru_cmd or sg_io_hdr_t).
-    // The hardware controller layer is expected to pass that struct into `inBuffer`.
     return ioctl(m_fd, controlCode, inBuffer) == 0;
 }
 
