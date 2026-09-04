@@ -27,13 +27,21 @@
     margin: 0;
     min-width: 0;
     min-height: 100vh;
+    overflow: hidden;
     background-color: var(--bg-main);
     color: var(--text-pure);
   }
 
   #root {
-    min-width: 100vw;
-    min-height: 100vh;
+    width: 100%;
+    min-width: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   /* Force all borders to default to your 1px structural outline color */
@@ -62,5 +70,14 @@
   /* Alternative: Literally a 1px colored line/accent to sit next to grayscale text */
   .status-pixel {
     @apply inline-block w-[2px] h-3 rounded-none; 
+  }
+
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
   }
 }

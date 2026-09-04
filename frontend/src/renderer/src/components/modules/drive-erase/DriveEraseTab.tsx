@@ -179,7 +179,7 @@ export function DriveEraseTab(): React.ReactElement {
               type="button"
               disabled={!canRequestErase}
               onClick={() => setDialogOpen(true)}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-status-error px-3 py-3 text-sm font-medium text-white transition-colors hover:bg-status-error/85 disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-ui-outline bg-ui-selection px-3 py-3 text-sm font-medium text-text-pure transition-colors hover:border-text-pure hover:bg-text-pure hover:text-background-main disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
             >
               <HardDriveDownload className="h-4 w-4" />
               {selectedDevice ? `Sanitize ${selectedDevice.path}` : 'Select a device to continue'}
@@ -253,7 +253,7 @@ export function DriveEraseTab(): React.ReactElement {
                   type="button"
                   disabled={!canConfirm}
                   onClick={startErase}
-                  className="rounded-md bg-status-error px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-status-error/85 disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
+                  className="rounded-md border border-ui-outline bg-ui-selection px-3 py-2 text-sm font-medium text-text-pure transition-colors hover:border-text-pure hover:bg-text-pure hover:text-background-main disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
                 >
                   Execute erase
                 </button>

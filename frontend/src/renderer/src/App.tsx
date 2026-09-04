@@ -5,6 +5,7 @@ import AppShell from './components/layout/Appshell'
 import type { NavItem } from './components/layout/ActivityBar'
 import { DriveEraseTab } from './components/modules/drive-erase/DriveEraseTab'
 import { FileEraseTab } from './components/modules/file-erase/FileEraseTab'
+import { RecoveryTab } from './components/modules/recovery/RecoveryTab'
 
 function App() {
   const [activeTab, setActiveTab] = useState<NavItem>('file-erase')
@@ -14,14 +15,14 @@ function App() {
     if (activeTab === 'file-erase') {
       return (
         <div className="flex h-full min-h-0 gap-4">
-          <aside className={`hidden shrink-0 lg:block ${explorerOpen ? 'w-72' : 'w-10'}`}>
+          <aside className={`hidden h-full min-h-0 shrink-0 lg:block ${explorerOpen ? 'w-72' : 'w-10'}`}>
             <FileSystemTree
               panel
               explorerOpen={explorerOpen}
               onToggleExplorer={() => setExplorerOpen((open) => !open)}
             />
           </aside>
-          <section className="min-w-0 flex-1">
+          <section className="scrollbar-hidden h-full min-h-0 min-w-0 flex-1 overflow-y-auto">
             <FileEraseTab />
           </section>
         </div>
@@ -34,6 +35,10 @@ function App() {
 
     if (activeTab === 'drive-erase') {
       return <DriveEraseTab />
+    }
+
+    if (activeTab === 'recovery') {
+      return <RecoveryTab />
     }
 
     return (

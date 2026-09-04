@@ -63,7 +63,7 @@ export default function Header() {
       
       <button 
         onClick={() => window.api.closeWindow()}
-        className="h-full px-3 text-text-muted hover:text-text-pure hover:bg-status-error"
+        className="h-full px-3 text-text-muted hover:bg-ui-selection hover:text-text-pure"
       >
         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
           <path strokeLinecap="square" d="M6 18L18 6M6 6l12 12" />

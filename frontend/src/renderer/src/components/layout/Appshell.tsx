@@ -11,7 +11,7 @@ interface AppShellProps {
 
 export default function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-background-main text-text-pure">
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-background-main text-text-pure">
       {/* Top Window Control Header */}
       <Header />
 
@@ -21,7 +21,7 @@ export default function AppShell({ activeTab, onTabChange, children }: AppShellP
         <ActivityBar activeTab={activeTab} onTabChange={onTabChange} />
 
         {/* Primary Viewport Area */}
-        <main className="min-w-0 flex-1 overflow-auto bg-background-main p-4">
+        <main className="scrollbar-hidden min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-background-main p-4">
           {children}
         </main>
       </div>

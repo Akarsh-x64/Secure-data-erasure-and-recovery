@@ -99,10 +99,12 @@ export function FileEraseTab(): ReactElement {
             Selective logical sanitization with an auditable NIST 800-88 clear profile.
           </p>
         </div>
-        <div className="flex items-center gap-3 text-xs text-text-muted">
-          <span className={`h-1.5 w-1.5 rounded-full ${statusColor}`} />
-          <span>{statusLabel}</span>
-        </div>
+        {executionState !== 'ready' && (
+          <div className="flex items-center gap-3 text-xs text-text-muted">
+            <span className={`h-1.5 w-1.5 rounded-full ${statusColor}`} />
+            <span>{statusLabel}</span>
+          </div>
+        )}
       </header>
 
       <div className="flex flex-col gap-3 rounded-lg border border-ui-outline bg-background-sidebar p-3 lg:flex-row lg:items-center">

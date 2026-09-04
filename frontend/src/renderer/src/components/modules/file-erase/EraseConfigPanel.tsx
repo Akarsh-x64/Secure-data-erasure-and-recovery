@@ -107,7 +107,7 @@ export function EraseConfigPanel({
               max={7}
               value={config.passCount}
               onChange={(event) => update({ passCount: Number(event.target.value) })}
-              className="w-full accent-status-warning"
+              className="w-full accent-text-pure"
             />
             <output className="w-9 rounded-md border border-ui-outline bg-background-main py-1 text-center text-sm text-text-pure">
               {config.passCount}
@@ -119,7 +119,7 @@ export function EraseConfigPanel({
           type="button"
           disabled={!nistReady}
           onClick={onRequestErase}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-status-error px-3 py-3 text-sm font-medium text-white transition-colors hover:bg-status-error/85 disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-ui-outline bg-ui-selection px-3 py-3 text-sm font-medium text-text-pure transition-colors hover:border-text-pure hover:bg-text-pure hover:text-background-main disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
         >
           <ShieldCheck className="h-4 w-4" /> Review and erase {targetCount} target
           {targetCount === 1 ? '' : 's'}

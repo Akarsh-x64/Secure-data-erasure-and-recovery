@@ -169,9 +169,9 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
   }
 
   return (
-    <div className={`grid grid-cols-1 ${panel ? '' : 'lg:grid-cols-12'} h-full w-full overflow-hidden rounded-lg border border-[var(--ui-outline)] bg-[var(--bg-main)] font-sans text-[var(--text-pure)] select-none`}>
+    <div className={`grid grid-cols-1 ${panel ? '' : 'lg:grid-cols-12'} h-full min-h-0 w-full overflow-hidden rounded-lg border border-[var(--ui-outline)] bg-[var(--bg-main)] font-sans text-[var(--text-pure)] select-none`}>
       {/* Sidebar / Explorer Tree Container (5 columns on LG) */}
-      <div className="lg:col-span-5 flex flex-col h-full bg-[var(--bg-sidebar)] border-r border-[var(--ui-outline)]">
+      <div className="lg:col-span-5 flex h-full min-h-0 flex-col bg-[var(--bg-sidebar)] border-r border-[var(--ui-outline)]">
         {/* Explorer Header */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--ui-outline)] bg-[var(--bg-icon)]">
           <div className="flex items-center space-x-2">
@@ -257,7 +257,7 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
         </div>
 
         {/* Tree Nodes List */}
-        <div className="flex-1 overflow-y-auto py-1">
+        <div className="scrollbar-hidden flex-1 overflow-y-auto py-1">
           {filteredData.length > 0 ? (
             filteredData.map((node) => (
               <TreeNode
