@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <cstdlib>
 
 // Include our Engine Layers
 #include "../Erasure/OS/Linux/LinuxStorageDevice.h"
@@ -10,7 +11,7 @@
 
 int main() {
     std::cout << "==========================================\n";
-    std::cout << "   Secure Erasure Engine - Interactive    \n";
+    std::cout << "    Secure Erasure Engine - Interactive     \n";
     std::cout << "==========================================\n\n";
 
     std::cout << "Path Formats for Linux:\n";
@@ -40,8 +41,6 @@ int main() {
     Erasure::Hardware::HDDController hardware(&osDevice);
 
     // AGGRESSIVELY LOCK AND DISMOUNT THE VOLUME
-    // If we don't do this, Windows OS will aggressively cache the file in RAM,
-    // intercept our writes, and possibly even overwrite our erased sectors with its cached copy!
     std::cout << "\nAttempting to lock and dismount volume to bypass OS Cache...\n";
     if (osDevice.LockVolume()) {
         std::cout << "  -> Volume Locked!\n";
@@ -94,19 +93,41 @@ int main() {
         return 0;
     }
 
+    bool success = false;
     if (filename == "WIPE") {
         std::cout << "\nWARNING: Initiating Full Volume Wipe!\n";
-        if (fsDriver->WipeVolume()) {
+        success = fsDriver->WipeVolume();
+        if (success) {
             std::cout << "[SUCCESS] Volume wiped cleanly while preserving core filesystem structures.\n";
         } else {
             std::cout << "[FAILED] WipeVolume failed.\n";
         }
     } else {
         std::cout << "\nNow attempting to securely delete '" << filename << "'...\n";
-        if (fsDriver->EraseFile(filename)) {
+        success = fsDriver->EraseFile(filename);
+        if (success) {
             std::cout << "[SUCCESS] '" << filename << "' was completely obliterated from the drive!\n";
         } else {
             std::cout << "[FAILED] Could not delete " << filename << "\n";
+        }
+    }
+
+    if (success) {
+        std::cout << "[System] Triggering native OS filesystem consistency check...\n";
+        osDevice.Close();
+
+        std::string repairCommand;
+        if (choice == "2") {
+            repairCommand = "sudo e2fsck -f -y " + path;
+        } else {
+            repairCommand = "sudo fsck.exfat -y " + path;
+        }
+
+        int result = std::system(repairCommand.c_str());
+        if (result == 0) {
+            std::cout << "[SUCCESS] Native OS metadata check completed cleanly. Filesystem is fully consistent.\n";
+        } else {
+            std::cout << "[WARNING] Filesystem check completed with exit code: " << result << "\n";
         }
     }
 
