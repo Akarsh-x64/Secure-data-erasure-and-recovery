@@ -1,3 +1,9 @@
 plans/
 *.exe
 *.img
+
+# Dependencies and generated output
+node_modules/
+dist/
+out/
+*.log
