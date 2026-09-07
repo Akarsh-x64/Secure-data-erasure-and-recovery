@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dfxml xmloutputversion='1.0'>
+  <metadata 
+  xmlns='http://www.forensicswiki.org/wiki/Category:Digital_Forensics_XML' 
+  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
+  xmlns:dc='http://purl.org/dc/elements/1.1/'>
+    <dc:type>Carve Report</dc:type>
+  </metadata>
+  <creator>
+    <package>PhotoRec</package>
+    <version>7.3-WIP</version>
+    <build_environment>
+      <compiler>GCC 13.4, Cygwin32 3003.3</compiler>
+      <library name='libext2fs' version='1.45.3'/>
+      <library name='libewf' version='20140608'/>
+      <library name='libjpeg' version='libjpeg-turbo-1.5.3'/>
+      <library name='libntfs' version='available'/>
+      <library name='zlib' version='1.2.11'/>
+    </build_environment>
+    <execution_environment>
+      <os_sysname>Windows</os_sysname>
+      <os_release>Windows 8 (9200)</os_release>
+      <os_version>Windows 8 (9200)</os_version>
+      <host>SHABNAM</host>
+      <arch>i686</arch>
+      <uid>197609</uid>
+      <start_time>2026-09-07T21:46:58+0530</start_time>
+    </execution_environment>
+  </creator>
+  <source>
+    <image_filename>C:\Users\Amit\sih\Secure-data-erasure-and-recovery\Recovery\Carving\Tests\Scalpel3CarverTest\test.img</image_filename>
+    <sectorsize>512</sectorsize>
+    <image_size>268435456</image_size>
+    <volume>
+      <byte_runs>
+        <byte_run offset='0' img_offset='0' len='268435456'/>
+      </byte_runs>
+      <block_size>512</block_size>
+    </volume>
+  </source>
+  <configuration>
+  </configuration>
+  <fileobject>
+    <filename>f0008099.jpg</filename>
+    <filesize>47905</filesize>
+    <byte_runs>
+      <byte_run offset='0' img_offset='4146688' len='65536'/>
+    </byte_runs>
+  </fileobject>
+</dfxml>

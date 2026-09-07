@@ -10,6 +10,32 @@
 namespace Recovery {
 namespace Core {
 
+    struct FileNameRecord {
+        std::string name;
+        std::string shortName;
+        std::string path;
+        uint64_t parentRecordId = 0;
+        uint64_t parentSequence = 0;
+        uint64_t metadataSequence = 0;
+        bool allocated = false;
+        bool deleted = false;
+    };
+
+    struct FileAttributeRecord {
+        uint16_t id = 0;
+        uint32_t type = 0;
+        uint32_t flags = 0;
+        std::string name;
+        uint64_t size = 0;
+        uint64_t allocatedSize = 0;
+        uint64_t initializedSize = 0;
+        uint32_t compressionSize = 0;
+        uint32_t skipLength = 0;
+        bool resident = false;
+        bool compressed = false;
+        bool sparse = false;
+    };
+
     /**
      * @brief Filesystem-independent file representation.
      *
@@ -29,6 +55,28 @@ namespace Core {
         uint64_t createdTime;           // Creation timestamp (epoch seconds)
         uint64_t modifiedTime;          // Last modification timestamp
         uint64_t accessedTime;          // Last access timestamp
+        uint64_t changeTime = 0;
+        uint64_t deletionTime = 0;
+        uint32_t createdTimeNanos = 0;
+        uint32_t modifiedTimeNanos = 0;
+        uint32_t accessedTimeNanos = 0;
+        uint32_t changeTimeNanos = 0;
+
+        uint64_t sequenceNumber = 0;
+        uint32_t metadataFlags = 0;
+        uint32_t metadataType = 0;
+        uint64_t uid = 0;
+        uint64_t gid = 0;
+        uint64_t linkCount = 0;
+        bool isDirectory = false;
+        bool isCompressed = false;
+        bool isSparse = false;
+        std::string symbolicLinkTarget;
+        uint32_t nameFlags = 0;
+        uint64_t parentRecordId = 0;
+        uint64_t parentSequence = 0;
+        std::vector<FileNameRecord> names;
+        std::vector<FileAttributeRecord> attributes;
 
         bool allocated;                 // Still allocated in the filesystem
         bool deleted;                   // Marked as deleted

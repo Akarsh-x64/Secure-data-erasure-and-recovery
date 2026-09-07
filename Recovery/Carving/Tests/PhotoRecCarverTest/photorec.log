@@ -1,0 +1,48 @@
+
+Using locale 'C.UTF-8'.
+
+
+Mon Sep  7 21:46:58 2026
+Command line: PhotoRec /log /d C:\Users\Amit\sih\Secure-data-erasure-and-recovery\Recovery\Carving\Tests\PhotoRecCarverTest\real_photorec_output /cmd C:\Users\Amit\sih\Secure-data-erasure-and-recovery\Recovery\Carving\Tests\Scalpel3CarverTest\test.img partition_none,fileopt,everything,disable,fileopt,jpg,enable,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\Users\Amit\sih\Secure-data-erasure-and-recovery\Recovery\Carving\Tests\Scalpel3CarverTest\test.img - 268 MB / 256 MiB -, sector size=512
+
+Partition table type (auto): None
+Disk C:\Users\Amit\sih\Secure-data-erasure-and-recovery\Recovery\Carving\Tests\Scalpel3CarverTest\test.img - 268 MB / 256 MiB (
+Partition table type: None
+heads/cylinder 16 (FAT) != 255 (HD)
+sect/track 32 (FAT) != 63 (HD)
+set_FAT_info: name from BS used
+FAT: cluster=2(0x2), pos=8098
+     Unknown                  0   0  1    32 162  2     524288 [Whole disk]
+   P FAT32                    0   0  1    32 162  2     524288 [NO NAME]
+     FAT32, blocksize=512, 268 MB / 256 MiB
+
+Interface File Select
+
+Interface File Select
+1 first-level signatures enabled
+
+Analyse
+   P FAT32                    0   0  1    32 162  2     524288 [NO NAME]
+     FAT32, blocksize=512, 268 MB / 256 MiB
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=32768, offset=17920
+Elapsed time 0h00m01s
+Pass 1 (blocksize=32768) STATUS_EXT2_OFF
+File should not be bigger than 52428800, stopped adding data
+C:\Users\Amit\sih\Secure-data-erasure-and-recovery\Recovery\Carving\Tests\PhotoRecCarverTest\real_photorec_output.1/f0008099.jpg	 8099-8226
+Elapsed time 0h00m01s
+Pass 1 +1 file
+jpg: 1/1 recovered
+Total: 1 file found
+
+524160 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.

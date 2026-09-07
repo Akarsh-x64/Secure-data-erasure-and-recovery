@@ -43,7 +43,7 @@ namespace Filesystems {
         virtual bool EnumerateFiles(
             std::vector<Core::FileRecord>& results) = 0;
 
-        /**
+        /** m
          * @brief Retrieves metadata for a specific file by its ID.
          */
         virtual bool GetFileMetadata(
