@@ -6,6 +6,7 @@ import type { NavItem } from './components/layout/ActivityBar'
 import { DriveEraseTab } from './components/modules/drive-erase/DriveEraseTab'
 import { FileEraseTab } from './components/modules/file-erase/FileEraseTab'
 import { RecoveryTab } from './components/modules/recovery/RecoveryTab'
+import { AuditLogsTab } from './components/modules/audit-logs/AuditLogsTabs'
 
 function App() {
   const [activeTab, setActiveTab] = useState<NavItem>('file-erase')
@@ -35,6 +36,10 @@ function App() {
 
     if (activeTab === 'recovery') {
       return <RecoveryTab />
+    }
+
+    if(activeTab==='audit'){
+      return <AuditLogsTab/>
     }
 
     return (
