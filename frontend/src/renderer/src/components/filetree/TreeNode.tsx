@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, Scissors, Flame } from 'lucide-react';
+import { ChevronRight, ChevronDown, Scissors, ScanSearch } from 'lucide-react';
 import { FileIcon } from './FileIcon';
 
 export interface ForensicNode {
@@ -22,7 +22,9 @@ interface TreeNodeProps {
   depth?: number;
   selectedId: string | null;
   onSelect: (node: ForensicNode) => void;
-  onToggleFlag: (id: string, type: 'erasure' | 'carving') => void;
+  actionMode?: 'erase' | 'recovery';
+  onAction?: (node: ForensicNode) => void;
+  markedNodeIds?: ReadonlySet<string>;
 }
 
 export const TreeNode: React.FC<TreeNodeProps> = ({
@@ -30,26 +32,30 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
   depth = 0,
   selectedId,
   onSelect,
-  onToggleFlag,
+  actionMode,
+  onAction,
+  markedNodeIds,
 }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [isOpen, setIsOpen] = useState<boolean>(depth === 0);
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const isSelected = selectedId === node.id;
+  const marked = markedNodeIds?.has(node.id) ?? false;
   const hasChildren = Boolean(node.children && node.children.length > 0);
+  const showAction = actionMode === 'erase' || (actionMode === 'recovery' && !node.isDirectory && node.isCorrupted);
 
-  const handleToggleExpand = (e: React.MouseEvent) => {
+  const handleToggleExpand = (e: React.MouseEvent): void => {
     e.stopPropagation();
     if (hasChildren || node.isDirectory) {
       setIsOpen(!isOpen);
     }
   };
 
-  const handleSelectNode = () => {
+  const handleSelectNode = (): void => {
     onSelect(node);
   };
 
-  const handleContextMenu = (e: React.MouseEvent) => {
+  const handleContextMenu = (e: React.MouseEvent): void => {
     e.preventDefault();
     setShowMenu(!showMenu);
   };
@@ -101,6 +107,12 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         {/* File/folder name */}
         <span className="truncate text-[13px]">{node.name}</span>
 
+        {marked && (
+          <span className="ml-2 shrink-0 rounded-full border border-status-valid/40 bg-status-valid/10 px-1.5 py-0.5 text-[10px] font-medium text-status-valid">
+            {actionMode === 'recovery' ? 'Carve' : 'Erase'}
+          </span>
+        )}
+
         {/* Deleted & confidence tag */}
         {node.isDeleted && (
           <span className="ml-1.5 truncate text-xs text-status-warning/90">
@@ -110,48 +122,29 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
         {/* Active flag badges */}
         <div className="ml-auto flex shrink-0 items-center gap-1">
-          {node.flaggedForCarving && (
-            <span className="rounded-full border border-status-warning/40 bg-status-warning/15 px-2 py-0.5 text-xs text-status-warning">
-              Carve
-            </span>
-          )}
-          {node.flaggedForErasure && (
-            <span className="rounded-full border border-status-error/40 bg-status-error/15 px-2 py-0.5 text-xs text-status-error">
-              Erase
-            </span>
-          )}
-
           {/* Quick action buttons on hover */}
-          <div className="ml-1 hidden items-center gap-1 group-hover:flex">
-            <button
-              title="Flag for file carving"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFlag(node.id, 'carving');
-              }}
-              className={`rounded p-1 hover:bg-ui-outline ${
-                node.flaggedForCarving ? 'text-status-warning' : 'text-text-muted'
-              }`}
-            >
-              <Scissors className="h-3.5 w-3.5" />
-            </button>
-            <button
-              title="Flag for target erasure"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFlag(node.id, 'erasure');
-              }}
-              className={`rounded p-1 hover:bg-ui-outline ${
-                node.flaggedForErasure ? 'text-status-error' : 'text-text-muted'
-              }`}
-            >
-              <Flame className="h-3.5 w-3.5" />
-            </button>
-          </div>
+          {showAction && onAction && (
+            <div className="ml-1 hidden items-center gap-1 group-hover:flex">
+              <button
+                title={actionMode === 'erase' ? 'Move to erase target queue' : 'Move to recovery queue'}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction(node);
+                }}
+                className="rounded p-1 text-text-muted hover:bg-ui-outline hover:text-status-warning"
+              >
+                {actionMode === 'erase' ? (
+                  <Scissors className="h-3.5 w-3.5" />
+                ) : (
+                  <ScanSearch className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Context menu popup */}
-        {showMenu && (
+        {showMenu && showAction && onAction && (
           <div
             className="absolute right-2 top-8 z-50 w-48 rounded-md border border-ui-outline bg-background-sidebar py-1 text-sm shadow-xl"
             onMouseLeave={() => setShowMenu(false)}
@@ -159,24 +152,17 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onToggleFlag(node.id, 'carving');
+                onAction(node);
                 setShowMenu(false);
               }}
               className="flex w-full items-center px-3 py-2 text-left text-text-pure hover:bg-ui-selection"
             >
-              <Scissors className="mr-2 h-4 w-4 text-status-warning" />
-              {node.flaggedForCarving ? 'Remove carving flag' : 'Flag for carving'}
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFlag(node.id, 'erasure');
-                setShowMenu(false);
-              }}
-              className="flex w-full items-center px-3 py-2 text-left text-text-pure hover:bg-ui-selection"
-            >
-              <Flame className="mr-2 h-4 w-4 text-status-error" />
-              {node.flaggedForErasure ? 'Remove erasure flag' : 'Flag for erasure'}
+              {actionMode === 'erase' ? (
+                <Scissors className="mr-2 h-4 w-4 text-status-warning" />
+              ) : (
+                <ScanSearch className="mr-2 h-4 w-4 text-status-warning" />
+              )}
+              {actionMode === 'erase' ? 'Move to erase target queue' : 'Move to recovery queue'}
             </button>
           </div>
         )}
@@ -192,7 +178,9 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
               depth={depth + 1}
               selectedId={selectedId}
               onSelect={onSelect}
-              onToggleFlag={onToggleFlag}
+              actionMode={actionMode}
+              onAction={onAction}
+              markedNodeIds={markedNodeIds}
             />
           ))}
         </div>

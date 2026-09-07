@@ -1,15 +1,15 @@
 import React, { useRef, useState } from 'react';
-import { FileArchive, HardDrive, UploadCloud, X } from 'lucide-react';
+import { FileArchive, FolderSearch, Loader2, UploadCloud, X } from 'lucide-react';
 
-export type ImageSourceMode = 'file' | 'sectors';
+export type ImageSourceMode = 'file' | 'directory';
 
 export interface ImageSource {
   mode: ImageSourceMode;
   fileName?: string;
   fileSize?: string;
-  devicePath?: string;
-  startSector?: number;
-  endSector?: number;
+  directoryPath?: string;
+  directoryFiles?: File[];
+  directoryScanned?: boolean;
 }
 
 interface DiskImageSelectorProps {
@@ -18,6 +18,8 @@ interface DiskImageSelectorProps {
   disabled?: boolean;
 }
 
+type ScanState = 'idle' | 'scanning' | 'scanned';
+
 export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
   source,
   onSourceChange,
@@ -25,7 +27,9 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
 }) => {
   const [mode, setMode] = useState<ImageSourceMode>(source?.mode ?? 'file');
   const [isDragging, setIsDragging] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [scanState, setScanState] = useState<ScanState>('idle');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const directoryInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = (files: FileList | null): void => {
     if (!files || files.length === 0) return;
@@ -35,18 +39,54 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
     onSourceChange({ mode: 'file', fileName: file.name, fileSize: sizeLabel });
   };
 
+  const handleDirectory = (files: FileList | null): void => {
+    if (!files || files.length === 0) return;
+    const relativePath = (files[0] as File & { webkitRelativePath?: string }).webkitRelativePath;
+    const folderName = relativePath ? relativePath.split('/')[0] : `${files.length} files selected`;
+    setScanState('idle');
+    onSourceChange({
+      mode: 'directory',
+      directoryPath: folderName,
+      directoryFiles: Array.from(files),
+      directoryScanned: false,
+    });
+  };
+
+  const runScan = (): void => {
+    setScanState('scanning');
+    setTimeout(() => {
+      setScanState('scanned');
+      if (source?.directoryPath) {
+        onSourceChange({ ...source, directoryScanned: true });
+      }
+    }, 1600);
+  };
+
+  const resetDirectory = (): void => {
+    setScanState('idle');
+    onSourceChange({ mode: 'directory', directoryScanned: false });
+  };
+
+  const switchMode = (next: ImageSourceMode): void => {
+    setMode(next);
+    setScanState('idle');
+    onSourceChange({ mode: next });
+  };
+
   return (
     <section className="rounded-lg border border-ui-outline bg-background-sidebar">
       <div className="flex items-center justify-between border-b border-ui-outline px-4 py-3">
         <div>
           <h2 className="text-sm font-medium text-text-pure">Image source</h2>
-          <p className="mt-0.5 text-xs text-text-muted">Raw disk dump or unallocated sector range</p>
+          <p className="mt-0.5 text-xs text-text-muted">
+            Raw disk dump or a directory to scan for corrupted files
+          </p>
         </div>
         <div className="flex items-center rounded-md border border-ui-outline bg-background-icon p-0.5 text-xs">
           <button
             type="button"
             disabled={disabled}
-            onClick={() => setMode('file')}
+            onClick={() => switchMode('file')}
             className={`rounded px-2.5 py-1 transition-colors disabled:cursor-not-allowed ${
               mode === 'file' ? 'bg-ui-selection text-text-pure' : 'text-text-muted hover:text-text-pure'
             }`}
@@ -56,12 +96,12 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
           <button
             type="button"
             disabled={disabled}
-            onClick={() => setMode('sectors')}
+            onClick={() => switchMode('directory')}
             className={`rounded px-2.5 py-1 transition-colors disabled:cursor-not-allowed ${
-              mode === 'sectors' ? 'bg-ui-selection text-text-pure' : 'text-text-muted hover:text-text-pure'
+              mode === 'directory' ? 'bg-ui-selection text-text-pure' : 'text-text-muted hover:text-text-pure'
             }`}
           >
-            Sector range
+            Directory
           </button>
         </div>
       </div>
@@ -111,7 +151,7 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
                 <button
                   type="button"
                   disabled={disabled}
-                  onClick={() => inputRef.current?.click()}
+                  onClick={() => fileInputRef.current?.click()}
                   className="text-status-valid underline-offset-2 hover:underline disabled:cursor-not-allowed"
                 >
                   browse files
@@ -119,7 +159,7 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
               </p>
               <p className="text-xs text-text-muted">Supports .dd, .img, .raw, and .bin images</p>
               <input
-                ref={inputRef}
+                ref={fileInputRef}
                 type="file"
                 accept=".dd,.img,.raw,.bin"
                 className="hidden"
@@ -128,66 +168,88 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
               />
             </div>
           )
-        ) : (
+        ) : scanState === 'scanned' ? (
           <div className="space-y-3">
-            <label className="block text-xs text-text-muted">
-              Device path
-              <input
-                type="text"
+            <div className="flex items-center justify-between rounded-md border border-ui-outline bg-background-main px-3 py-2.5">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <FolderSearch className="h-4 w-4 shrink-0 text-status-valid" />
+                <span className="truncate text-sm text-text-pure">{source?.directoryPath}</span>
+                <span className="shrink-0 rounded-full border border-status-valid/40 bg-status-valid/10 px-2 py-0.5 text-xs text-status-valid">
+                  Scan complete
+                </span>
+              </div>
+              <button
+                type="button"
                 disabled={disabled}
-                value={source?.devicePath ?? ''}
-                onChange={(e) =>
-                  onSourceChange({
-                    mode: 'sectors',
-                    devicePath: e.target.value,
-                    startSector: source?.startSector ?? 0,
-                    endSector: source?.endSector ?? 0,
-                  })
-                }
-                placeholder="/dev/sdb1"
-                className="mt-1.5 w-full rounded-md border border-ui-outline bg-background-main px-3 py-2 text-sm text-text-pure outline-none placeholder:text-text-muted/60 focus:border-status-valid disabled:cursor-not-allowed"
-              />
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <label className="block text-xs text-text-muted">
-                Start sector
-                <input
-                  type="number"
-                  disabled={disabled}
-                  value={source?.startSector ?? 0}
-                  onChange={(e) =>
-                    onSourceChange({
-                      mode: 'sectors',
-                      devicePath: source?.devicePath ?? '',
-                      startSector: Number(e.target.value),
-                      endSector: source?.endSector ?? 0,
-                    })
-                  }
-                  className="mt-1.5 w-full rounded-md border border-ui-outline bg-background-main px-3 py-2 text-sm text-text-pure outline-none focus:border-status-valid disabled:cursor-not-allowed"
-                />
-              </label>
-              <label className="block text-xs text-text-muted">
-                End sector
-                <input
-                  type="number"
-                  disabled={disabled}
-                  value={source?.endSector ?? 0}
-                  onChange={(e) =>
-                    onSourceChange({
-                      mode: 'sectors',
-                      devicePath: source?.devicePath ?? '',
-                      startSector: source?.startSector ?? 0,
-                      endSector: Number(e.target.value),
-                    })
-                  }
-                  className="mt-1.5 w-full rounded-md border border-ui-outline bg-background-main px-3 py-2 text-sm text-text-pure outline-none focus:border-status-valid disabled:cursor-not-allowed"
-                />
-              </label>
+                onClick={resetDirectory}
+                title="Choose a different directory"
+                className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-status-error/15 hover:text-status-error disabled:cursor-not-allowed"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-text-muted">
-              <HardDrive className="h-3.5 w-3.5" />
-              Scans the physical device directly without mounting a file system
+            <p className="text-xs text-text-muted">
+              The directory is ready. Select a file from the recovery explorer below to add it to
+              the carving queue.
+            </p>
+          </div>
+        ) : source?.directoryPath ? (
+          <div className="flex items-center justify-between rounded-md border border-ui-outline bg-background-main px-3 py-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <FolderSearch className="h-4 w-4 shrink-0 text-text-muted" />
+              <span className="truncate text-sm text-text-pure">{source.directoryPath}</span>
             </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                disabled={disabled || scanState === 'scanning'}
+                onClick={runScan}
+                className="flex items-center gap-1.5 rounded-md bg-status-valid px-3 py-1.5 text-xs font-medium text-background-main transition-colors hover:bg-status-valid/85 disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
+              >
+                {scanState === 'scanning' ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <FolderSearch className="h-3.5 w-3.5" />
+                )}
+                {scanState === 'scanning' ? 'Scanning...' : 'Scan for corrupted files'}
+              </button>
+              <button
+                type="button"
+                disabled={disabled || scanState === 'scanning'}
+                onClick={resetDirectory}
+                title="Remove directory"
+                className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-status-error/15 hover:text-status-error disabled:cursor-not-allowed"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-ui-outline bg-background-main px-4 py-10 text-center">
+            <FolderSearch className="h-7 w-7 text-text-muted" />
+            <p className="text-sm text-text-pure">
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => directoryInputRef.current?.click()}
+                className="text-status-valid underline-offset-2 hover:underline disabled:cursor-not-allowed"
+              >
+                Choose a directory
+              </button>{' '}
+              to scan for corrupted or recoverable files
+            </p>
+            <p className="text-xs text-text-muted">
+              Scans the folder tree without depending on file system metadata
+            </p>
+            <input
+              ref={directoryInputRef}
+              type="file"
+              className="hidden"
+              disabled={disabled}
+              // @ts-expect-error non-standard attributes for directory selection
+              webkitdirectory=""
+              onChange={(e) => handleDirectory(e.target.files)}
+            />
           </div>
         )}
       </div>

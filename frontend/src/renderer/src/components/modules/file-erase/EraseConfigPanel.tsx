@@ -1,4 +1,4 @@
-import { Check, FileKey2, Gauge, ShieldCheck } from 'lucide-react'
+import { Binary, Check, FileKey2, Gauge, ShieldCheck, Shuffle } from 'lucide-react'
 import type { ReactElement } from 'react'
 
 export type OverwriteMethod = 'zero' | 'random'
@@ -82,17 +82,24 @@ export function EraseConfigPanel({
               <button
                 key={method}
                 type="button"
+                aria-pressed={config.overwriteMethod === method}
                 onClick={() => update({ overwriteMethod: method })}
-                className={`flex items-center justify-between rounded-md border px-3 py-3 text-left text-sm transition-colors ${
+                  title={method === 'zero' ? 'Single pass with zero fill' : 'Overwrite with a random data pattern'}
+                  className={`flex min-h-14 items-center gap-2.5 rounded-md border px-3 py-2.5 text-left transition-colors ${
                   config.overwriteMethod === method
-                    ? 'border-status-valid/50 bg-status-valid/10 text-text-pure'
-                    : 'border-ui-outline text-text-muted hover:bg-ui-selection/40'
+                      ? 'border-status-valid bg-status-valid/10 text-text-pure shadow-[inset_0_0_0_1px_rgba(16,185,129,0.18)]'
+                      : 'border-ui-outline text-text-muted hover:border-text-muted hover:bg-ui-selection/40'
                 }`}
               >
-                <span>{method === 'zero' ? 'Single pass, zero fill' : 'Random overwrite'}</span>
-                {config.overwriteMethod === method && (
-                  <Check className="h-4 w-4 text-status-valid" />
-                )}
+                  {method === 'zero' ? (
+                  <Binary className="h-4 w-4 shrink-0 text-status-valid" />
+                  ) : (
+                  <Shuffle className="h-4 w-4 shrink-0 text-text-muted" />
+                  )}
+                <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                  {method === 'zero' ? 'Zero fill' : 'Random fill'}
+                </span>
+                {config.overwriteMethod === method && <Check className="h-4 w-4 shrink-0 text-status-valid" />}
               </button>
             ))}
           </div>
