@@ -1,22 +1,22 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <cstdlib>
 
-// Include Engine Layers
-#include "../Erasure/OS/Windows/WindowsStorageDevice.h"
+// Include our Engine Layers
+#include "../Erasure/OS/Linux/LinuxStorageDevice.h"
 #include "../Erasure/Hardware/Magnetic/HDDController.h"
-#include "../Erasure/Core/IFileSystemDriver.h"
 #include "../Erasure/File Systems/exFAT/exFAT.h"
 #include "../Erasure/File Systems/ext4/ext4.h"
 
 int main() {
     std::cout << "==========================================\n";
-    std::cout << "   Secure Erasure Engine - Interactive    \n";
+    std::cout << "    Secure Erasure Engine - Interactive     \n";
     std::cout << "==========================================\n\n";
 
-    std::cout << "Path Formats for Windows:\n";
-    std::cout << "  - For a physical drive (e.g. Drive 1): \\\\.\\PhysicalDrive1\n";
-    std::cout << "  - For a mounted volume (e.g. E: drive): \\\\.\\E:\n\n";
+    std::cout << "Path Formats for Linux:\n";
+    std::cout << "  - For a physical drive: /dev/nvme0n1 or /dev/sda\n";
+    std::cout << "  - For a partition: /dev/sda1\n";
 
     std::cout << "Enter the path to your target device / volume: ";
     std::string path;
@@ -28,7 +28,7 @@ int main() {
     }
 
     // 1. Create the OS Layer
-    Erasure::OS::WindowsStorageDevice osDevice;
+    Erasure::OS::LinuxStorageDevice osDevice;
 
     std::cout << "\nAttempting to open handle to: " << path << " ...\n";
     if (!osDevice.Open(path)) {
@@ -41,8 +41,7 @@ int main() {
     Erasure::Hardware::HDDController hardware(&osDevice);
 
     // AGGRESSIVELY LOCK AND DISMOUNT THE VOLUME
-    // Bypasses OS caching
-    std::cout << "\nAttempting to lock and dismount volume to bypass Windows Cache...\n";
+    std::cout << "\nAttempting to lock and dismount volume to bypass OS Cache...\n";
     if (osDevice.LockVolume()) {
         std::cout << "  -> Volume Locked!\n";
     } else {
@@ -50,7 +49,7 @@ int main() {
     }
 
     if (osDevice.DismountVolume()) {
-        std::cout << "  -> Volume Dismounted! Windows Cache dropped.\n";
+        std::cout << "  -> Volume Dismounted! OS Cache dropped.\n";
     }
 
     // Select Filesystem
@@ -94,19 +93,41 @@ int main() {
         return 0;
     }
 
+    bool success = false;
     if (filename == "WIPE") {
         std::cout << "\nWARNING: Initiating Full Volume Wipe!\n";
-        if (fsDriver->WipeVolume()) {
+        success = fsDriver->WipeVolume();
+        if (success) {
             std::cout << "[SUCCESS] Volume wiped cleanly while preserving core filesystem structures.\n";
         } else {
             std::cout << "[FAILED] WipeVolume failed.\n";
         }
     } else {
         std::cout << "\nNow attempting to securely delete '" << filename << "'...\n";
-        if (fsDriver->EraseFile(filename)) {
+        success = fsDriver->EraseFile(filename);
+        if (success) {
             std::cout << "[SUCCESS] '" << filename << "' was completely obliterated from the drive!\n";
         } else {
-            std::cout << "[FAILED] Could not delete '" << filename << "'\n";
+            std::cout << "[FAILED] Could not delete " << filename << "\n";
+        }
+    }
+
+    if (success) {
+        std::cout << "[System] Triggering native OS filesystem consistency check...\n";
+        osDevice.Close();
+
+        std::string repairCommand;
+        if (choice == "2") {
+            repairCommand = "sudo e2fsck -f -y " + path;
+        } else {
+            repairCommand = "sudo fsck.exfat -y " + path;
+        }
+
+        int result = std::system(repairCommand.c_str());
+        if (result == 0) {
+            std::cout << "[SUCCESS] Native OS metadata check completed cleanly. Filesystem is fully consistent.\n";
+        } else {
+            std::cout << "[WARNING] Filesystem check completed with exit code: " << result << "\n";
         }
     }
 
