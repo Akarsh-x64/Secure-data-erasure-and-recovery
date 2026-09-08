@@ -152,7 +152,7 @@ fs::path LocateRealTestImage(const fs::path& executablePath) {
     if (configuredImage != nullptr && *configuredImage != '\0') {
         return configuredImage;
     }
-    return executablePath.parent_path() / ".." / "Scalpel3CarverTest" / "test.img";
+    return executablePath.parent_path() / "test.img";
 }
 
 std::string QuoteCommandArgument(const std::string& value) {

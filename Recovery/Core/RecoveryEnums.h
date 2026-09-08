@@ -49,7 +49,24 @@ namespace Core {
         Journal,
         Orphan,
         Partial,
-        Carving
+        Carving,
+        Combined
+    };
+
+    enum class RecoveryBackend {
+        Unknown,
+        TSK_METADATA,
+        PHOTOREC_CARVING
+    };
+
+    /**
+     * @brief Describes whether a file's physical data ranges were recovered.
+     */
+    enum class DataRangeStatus {
+        Unknown,
+        Complete,
+        Unavailable,
+        Partial
     };
 
 } // namespace Core

@@ -4,6 +4,7 @@
 #include "DataRange.h"
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -81,12 +82,18 @@ namespace Core {
         bool allocated;                 // Still allocated in the filesystem
         bool deleted;                   // Marked as deleted
         bool orphaned;                  // No parent directory reference
+        DataRangeStatus dataRangeStatus; // Whether physical data ranges are known
 
         FileSystemType filesystem;      // Source filesystem type
 
         uint64_t filesystemRecordId;    // Native FS record (MFT index, inode, etc.)
 
         std::vector<DataRange> dataRanges;  // Physical data locations on storage
+        RecoveryBackend recoveryBackend;
+        std::string sourcePath;
+        std::optional<uint32_t> partitionIndex;
+        uint64_t partitionOffset = 0;
+        uint64_t partitionSize = 0;
 
         FileRecord()
             : id(0)
@@ -97,8 +104,10 @@ namespace Core {
             , allocated(false)
             , deleted(false)
             , orphaned(false)
+            , dataRangeStatus(DataRangeStatus::Unknown)
             , filesystem(FileSystemType::Unknown)
             , filesystemRecordId(0)
+            , recoveryBackend(RecoveryBackend::Unknown)
         {}
     };
 
