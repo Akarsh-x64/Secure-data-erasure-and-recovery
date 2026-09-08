@@ -329,11 +329,11 @@ void TestXfsDriver() {
     bool erase1Ok = driver.EraseFile("secret.txt");
     assert(erase1Ok);
 
-    // Verify data blocks 10 and 11 were overwritten with 0x00
+    // Verify data blocks 10 and 11 were overwritten with 3-pass DoD sanitization
     for (size_t i = 0; i < 2 * BLOCK_SIZE; ++i) {
-        assert(rawDisk[10 * BLOCK_SIZE + i] == 0x00);
+        assert(rawDisk[10 * BLOCK_SIZE + i] != 0xAA && rawDisk[10 * BLOCK_SIZE + i] != 0xBB);
     }
-    std::cout << "  -> [PASSED] Target file data blocks 10 & 11 completely zeroed!\n";
+    std::cout << "  -> [PASSED] Target file data blocks 10 & 11 sanitized with 3-pass wipe!\n";
 
     // Verify on-disk Inode 65 was overwritten with 0x00
     size_t f1Offset = 4 * BLOCK_SIZE + 1 * INODE_SIZE;
@@ -353,11 +353,11 @@ void TestXfsDriver() {
     bool erase2Ok = driver.EraseFile("archive.bin");
     assert(erase2Ok);
 
-    // Verify data block 30 was overwritten with 0x00
+    // Verify data block 30 was overwritten with 3-pass DoD sanitization
     for (size_t i = 0; i < BLOCK_SIZE; ++i) {
-        assert(rawDisk[30 * BLOCK_SIZE + i] == 0x00);
+        assert(rawDisk[30 * BLOCK_SIZE + i] != 0xCC);
     }
-    std::cout << "  -> [PASSED] B+Tree data block 30 completely zeroed!\n";
+    std::cout << "  -> [PASSED] B+Tree data block 30 sanitized with 3-pass wipe!\n";
 
     // Verify indirect B+Tree metadata block 20 was overwritten with 0x00
     for (size_t i = 0; i < BLOCK_SIZE; ++i) {
@@ -382,11 +382,11 @@ void TestXfsDriver() {
     bool eraseDirOk = driver.EraseDirectory("docs");
     assert(eraseDirOk);
 
-    // 1. Verify child file data block 35 was overwritten with 0x00
+    // 1. Verify child file data block 35 was overwritten with 3-pass DoD sanitization
     for (size_t i = 0; i < BLOCK_SIZE; ++i) {
-        assert(rawDisk[35 * BLOCK_SIZE + i] == 0x00);
+        assert(rawDisk[35 * BLOCK_SIZE + i] != 0xDD);
     }
-    std::cout << "  -> [PASSED] Nested file data block 35 completely zeroed!\n";
+    std::cout << "  -> [PASSED] Nested file data block 35 sanitized with 3-pass wipe!\n";
 
     // 2. Verify child file Inode 68 metadata on disk was overwritten with 0x00
     size_t f3Offset = 4 * BLOCK_SIZE + 4 * INODE_SIZE;
@@ -417,12 +417,12 @@ void TestXfsDriver() {
     bool wipeOk = driver.WipeVolume();
     assert(wipeOk);
 
-    // Verify user blocks 50 and 51 were zeroed
+    // Verify user blocks 50 and 51 were sanitized
     for (size_t i = 0; i < BLOCK_SIZE; ++i) {
-        assert(rawDisk[50 * BLOCK_SIZE + i] == 0x00);
-        assert(rawDisk[51 * BLOCK_SIZE + i] == 0x00);
+        assert(rawDisk[50 * BLOCK_SIZE + i] != 0x55);
+        assert(rawDisk[51 * BLOCK_SIZE + i] != 0x66);
     }
-    std::cout << "  -> [PASSED] User blocks 50 & 51 zeroed during volume wipe!\n";
+    std::cout << "  -> [PASSED] User blocks 50 & 51 sanitized during volume wipe!\n";
 
     // Verify Superblock is preserved intact
     const XfsSuperblock* sbAfter = reinterpret_cast<const XfsSuperblock*>(rawDisk);

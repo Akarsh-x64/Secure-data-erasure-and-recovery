@@ -463,6 +463,12 @@ An exhaustive codebase audit was conducted across every subsystem in `Erasure/` 
 ### 1. `Erasure/Hardware/Magnetic/HDDController.cpp`
 * **Vulnerability Fixed**: In `OverwriteWithPattern(startSector, sectorCount, pattern)`, allocating `sectorCount * sectorSize` directly on the heap caused 32-bit arithmetic overflow on large sector spans (e.g. >= 8,388,608 sectors) and unbounded heap allocation resulting in `std::bad_alloc`.
 * **Resolution**: Replaced single-shot allocation with bounded, chunked writes (up to 1024 sectors = 512KB per iteration), processing any arbitrary sector count securely without memory exhaustion.
+* **DoD 5220.22-M 3-Pass Overwrite Standard Implemented**:
+  - `SecureEraseSectors` and `SecureEraseDrive` upgraded to execute an authentic 3-pass physical overwrite cycle:
+    1. **Pass 1**: Fill with all zeros (`0x00` / binary `00000000`).
+    2. **Pass 2**: Fill with all ones (`0xFF` / binary `11111111`).
+    3. **Pass 3**: Fill with 64-bit Mersenne Twister (`std::mt19937_64`) pseudorandom noise / "gibberish".
+  - This eliminates residual magnetic hysteresis (remanence) on spinning magnetic platters and abstracts virtual disk sanitization. Added `OverwriteWithRandom()` helper.
 
 ### 2. `Erasure/OS/Windows/WindowsStorageDevice.cpp`
 * **Defect Fixed**: `UpdateGeometry()` relied exclusively on `IOCTL_DISK_GET_DRIVE_GEOMETRY_EX`, which routinely fails on mounted volume handles (e.g., `\\.\E:` or `\\.\D:`), preventing volume-level testing and erasure.

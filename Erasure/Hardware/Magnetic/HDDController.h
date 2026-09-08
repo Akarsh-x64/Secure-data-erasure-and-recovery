@@ -15,8 +15,11 @@ class HDDController : public Core::IHardwareController {
 private:
     Core::IStorageDevice* m_device;
 
-    // Helper for generating noise/zero buffers
+    // Helper for generating pattern buffers (e.g. 0x00 or 0xFF)
     bool OverwriteWithPattern(uint64_t startSector, uint32_t sectorCount, uint8_t pattern);
+
+    // Helper for generating random noise / gibberish buffer
+    bool OverwriteWithRandom(uint64_t startSector, uint32_t sectorCount);
 
 public:
     // Takes ownership of the OS device pipe
