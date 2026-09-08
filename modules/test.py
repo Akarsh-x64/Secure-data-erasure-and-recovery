@@ -76,7 +76,12 @@ if not path:
     print("Invalid path.")
     exit(1)
 
-device = osdevice.LinuxStorageDevice()
+if os.name == 'nt':
+    device = osdevice.WindowsStorageDevice()
+else:
+    device = osdevice.LinuxStorageDevice()
+
+print(f"\nAttempting to open handle to: {path} ...")
 print(f"\nAttempting to open handle to: {path} ...")
 if not device.Open(path):
     print("[ERROR] Failed to open device! (Check admin privileges/path)")
