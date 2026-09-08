@@ -1,6 +1,7 @@
 #include "WindowsStorageDevice.h"
-#include <iostream>
 #include <cstring>
+#include <iostream>
+
 
 namespace Erasure {
 namespace OS {
@@ -38,6 +39,8 @@ bool WindowsStorageDevice::Open(const std::string &devicePath) {
   );
 
   if (m_hDevice == INVALID_HANDLE_VALUE) {
+    std::cout << "[DEBUG] CreateFileA failed. GetLastError: " << GetLastError()
+              << "\n";
     return false;
   }
 
@@ -67,19 +70,13 @@ bool WindowsStorageDevice::UpdateGeometry() {
 
   // 1. Try IOCTL_DISK_GET_DRIVE_GEOMETRY_EX (standard for physical drives)
   bool success = DeviceIoControl(
-      m_hDevice,
-      IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
-      nullptr, 0,
-      &diskGeometryEx,
-      sizeof(diskGeometryEx),
-      &bytesReturned,
-      nullptr
-  );
+      m_hDevice, IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, nullptr, 0, &diskGeometryEx,
+      sizeof(diskGeometryEx), &bytesReturned, nullptr);
 
   if (success && diskGeometryEx.Geometry.BytesPerSector > 0) {
     m_geometry.bytesPerSector = diskGeometryEx.Geometry.BytesPerSector;
-    m_geometry.totalSectors =
-        diskGeometryEx.DiskSize.QuadPart / diskGeometryEx.Geometry.BytesPerSector;
+    m_geometry.totalSectors = diskGeometryEx.DiskSize.QuadPart /
+                              diskGeometryEx.Geometry.BytesPerSector;
     m_geometry.devicePath = m_devicePath;
     return true;
   }
@@ -89,7 +86,8 @@ bool WindowsStorageDevice::UpdateGeometry() {
   std::memset(&diskGeometry, 0, sizeof(diskGeometry));
   bytesReturned = 0;
   if (DeviceIoControl(m_hDevice, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0,
-                      &diskGeometry, sizeof(diskGeometry), &bytesReturned, nullptr) &&
+                      &diskGeometry, sizeof(diskGeometry), &bytesReturned,
+                      nullptr) &&
       diskGeometry.BytesPerSector > 0) {
     m_geometry.bytesPerSector = diskGeometry.BytesPerSector;
 
@@ -98,9 +96,11 @@ bool WindowsStorageDevice::UpdateGeometry() {
     std::memset(&lengthInfo, 0, sizeof(lengthInfo));
     bytesReturned = 0;
     if (DeviceIoControl(m_hDevice, IOCTL_DISK_GET_LENGTH_INFO, nullptr, 0,
-                        &lengthInfo, sizeof(lengthInfo), &bytesReturned, nullptr) &&
+                        &lengthInfo, sizeof(lengthInfo), &bytesReturned,
+                        nullptr) &&
         lengthInfo.Length.QuadPart > 0) {
-      m_geometry.totalSectors = lengthInfo.Length.QuadPart / m_geometry.bytesPerSector;
+      m_geometry.totalSectors =
+          lengthInfo.Length.QuadPart / m_geometry.bytesPerSector;
     } else {
       m_geometry.totalSectors = diskGeometry.Cylinders.QuadPart *
                                 diskGeometry.TracksPerCylinder *
@@ -110,17 +110,28 @@ bool WindowsStorageDevice::UpdateGeometry() {
     return true;
   }
 
-  // 3. Fallback: Direct IOCTL_DISK_GET_LENGTH_INFO (common for mounted volume handles like \\.\E:)
+  // 3. Fallback: Direct IOCTL_DISK_GET_LENGTH_INFO (common for mounted volume
+  // handles like \\.\E:)
   GET_LENGTH_INFORMATION lengthInfo;
   std::memset(&lengthInfo, 0, sizeof(lengthInfo));
   bytesReturned = 0;
   if (DeviceIoControl(m_hDevice, IOCTL_DISK_GET_LENGTH_INFO, nullptr, 0,
-                      &lengthInfo, sizeof(lengthInfo), &bytesReturned, nullptr) &&
+                      &lengthInfo, sizeof(lengthInfo), &bytesReturned,
+                      nullptr) &&
       lengthInfo.Length.QuadPart > 0) {
     m_geometry.bytesPerSector = 512; // Default standard sector size
     m_geometry.totalSectors = lengthInfo.Length.QuadPart / 512;
     m_geometry.devicePath = m_devicePath;
     return true;
+  } else {
+    // Fallback for regular file testing
+    LARGE_INTEGER fileSize;
+    if (GetFileSizeEx(m_hDevice, &fileSize)) {
+      m_geometry.bytesPerSector = 512;
+      m_geometry.totalSectors = fileSize.QuadPart / 512;
+      m_geometry.devicePath = m_devicePath;
+      return true;
+    }
   }
 
   return false;
@@ -128,7 +139,8 @@ bool WindowsStorageDevice::UpdateGeometry() {
 
 bool WindowsStorageDevice::ReadSectors(uint64_t startSector,
                                        uint32_t sectorCount, void *buffer) {
-  if (m_hDevice == INVALID_HANDLE_VALUE || buffer == nullptr || m_geometry.bytesPerSector == 0)
+  if (m_hDevice == INVALID_HANDLE_VALUE || buffer == nullptr ||
+      m_geometry.bytesPerSector == 0)
     return false;
 
   LARGE_INTEGER offset;
@@ -151,7 +163,8 @@ bool WindowsStorageDevice::ReadSectors(uint64_t startSector,
 bool WindowsStorageDevice::WriteSectors(uint64_t startSector,
                                         uint32_t sectorCount,
                                         const void *buffer) {
-  if (m_hDevice == INVALID_HANDLE_VALUE || buffer == nullptr || m_geometry.bytesPerSector == 0)
+  if (m_hDevice == INVALID_HANDLE_VALUE || buffer == nullptr ||
+      m_geometry.bytesPerSector == 0)
     return false;
 
   LARGE_INTEGER offset;
