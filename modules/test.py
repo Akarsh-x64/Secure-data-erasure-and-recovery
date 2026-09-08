@@ -61,6 +61,7 @@
 #         print("[SUCCESS] Filesystem check completed cleanly.")
 #     else:
 #         print(f"[WARNING] Filesystem check exited with code {result.returncode}")
+import os
 import subprocess
 import osdevice
 import hdd
