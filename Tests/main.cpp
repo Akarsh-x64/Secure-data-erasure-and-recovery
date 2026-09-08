@@ -893,10 +893,23 @@ static void SetupExFatSyntheticDisk(MemoryDiskDevice& dev) {
     std::memcpy(vbr.fileSystemName, "EXFAT   ", 8);
     vbr.bytesPerSectorShift = 9;   // 512 bytes
     vbr.sectorsPerClusterShift = 3; // 8 sectors (4096 bytes)
+    vbr.fatOffsetSectors = 24;      // FAT table at Sector 24
+    vbr.fatLengthSectors = 8;
     vbr.clusterHeapOffsetSectors = 32; // Cluster 2 at Sector 32
+    vbr.clusterCount = 2044;
+    vbr.volumeLengthSectors = 16384;
     vbr.rootDirectoryFirstCluster = 2;
+    vbr.numberOfFats = 1;
     vbr.bootSignature = 0xAA55;
     std::memcpy(disk, &vbr, sizeof(vbr));
+
+    // Initialize FAT table at Sector 24
+    uint32_t* fat = reinterpret_cast<uint32_t*>(disk + (24 * SECTOR_SIZE));
+    fat[0] = 0xFFFFFFF8; // Media descriptor
+    fat[1] = 0xFFFFFFFF; // Reserved
+    fat[2] = 0xFFFFFFFF; // Cluster 2 (Root Directory) EOF
+    fat[3] = 0xFFFFFFFF; // Cluster 3 (Allocation Bitmap) EOF
+    fat[4] = 0xFFFFFFFF; // Cluster 4 (Payload 'secret.txt') EOF
 
     // Cluster 2: Root Directory (Sector 32)
     uint8_t* rootDir = disk + (32 * SECTOR_SIZE);
@@ -1651,10 +1664,11 @@ static void RunInteractiveLiveSession() {
                 std::vector<uint64_t> targetSectors;
                 std::string preHash;
                 if (ntfsPtr->LocateTargetLocations(action, locs) && locs.isValid) {
+                    uint32_t spc = ntfsPtr->GetBytesPerSector() > 0 ? (ntfsPtr->GetBytesPerCluster() / ntfsPtr->GetBytesPerSector()) : 8;
                     if (!locs.dataExtents.empty()) {
                         for (const auto& ext : locs.dataExtents) {
-                            uint64_t startSec = ext.lcn * 8;
-                            for (uint64_t s = 0; s < ext.clusterCount * 8; ++s) {
+                            uint64_t startSec = ntfsPtr->ClusterToSector(ext.lcn);
+                            for (uint64_t s = 0; s < ext.clusterCount * spc; ++s) {
                                 targetSectors.push_back(startSec + s);
                             }
                         }
