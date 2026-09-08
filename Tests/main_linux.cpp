@@ -118,9 +118,9 @@ int main() {
 
         std::string repairCommand;
         if (choice == "2") {
-            repairCommand = "sudo e2fsck -f -y " + path;
+            repairCommand = "sudo ../_externals/e2fsck -f -y " + path;
         } else {
-            repairCommand = "sudo fsck.exfat -y " + path;
+            repairCommand = "sudo ../_externals/fsck.exfat -y " + path;
         }
 
         int result = std::system(repairCommand.c_str());
