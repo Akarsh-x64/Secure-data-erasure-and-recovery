@@ -810,25 +810,115 @@ exFAT uses a dual allocation architecture:
 
 ---
 
-# 6. Cross-Filesystem Comparative Matrix
+# 6. FAT32 Driver Internals (`Fat32Driver`)
 
-| Feature / Metric | NTFS (`NtfsDriver`) | XFS (`XfsDriver`) | ext4 (`Ext4Driver`) | exFAT (`ExFatDriver`) |
-|---|---|---|---|---|
-| **Boot Header** | VBR (Sector 0) + Fixup | Superblock (Sector 0) | Superblock (Offset 1024) | VBR (Sector 0) + Checksum (Sec 11) |
-| **Partition Structure** | Flat Cluster Addressing | Allocation Groups (AGs) | Block Groups | Cluster Heap |
-| **Endianness** | Little-Endian | Big-Endian (Network) | Little-Endian | Little-Endian |
-| **Primary Metadata** | 1024-byte MFT Record | 256/512-byte Dinode Core | 256-byte Inode Table Entry | 32-byte Directory Entry Sets |
-| **Data Extents** | Nibble-packed Runlists | 128-bit Packed Extents / B+Tree | Extent Tree (`0xF30A`) | `NoFatChain` Flag OR 32-bit FAT |
-| **Directory Index** | Alphabetical B-Tree (`$I30`) | Shortform / Block / Node B+Tree | Linear Linked List (`rec_len`) | Sequential 32-byte Records |
-| **Allocation Tracker** | `$Bitmap` (Record 6) | AGF B+Trees (`bno_cur`, `cnt_cur`) | Block Bitmap (per group) | Allocation Bitmap (Cluster 2+) |
-| **Directory Unlinking** | B-Tree Entry Scrubbing | Entry Compaction / `XfsDir2DataUnused` | `inode = 0`, `rec_len` preserved | Bit 7 cleared (`0x85` $\to$ `0x05`) |
-| **Metadata Wipe** | Full 1024 bytes zeroed | Full `m_inodeSize` bytes zeroed | Full 256 bytes zeroed + `i_dtime` | Bit 7 cleared, 31 bytes zeroed |
-| **Journal Scrubbing** | `$LogFile` / `$UsnJrnl` sweep | Circular Intent Log sweep (`sb_logstart`)| JBD2 journal block sweep | N/A (No Journal) |
-| **Torn-Write Guard** | Update Sequence Array (Fixup) | CRC32c Metadata (v5) | Checksum fields in GDT / Superblock | Sector 11 VBR Checksum |
+## 6.1 Architecture & Volume Boot Record (VBR / Extended BPB)
+FAT32 stores its boot sector at Sector 0 (LBA 0):
+* **`Fat32BootSector` (512 Bytes)**:
+  * `jmpBoot`: Jump instruction (`0xEB 0x58 0x90` or `0xE9 ...`).
+  * `oemName`: OEM Identifier (e.g. `"MSWIN4.1"`).
+  * `bytesPerSector`: Sector size (512, 1024, 2048, 4096).
+  * `sectorsPerCluster`: Cluster size multiplier ($1, 2, 4, 8, 16, 32, 64, 128$).
+  * `reservedSectorCount`: Typically 32 sectors reserved before the first FAT.
+  * `numFATs`: Count of FAT tables (typically 2).
+  * `rootEntryCount`: Must be 0 for FAT32.
+  * `totalSectors16`: Must be 0 for FAT32.
+  * `fatSize16`: Must be 0 for FAT32.
+  * `totalSectors32`: Total partition capacity in sectors.
+  * `fatSize32`: Sectors occupied by each FAT table.
+  * `extFlags`: Active FAT index and mirroring flags (Bit 7 = 0: mirroring enabled).
+  * `rootCluster`: Starting cluster of the Root Directory (typically Cluster 2).
+  * `fsInfoSector`: Sector location of the FSInfo structure (typically Sector 1).
+  * `backupBootSector`: Sector location of the backup VBR (typically Sector 6).
+  * `signature`: `0xAA55` at byte offset `0x1FE`.
+
+```
+LBA 0: Fat32BootSector (VBR)         LBA 1: FSInfo Sector
+┌────────────────────────────────┐   ┌────────────────────────────────┐
+│ Jump Code (0xEB 0x58 0x90)     │   │ LeadSig: 0x41615252 ("RRaA")   │
+│ OEM: "MSWIN4.1"                │   │ StrucSig: 0x61417272 ("rrAa")  │
+│ BytsPerSec: 512, SecPerClus: 8 │   │ Free_Count: Remaining Free     │
+│ RsvdSec: 32, NumFATs: 2        │   │ Nxt_Free: Next Allocation Hint │
+│ FATSz32: 32, RootClus: 2       │   │ TrailSig: 0xAA550000           │
+│ Boot Signature: 0xAA55         │   └────────────────────────────────┘
+└────────────────────────────────┘
+```
+
+### Addressing Mathematics
+$$\text{firstDataSector} = \text{reservedSectorCount} + (\text{numFATs} \times \text{fatSize32})$$
+$$\text{ClusterToSector}(C) = \text{firstDataSector} + ((C - 2) \times \text{sectorsPerCluster})$$
+$$\text{FatSector}(C) = \text{fatStartSector} + ((C \times 4) / \text{bytesPerSector})$$
+$$\text{FatOffsetInSector}(C) = (C \times 4) \pmod{\text{bytesPerSector}}$$
+
+## 6.2 28-Bit Cluster Addressing & Dual FAT Synchronization
+In FAT32, each FAT entry is a 32-bit word, but only the lower **28 bits** encode the cluster number. The upper 4 bits are reserved:
+* `FAT32_CLUSTER_FREE` (`0x00000000`): Unallocated / sanitized cluster.
+* `FAT32_CLUSTER_BAD` (`0x0FFFFFF7`): Damaged hardware cluster.
+* `FAT32_CLUSTER_EOC_MIN` (`0x0FFFFFF8` .. `0x0FFFFFFF`): End of Cluster Chain (EOC).
+
+### Dual FAT Mirroring
+Unless `extFlags & 0x0080` disables mirroring, all sanitization updates write to **both primary FAT1 and mirror FAT2**, guaranteeing that no forensic recovery tool can inspect the mirror table to reconstruct cluster extents.
+
+## 6.3 Short (8.3) & Long File Name (VFAT LFN) Directory Architecture
+FAT32 stores directory entries as 32-byte records inside directory cluster chains:
+* **Short File Name (SFN / `Fat32DirEntry`)**:
+  * `name[11]`: 8 characters filename + 3 characters extension (space-padded).
+  * `name[0] == 0xE5`: Entry is deleted / unallocated.
+  * `name[0] == 0x00`: Entry is free and terminates directory parsing.
+  * `fstClusHI` (Bytes 20..21) & `fstClusLO` (Bytes 26..27): 32-bit starting cluster $(C_{hi} \ll 16) \mid C_{lo}$.
+  * `fileSize` (Bytes 28..31): 32-bit file size in bytes.
+* **Long File Name (LFN / `Fat32LfnEntry`)**:
+  * Attribute byte `attr = 0x0F` (`FAT32_ATTR_LONG_NAME`).
+  * Precedes the SFN entry in reverse order (Order byte masked with `0x40` on first physical entry).
+  * Encodes up to 13 UTF-16LE characters per 32-byte record.
+  * Holds an 8-bit checksum matching the SFN entry's name.
+
+## 6.4 Forensic Sanitization Pipeline
+### Single File Erasure (`EraseFile`)
+1. **Path Resolution**: Traverses directory cluster chains from `rootCluster` matching both SFN and LFN accumulated names.
+2. **Cluster Chain Extraction (`GetClusterChain`)**: Follows 32-bit FAT entries until reaching EOC (`>= 0x0FFFFFF8`).
+3. **Physical Sector Obliteration**: For every cluster in the chain, translates cluster to LBA sectors and executes 3-Pass DoD 5220.22-M sanitization (`0x00` $\to$ `0xFF` $\to$ PRNG gibberish via `std::mt19937_64`).
+4. **FAT Table Deallocation**: Clears entries across both FAT1 and FAT2 tables to `0x00000000`, preserving reserved high 4 bits.
+5. **Metadata Obliteration (`SanitizeDirectoryEntry`)**:
+   * Preceding LFN entries: marks order byte with `0xE5` and zeroes all remaining 31 bytes.
+   * Primary SFN entry: marks `name[0] = 0xE5`, zeroes `name[1..10]`, zeroes `fstClusHI` and `fstClusLO`, zeroes `fileSize = 0`, and zeroes all creation/access/modification timestamps.
+6. **FSInfo Synchronization**: Updates `freeCount` by incrementing by the freed cluster count.
+
+### Recursive Folder Erasure (`EraseDirectory`)
+1. Locates directory starting cluster and parses child entries (`ListDirectoryContents`).
+2. Recursively descends depth-first, eradicating all leaf files and nested subdirectories.
+3. Overwrites the directory's own cluster chain with 3-Pass DoD sanitization.
+4. Clears FAT entries for the directory cluster chain.
+5. Marks the directory entry in the parent directory with `0xE5` and zeroes metadata.
+
+### Volume-Wide Sanitization (`WipeVolume`)
+1. Quarantines reserved sectors ($0 \dots \text{reservedSectorCount} - 1$), FAT1 and FAT2 tables, and the Root Directory cluster chain.
+2. Carpet-bombs all allocated user data clusters across the volume with 3-Pass DoD sanitization.
+3. Resets all user FAT entries to `0x00000000`.
+4. Cleans all non-system entries from the root directory cluster.
+5. Synchronizes FSInfo with updated free cluster count.
 
 ---
 
-# 7. Forensic Verification & Inspection Engine
+# 7. Cross-Filesystem Comparative Matrix
+
+| Feature / Metric | NTFS (`NtfsDriver`) | XFS (`XfsDriver`) | ext4 (`Ext4Driver`) | exFAT (`ExFatDriver`) | FAT32 (`Fat32Driver`) |
+|---|---|---|---|---|---|
+| **Boot Header** | VBR (Sector 0) + Fixup | Superblock (Sector 0) | Superblock (Offset 1024) | VBR (Sector 0) + Checksum (Sec 11) | VBR (Sector 0) + FSInfo (Sec 1) |
+| **Partition Structure** | Flat Cluster Addressing | Allocation Groups (AGs) | Block Groups | Cluster Heap | Cluster Heap |
+| **Endianness** | Little-Endian | Big-Endian (Network) | Little-Endian | Little-Endian | Little-Endian |
+| **Primary Metadata** | 1024-byte MFT Record | 256/512-byte Dinode Core | 256-byte Inode Table Entry | 32-byte Directory Entry Sets | 32-byte SFN Entry + LFNs |
+| **Data Extents** | Nibble-packed Runlists | 128-bit Packed Extents / B+Tree | Extent Tree (`0xF30A`) | `NoFatChain` Flag OR 32-bit FAT | 28-bit FAT Chain (32-bit words) |
+| **Directory Index** | Alphabetical B-Tree (`$I30`) | Shortform / Block / Node B+Tree | Linear Linked List (`rec_len`) | Sequential 32-byte Records | Sequential SFN + VFAT LFNs |
+| **Allocation Tracker** | `$Bitmap` (Record 6) | AGF B+Trees (`bno_cur`, `cnt_cur`) | Block Bitmap (per group) | Allocation Bitmap (Cluster 2+) | Dual FAT Tables (FAT1 & FAT2) |
+| **Directory Unlinking** | B-Tree Entry Scrubbing | Entry Compaction / `XfsDir2DataUnused` | `inode = 0`, `rec_len` preserved | Bit 7 cleared (`0x85` $\to$ `0x05`) | `name[0] = 0xE5` + LFN purge |
+| **Metadata Wipe** | Full 1024 bytes zeroed | Full `m_inodeSize` bytes zeroed | Full 256 bytes zeroed + `i_dtime` | Bit 7 cleared, 31 bytes zeroed | Stamped `0xE5`, 31 bytes zeroed |
+| **Journal Scrubbing** | `$LogFile` / `$UsnJrnl` sweep | Circular Intent Log sweep (`sb_logstart`)| JBD2 journal block sweep | N/A (No Journal) | N/A (No Journal) |
+| **Torn-Write Guard** | Update Sequence Array (Fixup) | CRC32c Metadata (v5) | Checksum fields in GDT / Superblock | Sector 11 VBR Checksum | Backup VBR at Sector 6 |
+
+---
+
+# 8. Forensic Verification & Inspection Engine
 
 The engine incorporates forensic inspection capabilities directly into `Tests/main.cpp`:
 

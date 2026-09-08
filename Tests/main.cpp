@@ -29,6 +29,8 @@
 #include "../Erasure/File Systems/ext4/ext4_Structures.h"
 #include "../Erasure/File Systems/exFAT/exFAT.h"
 #include "../Erasure/File Systems/exFAT/exFAT_Structures.h"
+#include "../Erasure/File Systems/FAT32/FAT32.h"
+#include "../Erasure/File Systems/FAT32/FAT32_Structures.h"
 
 using namespace Erasure;
 using namespace Erasure::Core;
@@ -345,8 +347,43 @@ static void ExplainExFatDirectoryEntry(const uint8_t* entryData, size_t size, ui
     }
 }
 
+static void ExplainFat32BootSector(const uint8_t* data, size_t size, uint64_t physicalOffset) {
+    if (size < sizeof(FAT32::Fat32BootSector)) return;
+    const auto* bpb = reinterpret_cast<const FAT32::Fat32BootSector*>(data);
+    std::cout << "\n[SEMANTIC BYTE BREAKDOWN: FAT32 VOLUME BOOT RECORD (VBR) @ 0x"
+              << std::hex << physicalOffset << std::dec << "]\n";
+    std::cout << "  * Offset +0x03..+0x0A [OEM Name]:      \"" << std::string(bpb->oemName, 8) << "\"\n";
+    std::cout << "  * Offset +0x0B..+0x0C [Bytes/Sector]:  " << bpb->bytesPerSector << " bytes\n";
+    std::cout << "  * Offset +0x0D       [Sec/Cluster]:   " << static_cast<int>(bpb->sectorsPerCluster)
+              << " (" << (bpb->bytesPerSector * bpb->sectorsPerCluster) << " bytes/cluster)\n";
+    std::cout << "  * Offset +0x0E..+0x0F [Reserved Secs]: " << bpb->reservedSectorCount << "\n";
+    std::cout << "  * Offset +0x10       [Number of FATs]:" << static_cast<int>(bpb->numFATs) << "\n";
+    std::cout << "  * Offset +0x24..+0x27 [FAT Size 32]:   " << bpb->fatSize32 << " sectors\n";
+    std::cout << "  * Offset +0x2C..+0x2F [Root Dir Clust]:Cluster " << bpb->rootCluster << "\n";
+    std::cout << "  * Offset +0x52..+0x59 [FS Type]:       \"" << std::string(bpb->fileSystemType, 8) << "\"\n";
+    std::cout << "  * Offset +0x1FE..+0x1FF [Signature]:   0x" << std::hex << bpb->signature << std::dec;
+    if (bpb->signature == 0xAA55) std::cout << " (Valid 0xAA55 Signature)\n";
+    else std::cout << " (Invalid / Sanitized)\n";
+}
+
+static void ExplainFat32DirectoryEntry(const uint8_t* entryData, size_t size, uint64_t physicalOffset) {
+    if (size < sizeof(FAT32::Fat32DirEntry)) return;
+    const auto* sfn = reinterpret_cast<const FAT32::Fat32DirEntry*>(entryData);
+    std::cout << "\n[SEMANTIC BYTE BREAKDOWN: FAT32 DIRECTORY ENTRY @ 0x" << std::hex << physicalOffset << std::dec << "]\n";
+    std::cout << "  * Offset +0x00..+0x0A [Name]:          \"" << std::string(reinterpret_cast<const char*>(sfn->name), 11) << "\"";
+    if (sfn->name[0] == FAT32::FAT32_DIR_ENTRY_DELETED) std::cout << " (0xE5 - Deleted / Sanitized Entry)\n";
+    else if (sfn->name[0] == 0x00) std::cout << " (0x00 - Free / End of Directory)\n";
+    else std::cout << "\n";
+    std::cout << "  * Offset +0x0B       [Attributes]:    0x" << std::hex << static_cast<int>(sfn->attr) << std::dec;
+    if (sfn->attr & FAT32::FAT32_ATTR_DIRECTORY) std::cout << " (Directory)\n";
+    else std::cout << " (File)\n";
+    uint32_t cluster = (static_cast<uint32_t>(sfn->fstClusHI) << 16) | sfn->fstClusLO;
+    std::cout << "  * Offset +0x14 & 0x1A[First Cluster]: Cluster " << cluster << "\n";
+    std::cout << "  * Offset +0x1C..+0x1F [File Size]:     " << sfn->fileSize << " bytes\n";
+}
+
 // ============================================================================
-// Synthetic Disk Image Builders for All 4 File Systems
+// Synthetic Disk Image Builders for All 5 File Systems
 // ============================================================================
 
 // 1. NTFS Synthetic Volume Builder
@@ -892,8 +929,105 @@ static void SetupExFatSyntheticDisk(MemoryDiskDevice& dev) {
     std::memcpy(payload, "EXFAT_SUPER_SECRET_PAYLOAD_CONFIDENTIAL_REPORT_2026", 51);
 }
 
+// 5. FAT32 Synthetic Volume Builder
+static void SetupFat32SyntheticDisk(MemoryDiskDevice& dev) {
+    uint8_t* disk = dev.GetDiskData();
+    constexpr uint32_t SECTOR_SIZE = 512;
+    constexpr uint32_t SEC_PER_CLUST = 8;
+
+    FAT32::Fat32BootSector vbr;
+    std::memset(&vbr, 0, sizeof(vbr));
+    vbr.jmpBoot[0] = 0xEB; vbr.jmpBoot[1] = 0x58; vbr.jmpBoot[2] = 0x90;
+    std::memcpy(vbr.oemName, "MSWIN4.1", 8);
+    vbr.bytesPerSector = SECTOR_SIZE;
+    vbr.sectorsPerCluster = SEC_PER_CLUST;
+    vbr.reservedSectorCount = 32;
+    vbr.numFATs = 2;
+    vbr.media = 0xF8;
+    vbr.totalSectors32 = static_cast<uint32_t>(dev.GetDiskSize() / SECTOR_SIZE);
+    vbr.fatSize32 = 32;
+    vbr.rootCluster = 2;
+    vbr.fsInfoSector = 1;
+    vbr.backupBootSector = 6;
+    vbr.driveNumber = 0x80;
+    vbr.bootSignature = 0x29;
+    vbr.volumeID = 0x12345678;
+    std::memcpy(vbr.volumeLabel, "NO NAME    ", 11);
+    std::memcpy(vbr.fileSystemType, "FAT32   ", 8);
+    vbr.signature = FAT32::FAT32_BOOT_SIGNATURE;
+    std::memcpy(disk, &vbr, sizeof(vbr));
+
+    // FSInfo at Sector 1
+    FAT32::Fat32FSInfo fsi;
+    std::memset(&fsi, 0, sizeof(fsi));
+    fsi.leadSig = FAT32::FAT32_FSINFO_LEAD_SIG;
+    fsi.strucSig = FAT32::FAT32_FSINFO_STRUC_SIG;
+    fsi.freeCount = 1000;
+    fsi.nextFree = 5;
+    fsi.trailSig = FAT32::FAT32_FSINFO_TRAIL_SIG;
+    std::memcpy(disk + (1 * SECTOR_SIZE), &fsi, sizeof(fsi));
+
+    // FAT1 (Sector 32) and FAT2 (Sector 64)
+    auto writeFat = [&](uint8_t fatIndex) {
+        uint32_t* fat = reinterpret_cast<uint32_t*>(disk + ((32 + fatIndex * 32) * SECTOR_SIZE));
+        fat[0] = 0x0FFFFF00 | 0xF8;
+        fat[1] = FAT32::FAT32_CLUSTER_EOC_MAX;
+        fat[2] = FAT32::FAT32_CLUSTER_EOC_MAX; // Root dir
+        fat[3] = FAT32::FAT32_CLUSTER_EOC_MAX; // secret.txt
+        fat[4] = FAT32::FAT32_CLUSTER_EOC_MAX; // docs folder
+        fat[5] = FAT32::FAT32_CLUSTER_EOC_MAX; // report.pdf inside docs
+    };
+    writeFat(0);
+    writeFat(1);
+
+    // First data sector = 32 + (2 * 32) = 96
+    // Cluster 2: Root Directory (Sector 96)
+    uint8_t* rootDir = disk + (96 * SECTOR_SIZE);
+
+    // Entry 1 in Root: "secret.txt" -> Cluster 3
+    auto* sfn1 = reinterpret_cast<FAT32::Fat32DirEntry*>(rootDir);
+    std::memcpy(sfn1->name, "SECRET  TXT", 11);
+    sfn1->attr = FAT32::FAT32_ATTR_ARCHIVE;
+    sfn1->fstClusHI = 0;
+    sfn1->fstClusLO = 3;
+    sfn1->fileSize = 48;
+
+    // Entry 2 in Root: "docs" -> Cluster 4
+    auto* sfn2 = reinterpret_cast<FAT32::Fat32DirEntry*>(rootDir + 32);
+    std::memcpy(sfn2->name, "DOCS       ", 11);
+    sfn2->attr = FAT32::FAT32_ATTR_DIRECTORY;
+    sfn2->fstClusHI = 0;
+    sfn2->fstClusLO = 4;
+
+    // Cluster 3: Payload for "secret.txt" (Sector 96 + (3-2)*8 = 104)
+    uint8_t* payload1 = disk + (104 * SECTOR_SIZE);
+    std::memcpy(payload1, "FAT32_SECRET_PAYLOAD_CONFIDENTIAL_AUTHENTICATION", 48);
+
+    // Cluster 4: Subdirectory "docs" (Sector 96 + (4-2)*8 = 112)
+    uint8_t* subDir = disk + (112 * SECTOR_SIZE);
+    auto* d_dot = reinterpret_cast<FAT32::Fat32DirEntry*>(subDir);
+    std::memcpy(d_dot->name, ".          ", 11);
+    d_dot->attr = FAT32::FAT32_ATTR_DIRECTORY;
+    d_dot->fstClusLO = 4;
+
+    auto* d_dotdot = reinterpret_cast<FAT32::Fat32DirEntry*>(subDir + 32);
+    std::memcpy(d_dotdot->name, "..         ", 11);
+    d_dotdot->attr = FAT32::FAT32_ATTR_DIRECTORY;
+    d_dotdot->fstClusLO = 2;
+
+    auto* d_child = reinterpret_cast<FAT32::Fat32DirEntry*>(subDir + 64);
+    std::memcpy(d_child->name, "REPORT  PDF", 11);
+    d_child->attr = FAT32::FAT32_ATTR_ARCHIVE;
+    d_child->fstClusLO = 5;
+    d_child->fileSize = 40;
+
+    // Cluster 5: Payload for "docs/report.pdf" (Sector 96 + (5-2)*8 = 120)
+    uint8_t* payload2 = disk + (120 * SECTOR_SIZE);
+    std::memcpy(payload2, "BLUEPRINT_TOP_SECRET_CLASSIFIED_SCHEMATICS", 42);
+}
+
 // ============================================================================
-// Automated Synthetic Test Suite Across All 4 File Systems
+// Automated Synthetic Test Suite Across All 5 File Systems
 // ============================================================================
 
 static void RunSyntheticSuite() {
@@ -1138,8 +1272,85 @@ static void RunSyntheticSuite() {
         std::cout << "[PASS] exFAT Suite Completed with 100% Verification.\n";
     }
 
+    // -------------------------------------------------------------------------
+    // 5. FAT32 Test Suite
+    // -------------------------------------------------------------------------
+    {
+        std::cout << "\n################################################################################\n";
+        std::cout << " [5/5] EXECUTING FAT32 FORENSIC VERIFICATION SUITE                             \n";
+        std::cout << "################################################################################\n";
+
+        MemoryDiskDevice fat32Dev(DISK_SIZE, 512, "MemoryDisk://FAT32");
+        SetupFat32SyntheticDisk(fat32Dev);
+        HDDController hdd(&fat32Dev);
+        Fat32Driver fat32Driver(&hdd);
+
+        assert(fat32Driver.Mount());
+        std::cout << "[FAT32] Mounted successfully.\n";
+
+        // Pre-deletion Inspection: VBR, SFN entry, and data cluster 3
+        ExplainFat32BootSector(fat32Dev.GetDiskData(), 512, 0);
+
+        size_t payload3Off = 104 * 512;
+        size_t sfn1Off = 96 * 512;
+        std::cout << "\n--- [BEFORE DELETION] Inspecting FAT32 Cluster 3 & SFN Entry ---\n";
+        PrintHexDump(fat32Dev.GetDiskData() + payload3Off, 64, payload3Off, "FAT32 Cluster 3 Data ('secret.txt')");
+        ExplainDataSector(fat32Dev.GetDiskData() + payload3Off, 64, payload3Off, "FAT32");
+
+        PrintHexDump(fat32Dev.GetDiskData() + sfn1Off, 32, sfn1Off, "FAT32 SFN Directory Entry");
+        ExplainFat32DirectoryEntry(fat32Dev.GetDiskData() + sfn1Off, 32, sfn1Off);
+
+        // Scenario 5A: Single File Erasure ("secret.txt")
+        std::cout << "\n--- Scenario 5A: Single File Erasure ('secret.txt') ---\n";
+        assert(fat32Driver.EraseFile("secret.txt"));
+
+        // Post-deletion Inspection
+        std::cout << "\n--- [AFTER DELETION] Re-inspecting Same Physical Offsets ---\n";
+        PrintHexDump(fat32Dev.GetDiskData() + payload3Off, 64, payload3Off, "FAT32 Cluster 3 Data [POST-WIPE]");
+        ExplainDataSector(fat32Dev.GetDiskData() + payload3Off, 64, payload3Off, "FAT32");
+
+        PrintHexDump(fat32Dev.GetDiskData() + sfn1Off, 32, sfn1Off, "FAT32 SFN Directory Entry [POST-WIPE]");
+        ExplainFat32DirectoryEntry(fat32Dev.GetDiskData() + sfn1Off, 32, sfn1Off);
+
+        assert(fat32Dev.GetDiskData()[payload3Off] != 'F'); // "FAT32..." payload destroyed by 3-pass wipe
+        assert(fat32Dev.GetDiskData()[sfn1Off] == FAT32::FAT32_DIR_ENTRY_DELETED); // 0xE5
+
+        // Check FAT entry for cluster 3 is 0
+        const uint32_t* fat1 = reinterpret_cast<const uint32_t*>(fat32Dev.GetDiskData() + 32 * 512);
+        assert((fat1[3] & FAT32::FAT32_CLUSTER_MASK) == FAT32::FAT32_CLUSTER_FREE);
+
+        // Scenario 5B: Recursive Folder Erasure ("docs")
+        std::cout << "\n--- Scenario 5B: Recursive Folder Erasure ('docs') ---\n";
+        size_t payload5Off = 120 * 512;
+        size_t sfn2Off = 96 * 512 + 32;
+
+        assert(fat32Driver.EraseDirectory("docs"));
+
+        // Verify child payload destroyed
+        assert(fat32Dev.GetDiskData()[payload5Off] != 'B'); // "BLUEPRINT..." destroyed
+        assert(fat32Dev.GetDiskData()[sfn2Off] == FAT32::FAT32_DIR_ENTRY_DELETED); // 0xE5
+        assert((fat1[4] & FAT32::FAT32_CLUSTER_MASK) == FAT32::FAT32_CLUSTER_FREE);
+        assert((fat1[5] & FAT32::FAT32_CLUSTER_MASK) == FAT32::FAT32_CLUSTER_FREE);
+
+        // Scenario 5C: Volume-Wide Wipe
+        std::cout << "\n--- Scenario 5C: Volume-Wide Wipe ---\n";
+        std::memset(fat32Dev.GetDiskData() + 200 * 512, 0x77, 512);
+        // Allocate cluster in FAT so WipeVolume finds it
+        uint32_t testCluster = 2 + (200 - 96) / 8;
+        uint32_t* mutableFat = reinterpret_cast<uint32_t*>(fat32Dev.GetDiskData() + 32 * 512);
+        mutableFat[testCluster] = FAT32::FAT32_CLUSTER_EOC_MAX;
+
+        PrintHexDump(fat32Dev.GetDiskData() + 200 * 512, 64, 200 * 512, "FAT32 Data Sector 200 [BEFORE WIPE]");
+        assert(fat32Driver.WipeVolume());
+        PrintHexDump(fat32Dev.GetDiskData() + 200 * 512, 64, 200 * 512, "FAT32 Data Sector 200 [AFTER WIPE]");
+        ExplainDataSector(fat32Dev.GetDiskData() + 200 * 512, 64, 200 * 512, "FAT32");
+        assert(fat32Dev.GetDiskData()[200 * 512] != 0x77);
+
+        std::cout << "[PASS] FAT32 Suite Completed with 100% Verification.\n";
+    }
+
     std::cout << "\n================================================================================\n";
-    std::cout << " [ALL SUITES PASSED] ZERO-RECOVERY VERIFIED ACROSS NTFS, XFS, EXT4, AND EXFAT!  \n";
+    std::cout << " [ALL SUITES PASSED] ZERO-RECOVERY VERIFIED ACROSS NTFS, XFS, EXT4, EXFAT, FAT32\n";
     std::cout << "================================================================================\n";
 }
 
@@ -1198,7 +1409,8 @@ static void RunInteractiveLiveSession() {
     std::cout << "  [2] XFS\n";
     std::cout << "  [3] ext4\n";
     std::cout << "  [4] exFAT\n";
-    std::cout << "Selection (1-4, default 1): ";
+    std::cout << "  [5] FAT32\n";
+    std::cout << "Selection (1-5, default 1): ";
     std::string fsChoice;
     std::getline(std::cin, fsChoice);
 
@@ -1207,6 +1419,7 @@ static void RunInteractiveLiveSession() {
     XfsDriver* xfsPtr = nullptr;
     Ext4Driver* ext4Ptr = nullptr;
     ExFatDriver* exFatPtr = nullptr;
+    Fat32Driver* fat32Ptr = nullptr;
 
     if (fsChoice == "2" || fsChoice == "xfs" || fsChoice == "XFS") {
         auto xfs = std::make_unique<XfsDriver>(&hardware);
@@ -1235,6 +1448,15 @@ static void RunInteractiveLiveSession() {
         exFat->PrintVBRInfo();
         exFatPtr = exFat.get();
         fsDriver = std::move(exFat);
+    } else if (fsChoice == "5" || fsChoice == "fat32" || fsChoice == "FAT32") {
+        auto fat32 = std::make_unique<Fat32Driver>(&hardware);
+        if (!fat32->Mount()) {
+            std::cerr << "[ERROR] Failed to mount FAT32 filesystem.\n";
+            return;
+        }
+        fat32->PrintBootInfo();
+        fat32Ptr = fat32.get();
+        fsDriver = std::move(fat32);
     } else {
         auto ntfs = std::make_unique<NtfsDriver>(&hardware);
         if (!ntfs->Mount()) {
@@ -1336,6 +1558,18 @@ static void RunInteractiveLiveSession() {
                 ExplainExFatBootSector(vbrSec.data(), 64, 0);
 
                 if (exFatPtr->EraseFile(action)) {
+                    std::cout << "[SUCCESS] Target eradicated.\n";
+                } else {
+                    std::cerr << "[FAILED] Erasure failed.\n";
+                }
+            } else if (fat32Ptr) {
+                std::cout << "\n[FAT32] Executing forensic erasure for: '" << action << "'...\n";
+                std::vector<uint8_t> vbrSec(512, 0);
+                hardware.ReadSectors(0, 1, vbrSec.data());
+                PrintHexDump(vbrSec.data(), 64, 0, "FAT32 VBR @ Sector 0");
+                ExplainFat32BootSector(vbrSec.data(), 64, 0);
+
+                if (fat32Ptr->EraseFile(action)) {
                     std::cout << "[SUCCESS] Target eradicated.\n";
                 } else {
                     std::cerr << "[FAILED] Erasure failed.\n";

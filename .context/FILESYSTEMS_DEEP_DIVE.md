@@ -7,6 +7,7 @@ The **Multi-Filesystem Secure Erasure Engine** is an advanced, dependency-free C
 2. **XFS** (Silicon Graphics High-Performance 64-bit Journaled File System — Enterprise Linux)
 3. **ext4** (Fourth Extended File System — Linux Default)
 4. **exFAT** (Extensible File Allocation Table — Flash & Removable Media)
+5. **FAT32** (File Allocation Table 32 — Universal Legacy & Flash Media)
 
 ### The Decoupled 3-Layer Architecture
 The engine strictly enforces a zero-leakage, modular 3-tier boundary:
@@ -412,18 +413,19 @@ exFAT employs a dual allocation mechanism:
 
 # 5. Cross-Filesystem Comparative Matrix
 
-| Feature | NTFS | XFS | ext4 | exFAT |
-|---|---|---|---|---|
-| **Boot Header** | VBR (Sector 0) + Fixup | Superblock (Sector 0) | Superblock (Offset 1024) | VBR (Sector 0) + Sec 11 Checksum |
-| **Partition Division** | Flat Cluster Addressing | Allocation Groups (AGs) | Block Groups | Cluster Heap |
-| **Endianness** | Little-Endian | Big-Endian (Network) | Little-Endian | Little-Endian |
-| **Metadata Record** | 1024-byte MFT Record | 256/512-byte Dinode | 256-byte Inode | 32-byte Entry Set (3+ records) |
-| **Data Addressing** | Nibble-packed Data Runs | 128-bit Packed Extents / B+Tree | Extent Tree (`0xF30A`) | Contiguous Flag OR 32-bit FAT |
-| **Directory Index** | Alphabetical B-Tree (`$I30`) | Hashed B-Tree / Shortform | Linear Array (`rec_len`) | Sequential 32-byte Records |
-| **Allocation Tracking** | `$Bitmap` (Record 6) | AGF B+Trees (`bno_cur`, `cnt_cur`) | Block Bitmap (per group) | Allocation Bitmap (Cluster 2+) |
-| **Parent Unlink Method** | B-Tree index entry scrub | Shortform compact / Extent unused | `inode = 0`, `rec_len` preserved | Bit 7 (`InUse`) cleared |
-| **Metadata Sanitization**| Full 1024-byte MFT Zeroing | Full `m_inodeSize` Zeroing | Full `m_inodeSize` Zeroing + `i_dtime`| Bit 7 cleared, 31 bytes zeroed |
-| **Journal Scrubbing** | `$LogFile` / `$UsnJrnl` purge | Intent Log (`sb_logstart`) purge | JBD2 journal block purge | N/A (No Journal) |
+| Feature | NTFS | XFS | ext4 | exFAT | FAT32 |
+|---|---|---|---|---|---|
+| **Boot Header** | VBR (Sector 0) + Fixup | Superblock (Sector 0) | Superblock (Offset 1024) | VBR (Sector 0) + Sec 11 Checksum | VBR (Sector 0) + FSInfo (Sec 1) |
+| **Partition Division** | Flat Cluster Addressing | Allocation Groups (AGs) | Block Groups | Cluster Heap | Cluster Heap |
+| **Endianness** | Little-Endian | Big-Endian (Network) | Little-Endian | Little-Endian | Little-Endian |
+| **Metadata Record** | 1024-byte MFT Record | 256/512-byte Dinode | 256-byte Inode | 32-byte Entry Set (3+ records) | 32-byte SFN Entry + LFNs |
+| **Data Addressing** | Nibble-packed Data Runs | 128-bit Packed Extents / B+Tree | Extent Tree (`0xF30A`) | Contiguous Flag OR 32-bit FAT | 28-bit FAT Chain (32-bit words) |
+| **Directory Index** | Alphabetical B-Tree (`$I30`) | Hashed B-Tree / Shortform | Linear Array (`rec_len`) | Sequential 32-byte Records | Sequential SFN + VFAT LFNs |
+| **Allocation Tracking** | `$Bitmap` (Record 6) | AGF B+Trees (`bno_cur`, `cnt_cur`) | Block Bitmap (per group) | Allocation Bitmap (Cluster 2+) | Dual FAT Tables (FAT1 & FAT2) |
+| **Parent Unlink Method** | B-Tree index entry scrub | Shortform compact / Extent unused | `inode = 0`, `rec_len` preserved | Bit 7 (`InUse`) cleared | `name[0] = 0xE5` + LFN purge |
+| **Metadata Sanitization**| Full 1024-byte MFT Zeroing | Full `m_inodeSize` Zeroing | Full `m_inodeSize` Zeroing + `i_dtime`| Bit 7 cleared, 31 bytes zeroed | Stamped `0xE5`, 31 bytes zeroed |
+| **Journal Scrubbing** | `$LogFile` / `$UsnJrnl` purge | Intent Log (`sb_logstart`) purge | JBD2 journal block purge | N/A (No Journal) | N/A (No Journal) |
+| **Torn-Write Guard** | Update Sequence Array (Fixup) | CRC32c Metadata (v5) | Checksum fields in GDT / Superblock | Sector 11 VBR Checksum | Backup VBR at Sector 6 |
 
 ---
 

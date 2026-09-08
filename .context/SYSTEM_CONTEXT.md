@@ -709,12 +709,80 @@ An exhaustive codebase audit was conducted across every subsystem in `Erasure/` 
 
 ---
 
+# Phase 8 — FAT32 Filesystem Secure Erasure Driver (`Fat32Driver`): Walkthrough
+
+## Overview & Background
+
+FAT32 (File Allocation Table 32-bit) is a ubiquitous filesystem supported natively across Windows, Linux, macOS, UEFI firmware, and embedded OS environments. It remains the dominant format for USB flash storage ($\le 32\text{ GB}$), SD cards, automotive head units, and EFI System Partitions (`ESP`).
+
+Phase 8 implements a high-performance, forensic-grade `Fat32Driver` adhering strictly to the **3-Layer Decoupled Architecture** (`IStorageDevice` $\to$ `IHardwareController` $\to$ `IFileSystemDriver`), complete with dynamic BPB geometry extraction, 28-bit cluster chain traversal, dual FAT table synchronization, SFN/LFN directory eradication, and 3-Pass DoD physical sector overwriting.
+
+### 1. Key On-Disk Structures Implemented (`Erasure/File Systems/FAT32/FAT32_Structures.h`)
+- **`Fat32BootSector` (512 Bytes, Packed)**:
+  - Validates `0xAA55` boot signature at offset 510.
+  - Standard BPB: `bytesPerSector` (512..4096), `sectorsPerCluster` (1..128), `reservedSectorCount` (typically 32), `numFATs` (typically 2).
+  - FAT32 Extended BPB: `fatSize32` (sectors per FAT), `extFlags` (mirroring control: bit 7 disables mirroring, bits 0-3 select active FAT), `rootCluster` (root directory start, typically 2), `fsInfoSector` (typically 1), `backupBootSector` (typically 6).
+- **`Fat32FSInfo` (512 Bytes, Packed)**:
+  - Signatures: `leadSig = 0x41615252` ("RRaA"), `strucSig = 0x61417272` ("rrAa"), `trailSig = 0xAA550000`.
+  - Tracks `freeCount` (total unallocated clusters) and `nextFree` (cluster allocation hint).
+- **`Fat32DirEntry` (32 Bytes SFN)**:
+  - 8.3 space-padded filename, attributes (`READ_ONLY`, `HIDDEN`, `SYSTEM`, `VOLUME_ID`, `DIRECTORY`, `ARCHIVE`), timestamps, `fstClusHI` (bits 16-31), `fstClusLO` (bits 0-15), `fileSize`.
+- **`Fat32LfnEntry` (32 Bytes VFAT LFN)**:
+  - Sequences long filenames up to 255 UTF-16LE characters across 32-byte chunks (`attr = 0x0F`), bound to the following SFN entry via an 8-bit checksum.
+
+### 2. Forensic Erasure Operations (`Erasure/File Systems/FAT32/FAT32.cpp`)
+- **`Mount()`**:
+  - Dynamically calculates:
+    $$\text{firstDataSector} = \text{reservedSectorCount} + (\text{numFATs} \times \text{fatSize32})$$
+    $$\text{totalClusters} = \frac{\text{totalSectors} - \text{firstDataSector}}{\text{sectorsPerCluster}}$$
+  - Computes exact LBA for any cluster:
+    $$\text{LBA}(C) = \text{firstDataSector} + (C - 2) \times \text{sectorsPerCluster}$$
+- **`EraseFile(relativePath)`**:
+  - Traverses directory cluster chains starting at `rootCluster`, matching both SFN and accumulated VFAT LFN Unicode names.
+  - Resolves starting cluster: $(fstClusHI \ll 16) \mid fstClusLO$.
+  - Follows cluster chain through the FAT until EOC ($\ge 0\text{x0FFFFFF8}$).
+  - Executes **3-Pass DoD 5220.22-M sanitization** across all clusters:
+    1. Pass 1: `0x00` (zero saturation)
+    2. Pass 2: `0xFF` (one saturation)
+    3. Pass 3: PRNG noise (`std::mt19937_64`)
+  - **Dual FAT Table Synchronization**: Zeroes cluster entries in **both FAT1 and FAT2** while strictly preserving the upper 4 reserved bits (`*entryPtr = (*entryPtr & 0xF0000000) | 0x00000000`).
+  - **Metadata Obliteration**:
+    - Marks primary SFN entry: `name[0] = 0xE5` (deleted), zero-fills all remaining 31 bytes (timestamps, size, cluster references).
+    - Marks all preceding LFN entries: `order = 0xE5`, zero-fills all remaining 31 bytes.
+  - Updates primary and backup `FSInfo` free cluster counts.
+- **`EraseDirectory(relativePath)`**:
+  - Recursively traverses directory tree depth-first post-order.
+  - Sanitizes all nested child files and subdirectories.
+  - Overwrites directory's own cluster chains with 3-Pass DoD.
+  - Zeroes FAT entries and stamps parent directory entry with `0xE5`.
+- **`WipeVolume()`**:
+  - Quarantines reserved sectors, FAT1/FAT2 tables, and root directory cluster.
+  - Carpet-bombs all allocated user data clusters with 3-Pass DoD overwrite.
+  - Zeroes user cluster entries in both FATs, clears root directory, and resets `FSInfo`.
+- **`FormatDrive(fullDriveSanitize)`**:
+  - Optional full volume DoD sanitization.
+  - Writes fresh VBR at Sector 0 and backup at Sector 6.
+  - Writes fresh `FSInfo` at Sector 1 and backup at Sector 7.
+  - Initializes FAT1 and FAT2 entries 0-2 and allocates clean root directory at Cluster 2.
+
+### 3. Master Test Runner Integration (`Tests/main.cpp`)
+- Added `[5/5] EXECUTING FAT32 FORENSIC VERIFICATION SUITE`:
+  - Builds synthetic in-memory FAT32 volume via `MemoryDiskDevice`.
+  - Asserts initial data presence and directory structure (`secret.txt` in root, nested file `blueprint.dwg` inside `docs/`).
+  - Verifies single file erasure: payload destroyed, cluster 3 FAT entry zeroed, SFN stamped `0xE5`.
+  - Verifies recursive folder erasure: nested files destroyed, folder cluster wiped, parent entry stamped `0xE5`.
+  - Verifies volume-wide wipe: allocated user clusters wiped, root directory reset.
+- Updated interactive live session menu to support option `[5] FAT32`.
+
+---
+
 ## Comprehensive Documentation Index
 
 The `.context/` directory contains specialized, exhaustive architectural manuals for every layer of the product:
 1. **Shipping Formats, Electron App & Recovery Architecture**:
    * [SHIPPING_AND_APPLICATION_ARCHITECTURE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/SHIPPING_AND_APPLICATION_ARCHITECTURE.md) — Covers the 3 distribution formats (Windows .exe, Linux .deb/AppImage, Live Boot RAM-disk ISO to sanitize Windows C: and system boot drives), Electron frontend + native C++ backend JSON-RPC IPC architecture, and the complete 4-phase Data Recovery subsystem (`Recovery/`).
 2. **Filesystem Execution Intensive Operations Manual**:
-   * [FILESYSTEM_EXECUTION_INTENSIVE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/FILESYSTEM_EXECUTION_INTENSIVE.md) — Line-by-line, code-level execution walkthrough of all 4 filesystem drivers (NTFS, XFS, ext4, exFAT), extent decoding, directory B-tree traversal, on-disk metadata wiping, and 3-pass DoD sanitization.
+   * [FILESYSTEM_EXECUTION_INTENSIVE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/FILESYSTEM_EXECUTION_INTENSIVE.md) — Line-by-line, code-level execution walkthrough of all 5 filesystem drivers (NTFS, XFS, ext4, exFAT, FAT32), extent decoding, directory B-tree traversal, on-disk metadata wiping, and 3-pass DoD sanitization.
 3. **Multi-Filesystem Deep Dive & Forensic Matrix**:
-   * [FILESYSTEMS_DEEP_DIVE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/FILESYSTEMS_DEEP_DIVE.md) — Architectural overview, comparative feature tables, and Shannon entropy forensic verification suite.
+   * [FILESYSTEMS_DEEP_DIVE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/FILESYSTEMS_DEEP_DIVE.md) — Architectural overview, comparative feature tables across all 5 filesystems, and Shannon entropy forensic verification suite.
+
