@@ -44,6 +44,10 @@ using NativeStorageDevice = Erasure::OS::WindowsStorageDevice;
 #include "../Erasure/File Systems/exFAT/exFAT_Structures.h"
 #include "../Erasure/File Systems/ext4/ext4.h"
 #include "../Erasure/File Systems/ext4/ext4_Structures.h"
+#include "../Erasure/File Systems/ext2/ext2.h"
+#include "../Erasure/File Systems/ext2/ext2_Structures.h"
+#include "../Erasure/File Systems/ext3/ext3.h"
+#include "../Erasure/File Systems/ext3/ext3_Structures.h"
 
 
 // Forensic Verification Engine
@@ -421,6 +425,116 @@ static void ExplainExt4Inode(const uint8_t *inodeData, size_t size,
       std::cout << "Block Pointers\n";
     }
   }
+}
+
+static void ExplainExt2Superblock(const uint8_t *data, size_t size,
+                                  uint64_t physicalOffset) {
+  if (size < sizeof(Ext2SuperBlock))
+    return;
+  const auto *sb = reinterpret_cast<const Ext2SuperBlock *>(data);
+  std::cout << "\n[SEMANTIC BYTE BREAKDOWN: ext2 SUPERBLOCK @ 0x" << std::hex
+            << physicalOffset << std::dec << "]\n";
+  std::cout << "  * Offset +0x38..+0x39 [Magic]:         0x" << std::hex
+            << sb->s_magic << std::dec;
+  if (sb->s_magic == 0xEF53)
+    std::cout << " (0xEF53 - Valid ext2 Magic)\n";
+  else
+    std::cout << " (Invalid / Sanitized)\n";
+
+  std::cout << "  * Offset +0x00..+0x03 [Total Inodes]:  " << sb->inode_count
+            << "\n";
+  std::cout << "  * Offset +0x04..+0x07 [Total Blocks]:  " << sb->blocks_count
+            << "\n";
+  std::cout << "  * Offset +0x18..+0x1B [Block Size]:    "
+            << (1024 << sb->log_block_size) << " bytes\n";
+  std::cout << "  * Offset +0x20..+0x23 [Blocks/Group]:  "
+            << sb->s_block_per_group << "\n";
+  std::cout << "  * Offset +0x28..+0x2B [Inodes/Group]:  "
+            << sb->s_inodes_per_group << "\n";
+}
+
+static void ExplainExt2Inode(const uint8_t *inodeData, size_t size,
+                             uint64_t physicalOffset) {
+  if (size < sizeof(Ext2Inode))
+    return;
+  const auto *ino = reinterpret_cast<const Ext2Inode *>(inodeData);
+  std::cout << "\n[SEMANTIC BYTE BREAKDOWN: ext2 INODE @ 0x" << std::hex
+            << physicalOffset << std::dec << "]\n";
+  std::cout << "  * Offset +0x00..+0x01 [File Mode]:     0x" << std::hex
+            << ino->i_mode << std::dec;
+  if ((ino->i_mode & 0xF000) == 0x4000)
+    std::cout << " (Directory)\n";
+  else if ((ino->i_mode & 0xF000) == 0x8000)
+    std::cout << " (Regular File)\n";
+  else if (ino->i_mode == 0)
+    std::cout << " (0x0000 - Sanitized / Free Inode)\n";
+  else
+    std::cout << "\n";
+
+  std::cout << "  * Offset +0x04..+0x07 [File Size]:     " << ino->i_size
+            << " bytes\n";
+  std::cout << "  * Offset +0x1A..+0x1B [Link Count]:    " << ino->i_links_count
+            << "\n";
+  std::cout << "  * Offset +0x28..+0x2B [Direct Block 0]: Block " << ino->i_block[0];
+  if (ino->i_block[0] == 0)
+    std::cout << " (0x00 - Zeroed / Sanitized)\n";
+  else
+    std::cout << " (Allocated Data Block)\n";
+}
+
+static void ExplainExt3Superblock(const uint8_t *data, size_t size,
+                                  uint64_t physicalOffset) {
+  if (size < sizeof(Ext3SuperBlock))
+    return;
+  const auto *sb = reinterpret_cast<const Ext3SuperBlock *>(data);
+  std::cout << "\n[SEMANTIC BYTE BREAKDOWN: ext3 SUPERBLOCK @ 0x" << std::hex
+            << physicalOffset << std::dec << "]\n";
+  std::cout << "  * Offset +0x38..+0x39 [Magic]:         0x" << std::hex
+            << sb->s_magic << std::dec;
+  if (sb->s_magic == 0xEF53)
+    std::cout << " (0xEF53 - Valid ext3 Magic)\n";
+  else
+    std::cout << " (Invalid / Sanitized)\n";
+
+  std::cout << "  * Offset +0x00..+0x03 [Total Inodes]:  " << sb->inode_count
+            << "\n";
+  std::cout << "  * Offset +0x04..+0x07 [Total Blocks]:  " << sb->blocks_count
+            << "\n";
+  std::cout << "  * Offset +0x18..+0x1B [Block Size]:    "
+            << (1024 << sb->log_block_size) << " bytes\n";
+  std::cout << "  * Offset +0x20..+0x23 [Blocks/Group]:  "
+            << sb->s_block_per_group << "\n";
+  std::cout << "  * Offset +0x28..+0x2B [Inodes/Group]:  "
+            << sb->s_inodes_per_group << "\n";
+}
+
+static void ExplainExt3Inode(const uint8_t *inodeData, size_t size,
+                             uint64_t physicalOffset) {
+  if (size < sizeof(Ext3Inode))
+    return;
+  const auto *ino = reinterpret_cast<const Ext3Inode *>(inodeData);
+  std::cout << "\n[SEMANTIC BYTE BREAKDOWN: ext3 INODE @ 0x" << std::hex
+            << physicalOffset << std::dec << "]\n";
+  std::cout << "  * Offset +0x00..+0x01 [File Mode]:     0x" << std::hex
+            << ino->i_mode << std::dec;
+  if ((ino->i_mode & 0xF000) == 0x4000)
+    std::cout << " (Directory)\n";
+  else if ((ino->i_mode & 0xF000) == 0x8000)
+    std::cout << " (Regular File)\n";
+  else if (ino->i_mode == 0)
+    std::cout << " (0x0000 - Sanitized / Free Inode)\n";
+  else
+    std::cout << "\n";
+
+  std::cout << "  * Offset +0x04..+0x07 [File Size]:     " << ino->i_size
+            << " bytes\n";
+  std::cout << "  * Offset +0x1A..+0x1B [Link Count]:    " << ino->i_links_count
+            << "\n";
+  std::cout << "  * Offset +0x28..+0x2B [Direct Block 0]: Block " << ino->i_block[0];
+  if (ino->i_block[0] == 0)
+    std::cout << " (0x00 - Zeroed / Sanitized)\n";
+  else
+    std::cout << " (Allocated Data Block)\n";
 }
 
 static void ExplainExFatBootSector(const uint8_t *data, size_t size,
@@ -1443,15 +1557,313 @@ static void SetupFat32SyntheticDisk(MemoryDiskDevice &dev) {
   std::memcpy(payload2, "BLUEPRINT_TOP_SECRET_CLASSIFIED_SCHEMATICS", 42);
 }
 
+// 6. ext2 Synthetic Volume Builder
+static void SetupExt2SyntheticDisk(MemoryDiskDevice &dev) {
+  uint8_t *disk = dev.GetDiskData();
+  constexpr uint32_t BLOCK_SIZE = 4096;
+  constexpr uint32_t TOTAL_BLOCKS = 1024;
+  constexpr uint32_t INODES_PER_GROUP = 128;
+  constexpr uint32_t INODE_SIZE = 128;
+
+  // Superblock at byte 1024
+  Ext2SuperBlock sb;
+  std::memset(&sb, 0, sizeof(sb));
+  sb.inode_count = INODES_PER_GROUP;
+  sb.blocks_count = TOTAL_BLOCKS;
+  sb.log_block_size = 2; // 1024 << 2 = 4096
+  sb.s_block_per_group = TOTAL_BLOCKS;
+  sb.s_inodes_per_group = INODES_PER_GROUP;
+  sb.s_magic = 0xEF53;
+  sb.s_rev_level = 1;
+  sb.inode_size = INODE_SIZE;
+  std::memcpy(disk + 1024, &sb, sizeof(sb));
+
+  // Group Descriptor Table at Block 1 (offset 1 * 4096)
+  Ext2GroupDescriptor gd;
+  std::memset(&gd, 0, sizeof(gd));
+  gd.bg_block_bitmap = 2;      // Block 2
+  gd.bg_inode_bitmap = 3;      // Block 3
+  gd.bg_inode_table = 4;       // Blocks 4..7
+  gd.bg_free_blocks_count = 1000;
+  gd.bg_free_inodes_count = INODES_PER_GROUP - 14;
+  std::memcpy(disk + 1 * BLOCK_SIZE, &gd, sizeof(gd));
+
+  // Mark Bitmaps
+  uint8_t *blockBitmap = disk + 2 * BLOCK_SIZE;
+  blockBitmap[0] = 0xFF; // Blocks 0..7
+  blockBitmap[1] = 0x0F; // Blocks 8..11 allocated
+
+  uint8_t *inodeBitmap = disk + 3 * BLOCK_SIZE;
+  inodeBitmap[0] = 0xFF; // Inodes 1..8
+  inodeBitmap[1] = 0x3F; // Inodes 9..14 allocated
+
+  // Inode Table at Block 4
+  uint8_t *itable = disk + 4 * BLOCK_SIZE;
+
+  // Inode 2: Root Directory (Points to Block 8)
+  Ext2Inode rootIno;
+  std::memset(&rootIno, 0, sizeof(rootIno));
+  rootIno.i_mode = 0040755;
+  rootIno.i_size = BLOCK_SIZE;
+  rootIno.i_links_count = 2;
+  rootIno.i_blocks = 8;
+  rootIno.i_block[0] = 8;
+  std::memcpy(itable + (2 - 1) * INODE_SIZE, &rootIno, sizeof(rootIno));
+
+  // Directory Entries in Block 8
+  uint8_t *dirBlock8 = disk + 8 * BLOCK_SIZE;
+  size_t off = 0;
+
+  auto *d1 = reinterpret_cast<Ext2DirEntry *>(dirBlock8 + off);
+  d1->inode = 2;
+  d1->rec_len = 12;
+  d1->name_len = 1;
+  d1->file_type = 2;
+  d1->name[0] = '.';
+  off += d1->rec_len;
+
+  auto *d2 = reinterpret_cast<Ext2DirEntry *>(dirBlock8 + off);
+  d2->inode = 2;
+  d2->rec_len = 12;
+  d2->name_len = 2;
+  d2->file_type = 2;
+  d2->name[0] = '.';
+  d2->name[1] = '.';
+  off += d2->rec_len;
+
+  auto *d3 = reinterpret_cast<Ext2DirEntry *>(dirBlock8 + off);
+  d3->inode = 12;
+  d3->rec_len = 32;
+  d3->name_len = 17;
+  d3->file_type = 1;
+  std::memcpy(d3->name, "database_dump.sql", 17);
+  off += d3->rec_len;
+
+  auto *d4 = reinterpret_cast<Ext2DirEntry *>(dirBlock8 + off);
+  d4->inode = 13;
+  d4->rec_len = static_cast<uint16_t>(BLOCK_SIZE - off);
+  d4->name_len = 5;
+  d4->file_type = 2;
+  std::memcpy(d4->name, "vault", 5);
+
+  // Inode 12: "database_dump.sql" (Points to Block 9)
+  Ext2Inode file12;
+  std::memset(&file12, 0, sizeof(file12));
+  file12.i_mode = 0100644;
+  file12.i_size = 64;
+  file12.i_links_count = 1;
+  file12.i_blocks = 8;
+  file12.i_block[0] = 9;
+  std::memcpy(itable + (12 - 1) * INODE_SIZE, &file12, sizeof(file12));
+
+  std::memcpy(disk + 9 * BLOCK_SIZE,
+              "CONFIDENTIAL_SQL_DATABASE_DUMP_HASHES_2026_SECRET", 49);
+
+  // Inode 13: "vault" (Directory, Points to Block 10)
+  Ext2Inode dir13;
+  std::memset(&dir13, 0, sizeof(dir13));
+  dir13.i_mode = 0040755;
+  dir13.i_size = BLOCK_SIZE;
+  dir13.i_links_count = 2;
+  dir13.i_blocks = 8;
+  dir13.i_block[0] = 10;
+  std::memcpy(itable + (13 - 1) * INODE_SIZE, &dir13, sizeof(dir13));
+
+  // Directory entries inside Block 10
+  uint8_t *dirBlock10 = disk + 10 * BLOCK_SIZE;
+  auto *v_d1 = reinterpret_cast<Ext2DirEntry *>(dirBlock10);
+  v_d1->inode = 13;
+  v_d1->rec_len = 12;
+  v_d1->name_len = 1;
+  v_d1->file_type = 2;
+  v_d1->name[0] = '.';
+
+  auto *v_d2 = reinterpret_cast<Ext2DirEntry *>(dirBlock10 + 12);
+  v_d2->inode = 2;
+  v_d2->rec_len = 12;
+  v_d2->name_len = 2;
+  v_d2->file_type = 2;
+  v_d2->name[0] = '.';
+  v_d2->name[1] = '.';
+
+  auto *v_d3 = reinterpret_cast<Ext2DirEntry *>(dirBlock10 + 24);
+  v_d3->inode = 14;
+  v_d3->rec_len = static_cast<uint16_t>(BLOCK_SIZE - 24);
+  v_d3->name_len = 8;
+  v_d3->file_type = 1;
+  std::memcpy(v_d3->name, "keys.pem", 8);
+
+  // Inode 14: "vault/keys.pem" (Points to Block 11)
+  Ext2Inode file14;
+  std::memset(&file14, 0, sizeof(file14));
+  file14.i_mode = 0100600;
+  file14.i_size = 32;
+  file14.i_links_count = 1;
+  file14.i_blocks = 8;
+  file14.i_block[0] = 11;
+  std::memcpy(itable + (14 - 1) * INODE_SIZE, &file14, sizeof(file14));
+
+  std::memcpy(disk + 11 * BLOCK_SIZE, "-----BEGIN PRIVATE KEY-----", 27);
+}
+
+// 7. ext3 Synthetic Volume Builder
+static void SetupExt3SyntheticDisk(MemoryDiskDevice &dev) {
+  uint8_t *disk = dev.GetDiskData();
+  constexpr uint32_t BLOCK_SIZE = 4096;
+  constexpr uint32_t TOTAL_BLOCKS = 1024;
+  constexpr uint32_t INODES_PER_GROUP = 128;
+  constexpr uint32_t INODE_SIZE = 128;
+
+  // Superblock at byte 1024
+  Ext3SuperBlock sb;
+  std::memset(&sb, 0, sizeof(sb));
+  sb.inode_count = INODES_PER_GROUP;
+  sb.blocks_count = TOTAL_BLOCKS;
+  sb.log_block_size = 2; // 1024 << 2 = 4096
+  sb.s_block_per_group = TOTAL_BLOCKS;
+  sb.s_inodes_per_group = INODES_PER_GROUP;
+  sb.s_magic = 0xEF53;
+  sb.s_rev_level = 1;
+  sb.inode_size = INODE_SIZE;
+  std::memcpy(disk + 1024, &sb, sizeof(sb));
+
+  // Group Descriptor Table at Block 1 (offset 1 * 4096)
+  Ext3GroupDescriptor gd;
+  std::memset(&gd, 0, sizeof(gd));
+  gd.bg_block_bitmap = 2;      // Block 2
+  gd.bg_inode_bitmap = 3;      // Block 3
+  gd.bg_inode_table = 4;       // Blocks 4..7
+  gd.bg_free_blocks_count = 1000;
+  gd.bg_free_inodes_count = INODES_PER_GROUP - 14;
+  std::memcpy(disk + 1 * BLOCK_SIZE, &gd, sizeof(gd));
+
+  // Mark Bitmaps
+  uint8_t *blockBitmap = disk + 2 * BLOCK_SIZE;
+  blockBitmap[0] = 0xFF; // Blocks 0..7
+  blockBitmap[1] = 0x0F; // Blocks 8..11 allocated
+
+  uint8_t *inodeBitmap = disk + 3 * BLOCK_SIZE;
+  inodeBitmap[0] = 0xFF; // Inodes 1..8
+  inodeBitmap[1] = 0x3F; // Inodes 9..14 allocated
+
+  // Inode Table at Block 4
+  uint8_t *itable = disk + 4 * BLOCK_SIZE;
+
+  // Inode 2: Root Directory (Points to Block 8)
+  Ext3Inode rootIno;
+  std::memset(&rootIno, 0, sizeof(rootIno));
+  rootIno.i_mode = 0040755;
+  rootIno.i_size = BLOCK_SIZE;
+  rootIno.i_links_count = 2;
+  rootIno.i_blocks = 8;
+  rootIno.i_block[0] = 8;
+  std::memcpy(itable + (2 - 1) * INODE_SIZE, &rootIno, sizeof(rootIno));
+
+  // Directory Entries in Block 8
+  uint8_t *dirBlock8 = disk + 8 * BLOCK_SIZE;
+  size_t off = 0;
+
+  auto *d1 = reinterpret_cast<Ext3DirEntry *>(dirBlock8 + off);
+  d1->inode = 2;
+  d1->rec_len = 12;
+  d1->name_len = 1;
+  d1->file_type = 2;
+  d1->name[0] = '.';
+  off += d1->rec_len;
+
+  auto *d2 = reinterpret_cast<Ext3DirEntry *>(dirBlock8 + off);
+  d2->inode = 2;
+  d2->rec_len = 12;
+  d2->name_len = 2;
+  d2->file_type = 2;
+  d2->name[0] = '.';
+  d2->name[1] = '.';
+  off += d2->rec_len;
+
+  auto *d3 = reinterpret_cast<Ext3DirEntry *>(dirBlock8 + off);
+  d3->inode = 12;
+  d3->rec_len = 32;
+  d3->name_len = 17;
+  d3->file_type = 1;
+  std::memcpy(d3->name, "database_dump.sql", 17);
+  off += d3->rec_len;
+
+  auto *d4 = reinterpret_cast<Ext3DirEntry *>(dirBlock8 + off);
+  d4->inode = 13;
+  d4->rec_len = static_cast<uint16_t>(BLOCK_SIZE - off);
+  d4->name_len = 5;
+  d4->file_type = 2;
+  std::memcpy(d4->name, "vault", 5);
+
+  // Inode 12: "database_dump.sql" (Points to Block 9)
+  Ext3Inode file12;
+  std::memset(&file12, 0, sizeof(file12));
+  file12.i_mode = 0100644;
+  file12.i_size = 64;
+  file12.i_links_count = 1;
+  file12.i_blocks = 8;
+  file12.i_block[0] = 9;
+  std::memcpy(itable + (12 - 1) * INODE_SIZE, &file12, sizeof(file12));
+
+  std::memcpy(disk + 9 * BLOCK_SIZE,
+              "CONFIDENTIAL_SQL_DATABASE_DUMP_HASHES_2026_SECRET", 49);
+
+  // Inode 13: "vault" (Directory, Points to Block 10)
+  Ext3Inode dir13;
+  std::memset(&dir13, 0, sizeof(dir13));
+  dir13.i_mode = 0040755;
+  dir13.i_size = BLOCK_SIZE;
+  dir13.i_links_count = 2;
+  dir13.i_blocks = 8;
+  dir13.i_block[0] = 10;
+  std::memcpy(itable + (13 - 1) * INODE_SIZE, &dir13, sizeof(dir13));
+
+  // Directory entries inside Block 10
+  uint8_t *dirBlock10 = disk + 10 * BLOCK_SIZE;
+  auto *v_d1 = reinterpret_cast<Ext3DirEntry *>(dirBlock10);
+  v_d1->inode = 13;
+  v_d1->rec_len = 12;
+  v_d1->name_len = 1;
+  v_d1->file_type = 2;
+  v_d1->name[0] = '.';
+
+  auto *v_d2 = reinterpret_cast<Ext3DirEntry *>(dirBlock10 + 12);
+  v_d2->inode = 2;
+  v_d2->rec_len = 12;
+  v_d2->name_len = 2;
+  v_d2->file_type = 2;
+  v_d2->name[0] = '.';
+  v_d2->name[1] = '.';
+
+  auto *v_d3 = reinterpret_cast<Ext3DirEntry *>(dirBlock10 + 24);
+  v_d3->inode = 14;
+  v_d3->rec_len = static_cast<uint16_t>(BLOCK_SIZE - 24);
+  v_d3->name_len = 8;
+  v_d3->file_type = 1;
+  std::memcpy(v_d3->name, "keys.pem", 8);
+
+  // Inode 14: "vault/keys.pem" (Points to Block 11)
+  Ext3Inode file14;
+  std::memset(&file14, 0, sizeof(file14));
+  file14.i_mode = 0100600;
+  file14.i_size = 32;
+  file14.i_links_count = 1;
+  file14.i_blocks = 8;
+  file14.i_block[0] = 11;
+  std::memcpy(itable + (14 - 1) * INODE_SIZE, &file14, sizeof(file14));
+
+  std::memcpy(disk + 11 * BLOCK_SIZE, "-----BEGIN PRIVATE KEY-----", 27);
+}
+
 // ============================================================================
-// Automated Synthetic Test Suite Across All 5 File Systems
+// Automated Synthetic Test Suite Across All 7 File Systems
 // ============================================================================
 
 static void RunSyntheticSuite() {
   std::cout << "\n============================================================="
                "===================\n";
   std::cout << "        RUNNING COMPREHENSIVE AUTOMATED VERIFICATION SUITE "
-               "(ALL 4 FS)           \n";
+               "(ALL 7 FS)           \n";
   std::cout << "==============================================================="
                "=================\n";
 
@@ -1463,7 +1875,7 @@ static void RunSyntheticSuite() {
   {
     std::cout << "\n###########################################################"
                  "#####################\n";
-    std::cout << " [1/4] EXECUTING NTFS FORENSIC VERIFICATION SUITE            "
+    std::cout << " [1/7] EXECUTING NTFS FORENSIC VERIFICATION SUITE            "
                  "                   \n";
     std::cout << "#############################################################"
                  "###################\n";
@@ -1504,7 +1916,7 @@ static void RunSyntheticSuite() {
   {
     std::cout << "\n###########################################################"
                  "#####################\n";
-    std::cout << " [2/4] EXECUTING XFS FORENSIC VERIFICATION SUITE             "
+    std::cout << " [2/7] EXECUTING XFS FORENSIC VERIFICATION SUITE             "
                  "                   \n";
     std::cout << "#############################################################"
                  "###################\n";
@@ -1636,7 +2048,7 @@ static void RunSyntheticSuite() {
   {
     std::cout << "\n###########################################################"
                  "#####################\n";
-    std::cout << " [3/4] EXECUTING ext4 FORENSIC VERIFICATION SUITE            "
+    std::cout << " [3/7] EXECUTING ext4 FORENSIC VERIFICATION SUITE            "
                  "                   \n";
     std::cout << "#############################################################"
                  "###################\n";
@@ -1699,7 +2111,7 @@ static void RunSyntheticSuite() {
   {
     std::cout << "\n###########################################################"
                  "#####################\n";
-    std::cout << " [4/4] EXECUTING exFAT FORENSIC VERIFICATION SUITE           "
+    std::cout << " [4/7] EXECUTING exFAT FORENSIC VERIFICATION SUITE           "
                  "                   \n";
     std::cout << "#############################################################"
                  "###################\n";
@@ -1720,7 +2132,7 @@ static void RunSyntheticSuite() {
     PrintHexDump(exFatDev.GetDiskData() + payloadOff, 64, payloadOff,
                  "exFAT Cluster 4 Data ('secret.txt')");
     ExplainDataSector(exFatDev.GetDiskData() + payloadOff, 64, payloadOff,
-                      "exFAT");
+                       "exFAT");
 
     PrintHexDump(exFatDev.GetDiskData() + dirEntryOff, 64, dirEntryOff,
                  "exFAT 0x85 Directory Entry");
@@ -1736,7 +2148,7 @@ static void RunSyntheticSuite() {
     PrintHexDump(exFatDev.GetDiskData() + payloadOff, 64, payloadOff,
                  "exFAT Cluster 4 Data [POST-WIPE]");
     ExplainDataSector(exFatDev.GetDiskData() + payloadOff, 64, payloadOff,
-                      "exFAT");
+                       "exFAT");
 
     PrintHexDump(exFatDev.GetDiskData() + dirEntryOff, 64, dirEntryOff,
                  "exFAT Directory Entry [POST-WIPE]");
@@ -1766,7 +2178,7 @@ static void RunSyntheticSuite() {
   {
     std::cout << "\n###########################################################"
                  "#####################\n";
-    std::cout << " [5/5] EXECUTING FAT32 FORENSIC VERIFICATION SUITE           "
+    std::cout << " [5/7] EXECUTING FAT32 FORENSIC VERIFICATION SUITE           "
                  "                  \n";
     std::cout << "#############################################################"
                  "###################\n";
@@ -1857,14 +2269,146 @@ static void RunSyntheticSuite() {
     std::cout << "[PASS] FAT32 Suite Completed with 100% Verification.\n";
   }
 
+  // -------------------------------------------------------------------------
+  // 6. ext2 Test Suite
+  // -------------------------------------------------------------------------
+  {
+    std::cout << "\n###########################################################"
+                 "#####################\n";
+    std::cout << " [6/7] EXECUTING ext2 FORENSIC VERIFICATION SUITE            "
+                 "                   \n";
+    std::cout << "#############################################################"
+                 "###################\n";
+
+    MemoryDiskDevice ext2Dev(DISK_SIZE, 512, "MemoryDisk://ext2");
+    SetupExt2SyntheticDisk(ext2Dev);
+    HDDController hdd(&ext2Dev);
+    Ext2Driver ext2Driver(&hdd);
+
+    assert(ext2Driver.Mount());
+    std::cout << "[ext2] Mounted successfully.\n";
+
+    // Pre-deletion Inspection
+    std::cout << "\n--- [BEFORE DELETION] Inspecting ext2 Data Block 9 & Inode 12 ---\n";
+    PrintHexDump(ext2Dev.GetDiskData() + 9 * 4096, 64, 9 * 4096,
+                 "ext2 Data Block 9 ('database_dump.sql')");
+    ExplainDataSector(ext2Dev.GetDiskData() + 9 * 4096, 64, 9 * 4096, "ext2");
+
+    size_t ino12Off = 4 * 4096 + (12 - 1) * 128;
+    PrintHexDump(ext2Dev.GetDiskData() + ino12Off, 128, ino12Off,
+                 "ext2 Inode 12");
+    ExplainExt2Inode(ext2Dev.GetDiskData() + ino12Off, 128, ino12Off);
+
+    // Scenario 6A: Erase file
+    assert(ext2Driver.EraseFile("database_dump.sql"));
+
+    // Post-deletion Inspection
+    std::cout << "\n--- [AFTER DELETION] Re-inspecting Same Physical Offsets ---\n";
+    PrintHexDump(ext2Dev.GetDiskData() + 9 * 4096, 64, 9 * 4096,
+                 "ext2 Data Block 9 [POST-WIPE]");
+    ExplainDataSector(ext2Dev.GetDiskData() + 9 * 4096, 64, 9 * 4096, "ext2");
+
+    PrintHexDump(ext2Dev.GetDiskData() + ino12Off, 128, ino12Off,
+                 "ext2 Inode 12 [POST-WIPE]");
+    ExplainExt2Inode(ext2Dev.GetDiskData() + ino12Off, 128, ino12Off);
+
+    assert(ext2Dev.GetDiskData()[9 * 4096] != 'C'); // Original 'C' destroyed
+    assert(ext2Dev.GetDiskData()[ino12Off] == 0x00);
+
+    // Scenario 6B: Erase nested file
+    assert(ext2Driver.EraseFile("vault/keys.pem"));
+    assert(ext2Dev.GetDiskData()[11 * 4096] != '-'); // Original '-' destroyed
+    size_t ino14Off = 4 * 4096 + (14 - 1) * 128;
+    assert(ext2Dev.GetDiskData()[ino14Off] == 0x00);
+
+    // Scenario 6C: Volume-wide wipe
+    std::cout << "\n--- Testing ext2 Volume-Wide Wipe ---\n";
+    std::memset(ext2Dev.GetDiskData() + 50 * 4096, 0xEE, 4096);
+    PrintHexDump(ext2Dev.GetDiskData() + 50 * 4096, 64, 50 * 4096,
+                 "ext2 User Block 50 [BEFORE WIPE]");
+    assert(ext2Driver.WipeVolume());
+    PrintHexDump(ext2Dev.GetDiskData() + 50 * 4096, 64, 50 * 4096,
+                 "ext2 User Block 50 [AFTER WIPE]");
+    ExplainDataSector(ext2Dev.GetDiskData() + 50 * 4096, 64, 50 * 4096, "ext2");
+    assert(ext2Dev.GetDiskData()[50 * 4096] != 0xEE);
+
+    std::cout << "[PASS] ext2 Suite Completed with 100% Verification.\n";
+  }
+
+  // -------------------------------------------------------------------------
+  // 7. ext3 Test Suite
+  // -------------------------------------------------------------------------
+  {
+    std::cout << "\n###########################################################"
+                 "#####################\n";
+    std::cout << " [7/7] EXECUTING ext3 FORENSIC VERIFICATION SUITE            "
+                 "                   \n";
+    std::cout << "#############################################################"
+                 "###################\n";
+
+    MemoryDiskDevice ext3Dev(DISK_SIZE, 512, "MemoryDisk://ext3");
+    SetupExt3SyntheticDisk(ext3Dev);
+    HDDController hdd(&ext3Dev);
+    Ext3Driver ext3Driver(&hdd);
+
+    assert(ext3Driver.Mount());
+    std::cout << "[ext3] Mounted successfully.\n";
+
+    // Pre-deletion Inspection
+    std::cout << "\n--- [BEFORE DELETION] Inspecting ext3 Data Block 9 & Inode 12 ---\n";
+    PrintHexDump(ext3Dev.GetDiskData() + 9 * 4096, 64, 9 * 4096,
+                 "ext3 Data Block 9 ('database_dump.sql')");
+    ExplainDataSector(ext3Dev.GetDiskData() + 9 * 4096, 64, 9 * 4096, "ext3");
+
+    size_t ino12Off = 4 * 4096 + (12 - 1) * 128;
+    PrintHexDump(ext3Dev.GetDiskData() + ino12Off, 128, ino12Off,
+                 "ext3 Inode 12");
+    ExplainExt3Inode(ext3Dev.GetDiskData() + ino12Off, 128, ino12Off);
+
+    // Scenario 7A: Erase file
+    assert(ext3Driver.EraseFile("database_dump.sql"));
+
+    // Post-deletion Inspection
+    std::cout << "\n--- [AFTER DELETION] Re-inspecting Same Physical Offsets ---\n";
+    PrintHexDump(ext3Dev.GetDiskData() + 9 * 4096, 64, 9 * 4096,
+                 "ext3 Data Block 9 [POST-WIPE]");
+    ExplainDataSector(ext3Dev.GetDiskData() + 9 * 4096, 64, 9 * 4096, "ext3");
+
+    PrintHexDump(ext3Dev.GetDiskData() + ino12Off, 128, ino12Off,
+                 "ext3 Inode 12 [POST-WIPE]");
+    ExplainExt3Inode(ext3Dev.GetDiskData() + ino12Off, 128, ino12Off);
+
+    assert(ext3Dev.GetDiskData()[9 * 4096] != 'C'); // Original 'C' destroyed
+    assert(ext3Dev.GetDiskData()[ino12Off] == 0x00);
+
+    // Scenario 7B: Erase nested file
+    assert(ext3Driver.EraseFile("vault/keys.pem"));
+    assert(ext3Dev.GetDiskData()[11 * 4096] != '-'); // Original '-' destroyed
+    size_t ino14Off = 4 * 4096 + (14 - 1) * 128;
+    assert(ext3Dev.GetDiskData()[ino14Off] == 0x00);
+
+    // Scenario 7C: Volume-wide wipe
+    std::cout << "\n--- Testing ext3 Volume-Wide Wipe ---\n";
+    std::memset(ext3Dev.GetDiskData() + 50 * 4096, 0xEE, 4096);
+    PrintHexDump(ext3Dev.GetDiskData() + 50 * 4096, 64, 50 * 4096,
+                 "ext3 User Block 50 [BEFORE WIPE]");
+    assert(ext3Driver.WipeVolume());
+    PrintHexDump(ext3Dev.GetDiskData() + 50 * 4096, 64, 50 * 4096,
+                 "ext3 User Block 50 [AFTER WIPE]");
+    ExplainDataSector(ext3Dev.GetDiskData() + 50 * 4096, 64, 50 * 4096, "ext3");
+    assert(ext3Dev.GetDiskData()[50 * 4096] != 0xEE);
+
+    std::cout << "[PASS] ext3 Suite Completed with 100% Verification.\n";
+  }
+
   // =========================================================================
-  // [6/6] EXECUTING FORENSIC VERIFICATION & AUDIT REPORTING SUITE
+  // [8/8] EXECUTING FORENSIC VERIFICATION & AUDIT REPORTING SUITE
   // =========================================================================
   {
     std::cout << "\n==========================================================="
                  "=====================\n";
     std::cout
-        << " [6/6] EXECUTING FORENSIC VERIFICATION & AUDIT REPORTING SUITE\n";
+        << " [8/8] EXECUTING FORENSIC VERIFICATION & AUDIT REPORTING SUITE\n";
     std::cout << "============================================================="
                  "===================\n\n";
 
@@ -1964,7 +2508,7 @@ static void RunSyntheticSuite() {
 
   std::cout << "\n============================================================="
                "===================\n";
-  std::cout << " [ALL SUITES PASSED] ZERO-RECOVERY VERIFIED ACROSS ALL 5 "
+  std::cout << " [ALL SUITES PASSED] ZERO-RECOVERY VERIFIED ACROSS ALL 7 "
                "FILESYSTEMS & VERIFIER \n";
   std::cout << "==============================================================="
                "=================\n";
@@ -1992,7 +2536,7 @@ static void RunInteractiveLiveSession() {
   std::cout << "  - Mounted Volume Partition: /dev/sdb1\n";
 #endif
   std::cout << "  - Type 'TEST' to run the automated in-memory verification "
-               "suite for all 5 FS\n\n";
+               "suite for all 7 FS\n\n";
 
   std::cout << "Enter target device path: ";
   std::string path;
@@ -2044,7 +2588,9 @@ static void RunInteractiveLiveSession() {
   std::cout << "  [3] ext4\n";
   std::cout << "  [4] exFAT\n";
   std::cout << "  [5] FAT32\n";
-  std::cout << "Selection (1-5, default 1): ";
+  std::cout << "  [6] ext2\n";
+  std::cout << "  [7] ext3\n";
+  std::cout << "Selection (1-7, default 1): ";
   std::string fsChoice;
   std::getline(std::cin, fsChoice);
 
@@ -2054,6 +2600,8 @@ static void RunInteractiveLiveSession() {
   Ext4Driver *ext4Ptr = nullptr;
   ExFatDriver *exFatPtr = nullptr;
   Fat32Driver *fat32Ptr = nullptr;
+  Ext2Driver *ext2Ptr = nullptr;
+  Ext3Driver *ext3Ptr = nullptr;
 
   if (fsChoice == "2" || fsChoice == "xfs" || fsChoice == "XFS") {
     auto xfs = std::make_unique<XfsDriver>(&hardware);
@@ -2091,6 +2639,24 @@ static void RunInteractiveLiveSession() {
     fat32->PrintBootInfo();
     fat32Ptr = fat32.get();
     fsDriver = std::move(fat32);
+  } else if (fsChoice == "6" || fsChoice == "ext2" || fsChoice == "EXT2") {
+    auto ext2 = std::make_unique<Ext2Driver>(&hardware);
+    if (!ext2->Mount()) {
+      std::cerr << "[ERROR] Failed to mount ext2 filesystem.\n";
+      return;
+    }
+    ext2->PrintSuperBlockInfo();
+    ext2Ptr = ext2.get();
+    fsDriver = std::move(ext2);
+  } else if (fsChoice == "7" || fsChoice == "ext3" || fsChoice == "EXT3") {
+    auto ext3 = std::make_unique<Ext3Driver>(&hardware);
+    if (!ext3->Mount()) {
+      std::cerr << "[ERROR] Failed to mount ext3 filesystem.\n";
+      return;
+    }
+    ext3->PrintSuperBlockInfo();
+    ext3Ptr = ext3.get();
+    fsDriver = std::move(ext3);
   } else {
     auto ntfs = std::make_unique<NtfsDriver>(&hardware);
     if (!ntfs->Mount()) {
@@ -2168,6 +2734,14 @@ static void RunInteractiveLiveSession() {
           fsName = "FAT32";
           firstDataSector = fat32Ptr->GetFirstDataSector();
           spc = fat32Ptr->GetBPB().sectorsPerCluster;
+        } else if (ext2Ptr) {
+          fsName = "ext2";
+          firstDataSector = 2;
+          spc = 8;
+        } else if (ext3Ptr) {
+          fsName = "ext3";
+          firstDataSector = 2;
+          spc = 8;
         }
 
         AuditReport vReport = verifier.AuditVolumeWipe(fsName, firstDataSector,
@@ -2309,6 +2883,44 @@ static void RunInteractiveLiveSession() {
           AuditReport fileReport = verifier.AuditFileErasure(
               action, "FAT32", {dataSec, dataSec + 1}, 4096,
               fat32Ptr->GetBytesPerCluster(), preHash, true, true);
+          fileReport.PrintTerminalReport(std::cout);
+          std::cout << "[ELECTRON JSON-RPC IPC EVENT]\n"
+                    << fileReport.ToJson() << "\n\n";
+        } else {
+          std::cerr << "[FAILED] Erasure failed.\n";
+        }
+      } else if (ext2Ptr) {
+        std::cout << "\n[ext2] Executing forensic erasure for: '" << action
+                  << "'...\n";
+        std::vector<uint8_t> sbSec(1024, 0);
+        hardware.ReadSectors(2, 2, sbSec.data());
+        PrintHexDump(sbSec.data(), 64, 1024, "ext2 Superblock @ 1024");
+        ExplainExt2Superblock(sbSec.data(), 64, 1024);
+
+        std::string preHash = verifier.CapturePreWipeDigest({2, 3});
+        if (ext2Ptr->EraseFile(action)) {
+          std::cout << "[SUCCESS] Target eradicated.\n";
+          AuditReport fileReport = verifier.AuditFileErasure(
+              action, "ext2", {2, 3, 4, 5}, 4096, 4096, preHash, true, true);
+          fileReport.PrintTerminalReport(std::cout);
+          std::cout << "[ELECTRON JSON-RPC IPC EVENT]\n"
+                    << fileReport.ToJson() << "\n\n";
+        } else {
+          std::cerr << "[FAILED] Erasure failed.\n";
+        }
+      } else if (ext3Ptr) {
+        std::cout << "\n[ext3] Executing forensic erasure for: '" << action
+                  << "'...\n";
+        std::vector<uint8_t> sbSec(1024, 0);
+        hardware.ReadSectors(2, 2, sbSec.data());
+        PrintHexDump(sbSec.data(), 64, 1024, "ext3 Superblock @ 1024");
+        ExplainExt3Superblock(sbSec.data(), 64, 1024);
+
+        std::string preHash = verifier.CapturePreWipeDigest({2, 3});
+        if (ext3Ptr->EraseFile(action)) {
+          std::cout << "[SUCCESS] Target eradicated.\n";
+          AuditReport fileReport = verifier.AuditFileErasure(
+              action, "ext3", {2, 3, 4, 5}, 4096, 4096, preHash, true, true);
           fileReport.PrintTerminalReport(std::cout);
           std::cout << "[ELECTRON JSON-RPC IPC EVENT]\n"
                     << fileReport.ToJson() << "\n\n";

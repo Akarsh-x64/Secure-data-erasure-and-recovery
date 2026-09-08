@@ -25,6 +25,8 @@ SOURCES=(
     "Erasure/File Systems/ext4/ext4.cpp"
     "Erasure/File Systems/exFAT/exFAT.cpp"
     "Erasure/File Systems/FAT32/FAT32.cpp"
+    "Erasure/File Systems/ext2/ext2.cpp"
+    "Erasure/File Systems/ext3/ext3.cpp"
     "Erasure/Verification/StatisticalTests.cpp"
     "Erasure/Verification/SignatureCarver.cpp"
     "Erasure/Verification/VerificationReport.cpp"
