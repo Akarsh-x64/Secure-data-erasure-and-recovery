@@ -47,7 +47,6 @@ private:
     // =========================================================================
     // Internal Geometry & Low-Level Helpers
     // =========================================================================
-    uint64_t ClusterToSector(uint64_t lcn) const;
     uint64_t SectorToByteOffset(uint64_t sector) const;
 
     bool ReadSectors(uint64_t startSector, uint32_t count, void* buffer) const;
@@ -55,6 +54,9 @@ private:
 
     // Applies NTFS update sequence (fixup array) to protected 512-byte sector chunks
     bool ApplyFixup(uint8_t* buffer, size_t bufferSize) const;
+
+    // Encodes NTFS update sequence (fixup array) before writing to raw sectors
+    bool EncodeFixup(uint8_t* buffer, size_t bufferSize) const;
 
     // Decodes variable-length runlist bytes into a vector of physical (LCN, count) extents
     bool DecodeRunList(const uint8_t* runlist, size_t maxLen, std::vector<NTFS::NtfsExtent>& outExtents) const;
@@ -78,9 +80,10 @@ private:
                                 uint64_t& outFileSize) const;
 
     // =========================================================================
-    // Volume Allocation Bitmap ($Bitmap - Record 6)
+    // Volume Allocation Bitmap ($Bitmap - Record 6) & $MFT Bitmap (Record 0)
     // =========================================================================
     bool ClearClusterBitmapBit(uint64_t lcn);
+    bool ClearMftRecordBitmapBit(uint64_t recordNum);
     bool ReadClusterBitmapByte(uint64_t lcn, uint8_t& outByte, uint64_t& outSector, uint32_t& outOffsetInSector, uint8_t& outBitMask) const;
 
     // =========================================================================
@@ -144,6 +147,7 @@ public:
     uint32_t GetBytesPerSector() const { return m_bytesPerSector; }
     uint32_t GetBytesPerCluster() const { return m_bytesPerCluster; }
     uint32_t GetMftRecordSize() const { return m_mftRecordSize; }
+    uint64_t ClusterToSector(uint64_t lcn) const;
 };
 
 } // namespace FileSystems

@@ -56,6 +56,11 @@ public:
     // Test function to verify VBR parsing
     void PrintVBRInfo() const;
 
+    // Diagnostics & Geometry Getters
+    uint64_t GetFirstDataSector() const { return m_vbr.clusterHeapOffsetSectors; }
+    uint32_t GetSectorsPerCluster() const { return m_sectorsPerCluster; }
+    uint32_t GetBytesPerSector() const { return m_bytesPerSector; }
+
     // =========================================================================
     // Checksum & Hash Algorithms (Microsoft exFAT Specification Compliant)
     // =========================================================================

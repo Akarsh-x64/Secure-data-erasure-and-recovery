@@ -101,7 +101,7 @@ void SignatureCarver::InitializeSignatures() {
     Add("Matroska / WebM Container (EBML)", "mkv", SignatureCategory::AUDIO_VIDEO, { 0x1A, 0x45, 0xDF, 0xA3 });
     Add("Windows Media Video (ASF / WMV / WMA)", "wmv", SignatureCategory::AUDIO_VIDEO, { 0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11 });
     Add("MPEG-PS Video", "mpg", SignatureCategory::AUDIO_VIDEO, { 0x00, 0x00, 0x01, 0xBA });
-    Add("MPEG-TS Transport Stream", "ts", SignatureCategory::AUDIO_VIDEO, { 0x47 }); // Sync byte 0x47
+    Add("MPEG-TS Transport Stream", "ts", SignatureCategory::AUDIO_VIDEO, { 0x47, 0x40, 0x00, 0x10 }); // Sync byte 0x47 + PID 0
     Add("Flash Video (FLV)", "flv", SignatureCategory::AUDIO_VIDEO, { 0x46, 0x4C, 0x56, 0x01 }); // FLV.
     Add("MIDI Audio File", "mid", SignatureCategory::AUDIO_VIDEO, { 0x4D, 0x54, 0x68, 0x64 }); // MThd
     Add("Advanced Audio Coding (AAC ADTS)", "aac", SignatureCategory::AUDIO_VIDEO, { 0xFF, 0xF1 });
@@ -171,14 +171,24 @@ std::vector<CarvedArtifact> SignatureCarver::ScanBuffer(const uint8_t* buffer, s
     // We scan on 512-byte sector boundaries (where files begin on disk) as well as any arbitrary offset
     // To balance speed and completeness, inspect sector boundaries first, and then sliding windows
     for (size_t offset = 0; offset < size; ++offset) {
-        // Fast skip if byte is zero or 0xFF (no magic header begins with 0x00 or 0xFF except JPEG)
+        // Fast skip if byte is zero
         uint8_t firstByte = buffer[offset];
         if (firstByte == 0x00) {
             continue;
         }
 
+        bool isSectorBoundary = ((basePhysicalOffset + offset) % sectorSize) == 0;
+
         for (const auto& sig : m_signatures) {
             size_t sigLen = sig.headerBytes.size();
+
+            // Guard against PRNG noise false-positive collisions:
+            // Standalone files on disk always begin at sector boundaries.
+            // Signatures shorter than 4 bytes (e.g. BM, MZ, GZ) must be sector-aligned.
+            if (sigLen < 4 && !isSectorBoundary) {
+                continue;
+            }
+
             size_t targetPos = offset + sig.headerOffset;
 
             if (targetPos + sigLen <= size) {

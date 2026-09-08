@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../Core/IHardwareController.h"
-#include "../../Core/IStorageDevice.h"
+#include "../Core/IHardwareController.h"
+#include "../Core/IStorageDevice.h"
 #include "VerificationReport.h"
 #include "SignatureCarver.h"
 #include "StatisticalTests.h"

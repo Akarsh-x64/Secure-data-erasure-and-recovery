@@ -80,6 +80,39 @@ bool NtfsDriver::ApplyFixup(uint8_t* buffer, size_t bufferSize) const {
     return true;
 }
 
+bool NtfsDriver::EncodeFixup(uint8_t* buffer, size_t bufferSize) const {
+    if (!buffer || bufferSize < sizeof(NTFS::NtfsRecordHeader)) return false;
+
+    const auto* hdr = reinterpret_cast<const NTFS::NtfsRecordHeader*>(buffer);
+    if (hdr->magic != NTFS::NTFS_MAGIC_FILE && hdr->magic != NTFS::NTFS_MAGIC_INDX) {
+        return false;
+    }
+
+    uint16_t usnOffset = hdr->updateSequenceOffset;
+    uint16_t usnCount = hdr->updateSequenceSize;
+
+    if (static_cast<size_t>(usnOffset) + static_cast<size_t>(usnCount) * 2 > bufferSize) {
+        return false;
+    }
+
+    uint16_t* usnPtr = reinterpret_cast<uint16_t*>(buffer + usnOffset);
+    uint16_t usn = *usnPtr + 1;
+    if (usn == 0 || usn == 0xFFFF) usn = 1;
+    *usnPtr = usn;
+
+    uint16_t* fixupArray = reinterpret_cast<uint16_t*>(buffer + usnOffset + 2);
+
+    for (uint16_t i = 0; i < usnCount - 1; ++i) {
+        size_t sectorEndOffset = static_cast<size_t>(i + 1) * 512 - 2;
+        if (sectorEndOffset + 2 > bufferSize) break;
+
+        uint16_t* sectorWordPtr = reinterpret_cast<uint16_t*>(buffer + sectorEndOffset);
+        fixupArray[i] = *sectorWordPtr;
+        *sectorWordPtr = usn;
+    }
+    return true;
+}
+
 // =============================================================================
 // Runlist Decoder
 // =============================================================================
@@ -188,24 +221,48 @@ bool NtfsDriver::WriteMftRecord(uint64_t recordNum, const std::vector<uint8_t>& 
         return false;
     }
 
-    std::memcpy(buffer.data() + offsetInSector, inRecord.data(), m_mftRecordSize);
+    std::vector<uint8_t> recordCopy(inRecord.begin(), inRecord.begin() + m_mftRecordSize);
+    EncodeFixup(recordCopy.data(), m_mftRecordSize);
+
+    std::memcpy(buffer.data() + offsetInSector, recordCopy.data(), m_mftRecordSize);
     return WriteSectors(startSector, sectorsNeeded, buffer.data());
 }
 
 bool NtfsDriver::WipeMftRecordOnDisk(uint64_t recordNum) {
-    uint32_t offsetInSector = 0;
-    uint64_t startSector = MftRecordToSector(recordNum, offsetInSector);
-
-    uint32_t sectorsNeeded = (m_mftRecordSize + offsetInSector + m_bytesPerSector - 1) / m_bytesPerSector;
-    std::vector<uint8_t> buffer(sectorsNeeded * m_bytesPerSector);
-
-    if (!ReadSectors(startSector, sectorsNeeded, buffer.data())) {
+    std::vector<uint8_t> record;
+    if (!ReadMftRecord(recordNum, record)) {
         return false;
     }
 
-    // Obliterate the 1024-byte record on disk with zeros
-    std::memset(buffer.data() + offsetInSector, 0, m_mftRecordSize);
-    return WriteSectors(startSector, sectorsNeeded, buffer.data());
+    auto* hdr = reinterpret_cast<NTFS::NtfsRecordHeader*>(record.data());
+    if (hdr->magic == NTFS::NTFS_MAGIC_FILE) {
+        hdr->sequenceNumber++;
+        hdr->flags &= ~NTFS::FILE_RECORD_IN_USE; // Mark record as free/unallocated
+        hdr->hardLinkCount = 0;
+        hdr->baseFileRecord = 0;
+
+        uint16_t firstAttr = hdr->firstAttributeOffset;
+        if (firstAttr == 0 || firstAttr > m_mftRecordSize - 8) {
+            firstAttr = 0x38;
+            hdr->firstAttributeOffset = firstAttr;
+        }
+
+        // Write ATTR_END marker at firstAttributeOffset
+        *reinterpret_cast<uint32_t*>(record.data() + firstAttr) = NTFS::ATTR_END;
+        hdr->usedBytes = firstAttr + 8; // Quadword aligned
+
+        // Zero out all sensitive attribute payload data completely
+        size_t zeroStart = firstAttr + 4;
+        if (zeroStart < m_mftRecordSize) {
+            std::memset(record.data() + zeroStart, 0, m_mftRecordSize - zeroStart);
+        }
+    } else {
+        std::memset(record.data(), 0, m_mftRecordSize);
+    }
+
+    bool ok = WriteMftRecord(recordNum, record);
+    ClearMftRecordBitmapBit(recordNum);
+    return ok;
 }
 
 // =============================================================================
@@ -358,6 +415,59 @@ bool NtfsDriver::ClearClusterBitmapBit(uint64_t lcn) {
 
     sectorBuf[offsetInSector] &= ~bitMask;
     return WriteSectors(sector, 1, sectorBuf.data());
+}
+
+bool NtfsDriver::ClearMftRecordBitmapBit(uint64_t recordNum) {
+    std::vector<uint8_t> mft0;
+    if (!ReadMftRecord(NTFS::MFT_REC_MFT, mft0)) return false;
+
+    const uint8_t* attrPtr = FindAttribute(mft0, NTFS::ATTR_BITMAP);
+    if (!attrPtr) return false;
+
+    const auto* attrHdr = reinterpret_cast<const NTFS::NtfsAttributeHeader*>(attrPtr);
+    uint64_t byteIdx = recordNum / 8;
+    uint8_t mask = static_cast<uint8_t>(1 << (recordNum % 8));
+
+    if (attrHdr->nonResidentFlag == 0) {
+        const auto* res = reinterpret_cast<const NTFS::NtfsResidentAttributeHeader*>(
+            attrPtr + sizeof(NTFS::NtfsAttributeHeader)
+        );
+        if (byteIdx < res->valueLength) {
+            uint8_t* valPtr = const_cast<uint8_t*>(attrPtr + res->valueOffset);
+            valPtr[byteIdx] &= ~mask;
+            return WriteMftRecord(NTFS::MFT_REC_MFT, mft0);
+        }
+    } else {
+        const auto* nonRes = reinterpret_cast<const NTFS::NtfsNonResidentAttributeHeader*>(
+            attrPtr + sizeof(NTFS::NtfsAttributeHeader)
+        );
+        std::vector<NTFS::NtfsExtent> extents;
+        size_t runListLen = (attrHdr->length > nonRes->dataRunsOffset) ? (attrHdr->length - nonRes->dataRunsOffset) : 0;
+        if (DecodeRunList(attrPtr + nonRes->dataRunsOffset, runListLen, extents)) {
+            uint64_t curByte = 0;
+            for (const auto& ext : extents) {
+                uint64_t extBytes = ext.clusterCount * m_bytesPerCluster;
+                if (byteIdx < curByte + extBytes) {
+                    uint64_t offInExt = byteIdx - curByte;
+                    uint64_t clusterInExt = offInExt / m_bytesPerCluster;
+                    uint32_t byteInCluster = static_cast<uint32_t>(offInExt % m_bytesPerCluster);
+
+                    uint64_t targetLcn = ext.lcn + clusterInExt;
+                    uint64_t sector = ClusterToSector(targetLcn) + (byteInCluster / m_bytesPerSector);
+                    uint32_t offInSector = byteInCluster % m_bytesPerSector;
+
+                    std::vector<uint8_t> secBuf(m_bytesPerSector);
+                    if (ReadSectors(sector, 1, secBuf.data())) {
+                        secBuf[offInSector] &= ~mask;
+                        return WriteSectors(sector, 1, secBuf.data());
+                    }
+                    return false;
+                }
+                curByte += extBytes;
+            }
+        }
+    }
+    return false;
 }
 
 // =============================================================================
@@ -537,26 +647,113 @@ bool NtfsDriver::FindEntryInDirectory(uint64_t dirRecordNum, const std::string& 
 }
 
 bool NtfsDriver::ScrubDirectoryEntry(uint64_t dirRecordNum, const std::string& targetName) {
-    uint64_t childRecord = 0;
-    bool isDir = false;
-    uint64_t indexSector = 0;
-    uint32_t indexOffset = 0;
-    uint32_t entrySize = 0;
+    std::vector<uint8_t> dirRecord;
+    if (!ReadMftRecord(dirRecordNum, dirRecord)) return false;
 
-    if (!FindEntryInDirectory(dirRecordNum, targetName, childRecord, isDir, indexSector, indexOffset, entrySize)) {
-        return false;
+    // 1. Try removing from resident $INDEX_ROOT
+    uint8_t* indexRootAttr = const_cast<uint8_t*>(FindAttribute(dirRecord, NTFS::ATTR_INDEX_ROOT));
+    if (indexRootAttr) {
+        auto* attrHdr = reinterpret_cast<NTFS::NtfsAttributeHeader*>(indexRootAttr);
+        auto* resHdr = reinterpret_cast<NTFS::NtfsResidentAttributeHeader*>(
+            indexRootAttr + sizeof(NTFS::NtfsAttributeHeader)
+        );
+        uint8_t* rootPayload = indexRootAttr + resHdr->valueOffset;
+        uint8_t* indexData = rootPayload + sizeof(NTFS::NtfsIndexRootHeader);
+        size_t indexDataLen = resHdr->valueLength - sizeof(NTFS::NtfsIndexRootHeader);
+
+        uint64_t childRef = 0;
+        bool isDir = false;
+        uint64_t childVcn = 0;
+        size_t entryOffset = 0;
+        uint32_t entryLen = 0;
+
+        if (SearchIndexBlock(indexData, indexDataLen, targetName, childRef, isDir, childVcn, entryOffset, entryLen)) {
+            auto* idxHdr = reinterpret_cast<NTFS::NtfsIndexHeader*>(indexData);
+            if (entryOffset + entryLen <= idxHdr->totalEntriesSize) {
+                // Shift subsequent index entries left over the eradicated entry
+                size_t bytesToShift = idxHdr->totalEntriesSize - (entryOffset + entryLen);
+                if (bytesToShift > 0) {
+                    std::memmove(indexData + entryOffset, indexData + entryOffset + entryLen, bytesToShift);
+                }
+                // Zero vacated tail space of index entries
+                std::memset(indexData + idxHdr->totalEntriesSize - entryLen, 0, entryLen);
+
+                idxHdr->totalEntriesSize -= entryLen;
+                idxHdr->allocatedSize -= entryLen;
+                resHdr->valueLength -= entryLen;
+
+                uint32_t oldAttrLen = attrHdr->length;
+                attrHdr->length -= entryLen;
+
+                // Shift any subsequent attributes in the MFT record left
+                size_t afterAttrOffset = (indexRootAttr - dirRecord.data()) + oldAttrLen;
+                auto* recHdr = reinterpret_cast<NTFS::NtfsRecordHeader*>(dirRecord.data());
+                if (afterAttrOffset < recHdr->usedBytes) {
+                    size_t tailBytes = recHdr->usedBytes - afterAttrOffset;
+                    std::memmove(dirRecord.data() + afterAttrOffset - entryLen, dirRecord.data() + afterAttrOffset, tailBytes);
+                }
+                std::memset(dirRecord.data() + recHdr->usedBytes - entryLen, 0, entryLen);
+                recHdr->usedBytes -= entryLen;
+
+                return WriteMftRecord(dirRecordNum, dirRecord);
+            }
+        }
     }
 
-    uint32_t sectorsNeeded = (indexOffset + entrySize + m_bytesPerSector - 1) / m_bytesPerSector;
-    std::vector<uint8_t> buffer(sectorsNeeded * m_bytesPerSector);
+    // 2. Try removing from non-resident $INDEX_ALLOCATION ("INDX" blocks)
+    const uint8_t* indexAllocAttr = FindAttribute(dirRecord, NTFS::ATTR_INDEX_ALLOCATION, "$I30");
+    if (indexAllocAttr) {
+        std::vector<NTFS::NtfsExtent> allocExtents;
+        const auto* nonRes = reinterpret_cast<const NTFS::NtfsNonResidentAttributeHeader*>(
+            indexAllocAttr + sizeof(NTFS::NtfsAttributeHeader)
+        );
+        const auto* attrHdr = reinterpret_cast<const NTFS::NtfsAttributeHeader*>(indexAllocAttr);
+        size_t runListLen = (attrHdr->length > nonRes->dataRunsOffset) ? (attrHdr->length - nonRes->dataRunsOffset) : 0;
+        DecodeRunList(indexAllocAttr + nonRes->dataRunsOffset, runListLen, allocExtents);
 
-    if (!ReadSectors(indexSector, sectorsNeeded, buffer.data())) {
-        return false;
+        for (const auto& ext : allocExtents) {
+            uint64_t blocksInExtent = (ext.clusterCount * m_bytesPerCluster) / m_indexBlockSize;
+            for (uint64_t b = 0; b < blocksInExtent; ++b) {
+                uint64_t blockStartSector = ClusterToSector(ext.lcn) + (b * m_indexBlockSize / m_bytesPerSector);
+                std::vector<uint8_t> blockBuffer(m_indexBlockSize);
+
+                if (!ReadSectors(blockStartSector, m_indexBlockSize / m_bytesPerSector, blockBuffer.data())) {
+                    continue;
+                }
+
+                ApplyFixup(blockBuffer.data(), blockBuffer.size());
+                auto* ib = reinterpret_cast<NTFS::NtfsIndexBlock*>(blockBuffer.data());
+                if (ib->magic != NTFS::NTFS_MAGIC_INDX) continue;
+
+                uint64_t childRef = 0;
+                bool isDir = false;
+                uint64_t childVcn = 0;
+                size_t entryOffset = 0;
+                uint32_t entryLen = 0;
+
+                uint8_t* indexHeaderPtr = reinterpret_cast<uint8_t*>(&ib->indexHeader);
+                size_t headerOffsetInBlock = indexHeaderPtr - blockBuffer.data();
+
+                if (SearchIndexBlock(indexHeaderPtr, m_indexBlockSize - headerOffsetInBlock,
+                                     targetName, childRef, isDir, childVcn, entryOffset, entryLen)) {
+                    auto* idxHdr = &ib->indexHeader;
+                    if (entryOffset + entryLen <= idxHdr->totalEntriesSize) {
+                        size_t bytesToShift = idxHdr->totalEntriesSize - (entryOffset + entryLen);
+                        if (bytesToShift > 0) {
+                            std::memmove(indexHeaderPtr + entryOffset, indexHeaderPtr + entryOffset + entryLen, bytesToShift);
+                        }
+                        std::memset(indexHeaderPtr + idxHdr->totalEntriesSize - entryLen, 0, entryLen);
+                        idxHdr->totalEntriesSize -= entryLen;
+
+                        EncodeFixup(blockBuffer.data(), blockBuffer.size());
+                        return WriteSectors(blockStartSector, m_indexBlockSize / m_bytesPerSector, blockBuffer.data());
+                    }
+                }
+            }
+        }
     }
 
-    // Zero out the entire directory index entry on disk
-    std::memset(buffer.data() + indexOffset, 0, entrySize);
-    return WriteSectors(indexSector, sectorsNeeded, buffer.data());
+    return false;
 }
 
 bool NtfsDriver::ListDirectoryContents(uint64_t dirRecordNum,
@@ -1129,6 +1326,7 @@ bool NtfsDriver::FormatDrive(bool fullDriveSanitize) {
         uint32_t sectorsNeeded = (1024 + offInSec + bytesPerSec - 1) / bytesPerSec;
         std::vector<uint8_t> secBuf(sectorsNeeded * bytesPerSec, 0);
         ReadSectors(targetSec, sectorsNeeded, secBuf.data());
+        EncodeFixup(cleanRecord.data(), 1024);
         std::memcpy(secBuf.data() + offInSec, cleanRecord.data(), 1024);
         WriteSectors(targetSec, sectorsNeeded, secBuf.data());
     }

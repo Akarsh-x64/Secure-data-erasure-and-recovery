@@ -176,6 +176,7 @@ AuditReport VerificationEngine::AuditDirectoryErasure(const std::string& path,
     report.clusterSize = clusterSize;
     report.directoryUnlinked = parentUnlinked;
     report.metadataCleared = true;
+    (void)childFiles;
 
     if (!m_hardware) {
         report.passed = false;

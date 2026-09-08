@@ -52,7 +52,8 @@ bool WindowsStorageDevice::Open(const std::string &devicePath) {
 
 void WindowsStorageDevice::Close() {
   if (m_hDevice != INVALID_HANDLE_VALUE) {
-    // Unlock volume just in case it was locked
+    FlushFileBuffers(m_hDevice);
+    DismountVolume();
     UnlockVolume();
     CloseHandle(m_hDevice);
     m_hDevice = INVALID_HANDLE_VALUE;

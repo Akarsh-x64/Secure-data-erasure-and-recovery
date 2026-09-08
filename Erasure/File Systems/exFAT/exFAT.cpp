@@ -85,11 +85,12 @@ bool ExFatDriver::Mount() {
 }
 
 uint32_t ExFatDriver::ReadFatEntry(uint32_t cluster) const {
+    if (m_vbr.fatOffsetSectors == 0 || m_bytesPerSector == 0) return 0xFFFFFFFF;
     uint64_t fatSector = m_vbr.fatOffsetSectors + ((cluster * 4) / m_bytesPerSector);
     uint32_t fatOffset = (cluster * 4) % m_bytesPerSector;
     
     std::vector<uint8_t> sector(m_bytesPerSector);
-    if (!m_hardware->ReadSectors(fatSector, 1, sector.data())) return 0;
+    if (!m_hardware->ReadSectors(fatSector, 1, sector.data())) return 0xFFFFFFFF;
     
     uint32_t nextCluster;
     std::memcpy(&nextCluster, &sector[fatOffset], sizeof(uint32_t));
@@ -152,7 +153,9 @@ std::vector<uint32_t> ExFatDriver::GetClusterChain(uint32_t startCluster, uint64
         // Unknown length (e.g. Root Directory). Must follow FAT chain until EOF.
         while (currentCluster >= 2 && currentCluster < 0xFFFFFFF8) {
             clusters.push_back(currentCluster);
-            currentCluster = ReadFatEntry(currentCluster);
+            uint32_t next = ReadFatEntry(currentCluster);
+            if (next < 2 || next >= 0xFFFFFFF8 || next == currentCluster) break;
+            currentCluster = next;
         }
     } else {
         uint32_t clusterCount = static_cast<uint32_t>((dataLength + clusterBytes - 1) / clusterBytes);
@@ -367,11 +370,19 @@ bool ExFatDriver::WipeVolume() {
         return false;
     };
 
-    std::cout << "[Erasure] Carpet Bombing " << m_vbr.clusterCount << " data clusters...\n";
+    uint32_t totalClusters = m_vbr.clusterCount;
+    if (totalClusters == 0 && m_sectorsPerCluster > 0 && m_hardware != nullptr) {
+        auto geo = m_hardware->GetGeometry();
+        if (geo.totalSectors > m_vbr.clusterHeapOffsetSectors) {
+            totalClusters = static_cast<uint32_t>((geo.totalSectors - m_vbr.clusterHeapOffsetSectors) / m_sectorsPerCluster);
+        }
+    }
+
+    std::cout << "[Erasure] Carpet Bombing " << totalClusters << " data clusters...\n";
     uint32_t wipeCount = 0;
     
     // Secure Erase all non-quarantined clusters
-    for (uint32_t cluster = 2; cluster <= m_vbr.clusterCount + 1; ++cluster) {
+    for (uint32_t cluster = 2; cluster <= totalClusters + 1; ++cluster) {
         if (isQuarantined(cluster)) continue;
 
         uint64_t sector = ClusterToSector(cluster);
