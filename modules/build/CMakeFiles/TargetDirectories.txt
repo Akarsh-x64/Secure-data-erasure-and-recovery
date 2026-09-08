@@ -1,3 +1,0 @@
-/home/ak/dev/dataEraser/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/core.dir
-/home/ak/dev/dataEraser/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/edit_cache.dir
-/home/ak/dev/dataEraser/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/rebuild_cache.dir

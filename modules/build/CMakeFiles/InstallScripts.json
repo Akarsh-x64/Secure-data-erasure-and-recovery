@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/ak/dev/dataEraser/Secure-data-erasure-and-recovery/modules/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
