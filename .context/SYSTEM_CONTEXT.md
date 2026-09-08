@@ -509,9 +509,212 @@ An exhaustive codebase audit was conducted across every subsystem in `Erasure/` 
   - Guarded against underflow in block group counting (`totalBlocks < s_first_data_block`).
 
 ### 6. `Tests/main.cpp`
+- `NtfsBootSector`: Sector 0 Volume Boot Record (VBR) with `"NTFS    "` OEM identifier, bytes per sector, sectors per cluster, total sectors, `$MFT` start LCN, `$MFTMirr` start LCN, clusters per MFT record (negative power of 2: `-10` -> 1024 bytes), clusters per index buffer (`-12` -> 4096 bytes), serial number, and `0xAA55` boot signature.
+    - `NtfsRecordHeader`: 1024-byte MFT record header (`"FILE"` magic, update sequence / fixup offset & size, LSN, sequence number, link count, attribute offset, flags `0x0001` in-use / `0x0002` directory, used/allocated bytes).
+    - `NtfsAttributeHeader`: Common attribute header, plus resident header (`valueLength`, `valueOffset`) and non-resident header (`startingVCN`, `highestVCN`, `dataRunsOffset`, allocated/real/initialized sizes).
+    - Attribute Types: `ATTR_STANDARD_INFORMATION` (`0x10`), `ATTR_ATTRIBUTE_LIST` (`0x20`), `ATTR_FILE_NAME` (`0x30`), `ATTR_DATA` (`0x80`), `ATTR_INDEX_ROOT` (`0x90`), `ATTR_INDEX_ALLOCATION` (`0xA0`), `ATTR_BITMAP` (`0xB0`), `ATTR_END` (`0xFFFFFFFF`).
+    - B-Tree Directory Structures: `NtfsIndexRootHeader`, `NtfsIndexHeader`, `NtfsIndexEntry` (48-bit record ref, entry length, key length, flags, UTF-16 filename, child VCN), and 4096-byte `"INDX"` blocks (`NtfsIndexBlock`).
+    - Standard System Records: Record 0 (`$MFT`), 1 (`$MFTMirr`), 2 (`$LogFile`), 3 (`$Volume`), 5 (`$Root`), 6 (`$Bitmap`), 7 (`$Boot`), 16+ (User Files/Directories).
+    - Helper Types: `NtfsExtent { uint64_t lcn; uint64_t clusterCount; }` and `TargetLocations`.
+
+- **`NTFS.h` / `NTFS.cpp` (`NtfsDriver`)**:
+  - Implements `Core::IFileSystemDriver`:
+    - `Mount()`: Reads Sector 0, validates `"NTFS    "` and `0xAA55`, decodes dynamic geometry without hardcoded offsets, reads Record 0 (`$MFT`), and decodes its runlist to build dynamic MFT extent mappings for navigating fragmented MFT records.
+    - `ApplyFixup()`: Applies NTFS update sequence (fixup array) to protected 512-byte sectors.
+    - `DecodeRunList()`: Decompresses variable-length runlists into contiguous `(LCN, clusterCount)` extents.
+    - `EraseFile(relativePath)`: Traverses directory B-trees from Root Record 5.
+      - If resident `$DATA`: zeroes data payload bytes in-place inside the MFT record.
+      - If non-resident `$DATA`: converts runlist LCNs to sectors, calls `m_hardware->SecureEraseSectors()`, and clears cluster bits in `$Bitmap` (Record 6).
+      - Completely zeroes the 1024-byte MFT record on disk (`WipeMftRecordOnDisk`).
+      - Scrubs the entry from the parent directory's `$INDEX_ROOT` or `"INDX"` blocks (`ScrubDirectoryEntry`).
+      - Seamlessly delegates to `EraseDirectory` if target is a folder.
+    - `EraseDirectory(relativePath)` & `EraseDirectoryRecursive()`:
+      - Recursively parses directory index entries, eradicates all child files, nested subdirectories, and directory index blocks (`$INDEX_ALLOCATION`).
+      - Zeroes directory MFT records on disk and scrubs parent directory index entries.
+    - `WipeVolume()`:
+      - Quarantines system metadata records (0–15).
+      - Scans all active user records (16+) in `$MFT`, sanitizes all allocated data extents via `SecureEraseSectors`, clears bitmap bits, zeroes on-disk MFT records, and scrubs user entries from Root directory.
+    - `FormatDrive(fullDriveSanitize)`:
+      - Sanitizes the drive via `m_hardware->SecureEraseDrive()` (or sweeping zero overwrite).
+      - Writes a pristine, valid NTFS VBR at Sector 0 and initializes clean MFT system records (Records 0-15: `$MFT`, `$MFTMirr`, `$Volume`, `$Root` Record 5 with empty `$INDEX_ROOT`, and `$Bitmap` Record 6) using only `m_hardware->WriteSectors()`.
+
+### 2. Forensic `xxd`-Style Hex Verification & Semantic Byte Breakdown Engine
+
+Built directly into `NtfsDriver` (`VerifyAndErase` and `VerifyAndFormatDrive`) supporting **File**, **Folder**, and **Disk / Volume** inputs:
+
+- **Before Deletion Inspection**:
+  - Resolves exact physical disk sectors and byte offsets for:
+    1. Target MFT Record (1024 bytes)
+    2. Data Sectors (resident payload or non-resident cluster extents)
+    3. Parent Directory Index Entry
+    4. Cluster Allocation Bitmap byte (`$Bitmap` Record 6)
+  - Outputs standard `xxd`-compatible hex dumps (`[Offset] [16 Hex Bytes] |[ASCII]|`).
+  - Outputs an annotated **Byte-by-Byte Semantic Breakdown** explaining:
+    - MFT Header: Magic `"FILE"`, Update sequence, LSN, Sequence number, Flags (`0x0001` In-Use, `0x0002` Directory).
+    - Attributes: `$STANDARD_INFORMATION` (timestamps), `$FILE_NAME` (parent ref, length, UTF-16 characters), `$DATA` (payload or runlist LCNs).
+    - Directory entries: File reference, key length, child VCNs.
+    - `$Bitmap` byte: bit value `1` denoting allocated status.
+
+- **After Deletion Re-Inspection**:
+  - Re-reads the exact same physical byte offsets from disk.
+  - Outputs post-deletion `xxd` hex dumps.
+  - Explains the forensic difference:
+    - Data sectors: all `0x00` (wiped).
+    - MFT record: zeroed on disk (`0x00000000`).
+    - Parent directory entry: scrubbed.
+    - `$Bitmap` byte: bit cleared from `1` (allocated) to `0` (free).
+
+### 3. Verification Runner (`Tests/test_ntfs.cpp`)
+
+- Statically linked test executable: `Tests/test_ntfs_runner.exe`.
+- Simulates an in-memory disk device (`MemoryDiskDevice`) coupled with `HDDController` and `NtfsDriver`.
+- Demonstrates:
+  - File verification & erasure (`--file passwords.txt`).
+  - Folder recursive verification & erasure (`--folder Finance`).
+  - Disk format verification (`--disk`).
+
+---
+
+# Phase 5 — XFS Filesystem Secure Deletion & Recursive Folder Eradication: Walkthrough
+
+## What Was Implemented
+
+Support for the Silicon Graphics **XFS** (Extents & B+Trees) filesystem inside the `Erasure` module, covering both single file destruction, nested file erasure, and complete recursive folder eradication.
+
+### 1. Architecture & On-Disk Structures (`Erasure/File Systems/XFS/`)
+
+- **`XFS_Structures.h`**:
+  - Strictly packed (`#pragma pack(push, 1)`) on-disk structures matching raw XFS v4 and v5 (CRC) layouts.
+  - Endianness conversion helpers: `be16_to_cpu`, `be32_to_cpu`, `be64_to_cpu` converting Big-Endian disk records to host CPU order with zero-overhead compiler intrinsics.
+  - `XfsSuperblock`: Magic `0x58465342` ("XFSB"), block size, AG blocks, AG count, root inode (`sb_rootino`), and log geometry.
+  - `XfsDinodeCore`: On-disk inode structure (v2 and v3 CRC), mode, format (`LOCAL`, `EXTENTS`, `BTREE`), timestamps, sizes, and fork offsets.
+  - Extent & B+Tree Records: 128-bit packed `XfsBmbtRec` records, `XfsBmdrBlock`, `XfsBtreeBlock` (magic `0x424D4150` "BMAP").
+  - Directory Structures: `XfsDir2SfHdr` (Shortform directories), `XfsDir2DataHdr` / `XfsDir3DataHdr` (Block/Extent directories), and `XfsDir2BlockTail` (leaf hash arrays).
+
+- **`XFS.h` / `XFS.cpp` (`XfsDriver`)**:
+  - Implements `Core::IFileSystemDriver`:
+    - `Mount()`: Validates `"XFSB"`, unpacks primary superblock at Sector 0, computes AG bitshifts and block addressing geometries.
+    - `EraseFile(relativePath)`: Traverses directory hierarchy from root inode `m_rootIno`. If the target is a directory, automatically delegates to `EraseDirectory`. If a file: resolves extents, zeroes data blocks via `m_hardware->SecureEraseSectors()`, zeroes indirect B+Tree blocks, wipes the on-disk Inode structure (`WipeInodeOnDisk`), scrubs the directory entry from the parent directory (`WipeDirectoryEntry`), and cleans Intent Log transactions (`ScrubJournalForInode`).
+    - `EraseDirectory(relativePath)` & `EraseDirectoryRecursive(dirIno)`:
+      - Traverses Shortform (`LOCAL`) and Block/Extent (`EXTENTS`/`BTREE`) directories.
+      - Recursively eradicates all child files, nested subdirectories, directory extent blocks, on-disk inodes, and parent directory records.
+    - `WipeVolume()`: Quarantines allocation group headers (Superblock, AGF, AGI, AGFL across all AGs) and root inode, while zeroing all user data blocks and resetting directory tables.
+
+### 2. Testing & Verification Suite (`Tests/test_xfs.cpp`)
+
+- Synthetic in-memory XFS disk image (`MemoryDiskDevice` + `HDDController`).
+- Comprehensive assertions covering:
+  - Mount & superblock parsing (Block size 4096, 1 AG, root inode 64).
+  - Test 1: Single file erasure (`secret.txt` in Extent format).
+  - Test 2: B+Tree file erasure (`archive.bin` with indirect B+Tree metadata block 20 and data block 30).
+  - Test 3: Recursive Folder Erasure (`docs` directory containing nested file `report.txt` pointing to data block 35).
+  - Test 4: Surgical Volume Wipe (`WipeVolume()`).
+- Statically linked test executable: `Tests/test_xfs_runner.exe`.
+
+---
+
+# Phase 6 — Unified Multi-Filesystem Master Test Runner (`Tests/main.cpp`): Walkthrough
+
+## What Was Implemented
+
+Consolidated all individual filesystem test runners (`test_ntfs.cpp`, `test_xfs.cpp`, `test_ext4.cpp`) into **one single unified test runner** (`Tests/main.cpp`), adhering to `Core::IFileSystemDriver` across all four supported filesystems: **NTFS, XFS, ext4, and exFAT**.
+
+### 1. Key Capabilities & Forensic Verification Features
+- **All 4 Filesystems Supported**:
+  - `Erasure::FileSystems::NtfsDriver` (`NTFS.h` / `NTFS.cpp`)
+  - `Erasure::FileSystems::XfsDriver` (`XFS.h` / `XFS.cpp`)
+  - `Erasure::FileSystems::Ext4Driver` (`ext4.h` / `ext4.cpp`)
+  - `Erasure::FileSystems::ExFatDriver` (`exFAT.h` / `exFAT.cpp`): Implements Microsoft exFAT spec-compliant checksum and hash algorithms (`ComputeNameHash`, `ComputeEntrySetChecksum`, `ComputeBootChecksum`, `VerifyBootChecksum`, `VerifyEntrySetChecksum`) directly within the driver class.
+- **Intake Targets**:
+  - **File Input**: Surgically deletes single files, sanitizes on-disk metadata (Inodes/MFT records/Directory entries), and wipes data runs/extents/clusters.
+  - **Folder Input**: Recursively traverses folder hierarchies, eradicating all nested child files, child directories, directory blocks/indexes, and unlinking from parent structures.
+  - **Disk Input**: Provisions complete volume formatting (`FormatDrive`) and surgical volume-wide sanitization (`WipeVolume`).
+- **Forensic Verification Output**:
+  - **Canonical `xxd` Hex Dumps**: Before-and-after hex dumps showing exact byte values, physical disk offsets, 16-byte aligned hexadecimal representations, and ASCII decodes.
+  - **Semantic Byte Breakdowns**: Clear forensic explanations of on-disk structures:
+    - Data sectors (active user payload vs `0x00` zero saturation)
+    - NTFS VBR, MFT record headers (`FILE`, flags, sequence), attribute records
+    - XFS Superblock, dinode core (`IN`, format, mode, size), BMBT extents
+    - ext4 Superblock (`0xEF53`), Group Descriptors, Inode (`0xF30A` extent tree), Directory entries
+    - exFAT VBR, Allocation Bitmap, File (`0x85`), Stream (`0xC0`), Filename (`0xC1`) entries
+- **Operational Execution Modes**:
+  - **Automated Synthetic Self-Test** (`.\Tests\main.exe --test`): Hermetic in-memory verification across all 4 filesystems via `MemoryDiskDevice` without requiring physical drive handles or administrative privileges.
+  - **Interactive Live Session** (`.\Tests\main.exe`): Prompts user for live physical drives (`\\.\PhysicalDrive1`), mounted volume letters (`\\.\E:`), selects filesystem (1-4), and performs verified erasure/formatting.
+
+### 2. Compilation
+- Target binary: `Tests/main.exe`
+- Compiler: MinGW-w64 UCRT GCC 14.2 (`g++ -std=c++17 -Wall -Wextra -O2`)
+- Dependencies: `WindowsStorageDevice.cpp`, `HDDController.cpp`, `NTFS.cpp`, `XFS.cpp`, `ext4.cpp`, `exFAT.cpp`.
+- Status: Build succeeded with 0 errors.
+
+---
+
+# Phase 7 — Comprehensive Bug Audit, Hardening & Spec Alignment Across All Erasure Subsystems: Walkthrough
+
+## Overview of Audit & Fixes
+
+An exhaustive codebase audit was conducted across every subsystem in `Erasure/` (`Core/`, `Hardware/`, `OS/`, and `File Systems/`) to identify and resolve memory safety violations, integer overflows, buffer overruns, division-by-zero vulnerabilities, and specification compliance defects.
+
+### 1. `Erasure/Hardware/Magnetic/HDDController.cpp`
+* **Vulnerability Fixed**: In `OverwriteWithPattern(startSector, sectorCount, pattern)`, allocating `sectorCount * sectorSize` directly on the heap caused 32-bit arithmetic overflow on large sector spans (e.g. >= 8,388,608 sectors) and unbounded heap allocation resulting in `std::bad_alloc`.
+* **Resolution**: Replaced single-shot allocation with bounded, chunked writes (up to 1024 sectors = 512KB per iteration), processing any arbitrary sector count securely without memory exhaustion.
+* **DoD 5220.22-M 3-Pass Overwrite Standard Implemented**:
+  - `SecureEraseSectors` and `SecureEraseDrive` upgraded to execute an authentic 3-pass physical overwrite cycle:
+    1. **Pass 1**: Fill with all zeros (`0x00` / binary `00000000`).
+    2. **Pass 2**: Fill with all ones (`0xFF` / binary `11111111`).
+    3. **Pass 3**: Fill with 64-bit Mersenne Twister (`std::mt19937_64`) pseudorandom noise / "gibberish".
+  - This eliminates residual magnetic hysteresis (remanence) on spinning magnetic platters and abstracts virtual disk sanitization. Added `OverwriteWithRandom()` helper.
+
+### 2. `Erasure/OS/Windows/WindowsStorageDevice.cpp`
+* **Defect Fixed**: `UpdateGeometry()` relied exclusively on `IOCTL_DISK_GET_DRIVE_GEOMETRY_EX`, which routinely fails on mounted volume handles (e.g., `\\.\E:` or `\\.\D:`), preventing volume-level testing and erasure.
+* **Resolution**:
+  - Implemented fallback cascade to `IOCTL_DISK_GET_DRIVE_GEOMETRY` and `IOCTL_DISK_GET_LENGTH_INFO`.
+  - Added fallback default of 512-byte sector size if underlying geometry cannot be directly queried.
+  - Zero-initialized Win32 structs via `std::memset` (`#include <cstring>`) to eliminate compiler warnings.
+  - Added guards in `ReadSectors` and `WriteSectors` validating `m_geometry.bytesPerSector > 0`.
+
+### 3. `Erasure/File Systems/NTFS/NTFS.cpp`
+* **Critical Memory Safety Bug in `FormatDrive`**:
+  - *Previous code*: Allocated `secBuf` of size `bytesPerSec` (512 bytes on standard drives), then called `std::memcpy(secBuf.data() + offInSec, cleanRecord.data(), 1024)`.
+  - *Impact*: Caused a catastrophic **512-byte heap memory corruption** on every MFT record written and only wrote half of the record to disk.
+  - *Resolution*: Calculated `sectorsNeeded = (1024 + offInSec + bytesPerSec - 1) / bytesPerSec`, allocated `sectorsNeeded * bytesPerSec`, and performed full multi-sector reads and writes.
+* **Runlist Length Underflow in `$INDEX_ALLOCATION` Decoding**:
+  - *Previous code*: Lines 495, 611, and 860 passed `indexAllocAttr[1] - nonRes->dataRunsOffset` to `DecodeRunList()`. Since `indexAllocAttr[1]` accessed byte 1 of the attribute type (`0x00`), `0 - dataRunsOffset` underflowed to a massive positive `size_t`.
+  - *Resolution*: Replaced with `(attrHdr->length > nonRes->dataRunsOffset) ? (attrHdr->length - nonRes->dataRunsOffset) : 0`.
+* **Signed Shift Undefined Behavior in `DecodeRunList`**:
+  - *Previous code*: Used `static_cast<int64_t>(0xFF) << (i * 8)`, shifting into the sign bit of `int64_t`.
+  - *Resolution*: Sign-extended cleanly using unsigned bitmask `uint64_t mask = ~0ULL << (offsetFieldSize * 8)` and standard two's complement conversion.
+* **Bounds Hardening**:
+  - Enforced string offset and length bounds on UTF-16 attribute names in `FindAttribute`.
+  - Validated resident attribute value length and offset bounds against both the attribute record and the MFT buffer in `GetFileAllocatedExtents`.
+
+### 4. `Erasure/File Systems/exFAT/exFAT.cpp`
+* **Directory Deletion & Directory Stream Truncation Bug**:
+  - *Previous code*: Zeroing the entire 32-byte directory entry set with `std::memset` set `EntryType = 0x00`. Per Microsoft exFAT specification, `0x00` represents **EndOfDirectory**, terminating directory scanning immediately and rendering all subsequent files and folders in that directory inaccessible.
+  - *Resolution*: In accordance with Microsoft exFAT spec §6.2.1.1, cleared bit 7 (`InUse = 0`, transforming e.g. `0x85` -> `0x05`, `0xC0` -> `0x40`, `0xC1` -> `0x41`) and zeroed the remaining 31 bytes of each entry. This securely obliterates file names, timestamps, cluster pointers, and data lengths while keeping the directory traversal chain intact.
+* **Division-by-Zero Guards**:
+  - Added guards against `m_bytesPerSector == 0` or `m_sectorsPerCluster == 0` in `ClearBitmapBit` and `GetClusterChain`.
+* **VBR Parameter Validation in `Mount()`**:
+  - Validated shift parameters per exFAT spec §3.1.5: `bytesPerSectorShift` must be in the range [9, 12] (512B to 4096B) and `sectorsPerClusterShift <= 25` (max cluster size 32MB), preventing undefined bit shift behavior on corrupted media.
+
+### 5. `Erasure/File Systems/ext4/ext4.cpp`
+* **Superblock Validation in `Mount()`**:
+  - Enforced `s_log_block_size <= 6` (maximum 64KB block size per Linux ext4 kernel specifications) to prevent bit-shift overflow in `1024 << s_log_block_size`.
+  - Verified `m_inodeSize <= m_blockSize` and `(m_blockSize % m_inodeSize) == 0` to prevent buffer overruns when computing inode block offsets.
+  - Guarded against underflow in block group counting (`totalBlocks < s_first_data_block`).
+
+### 6. `Tests/main.cpp`
 * **Synthetic Test Flag Correction**:
   - In `RunExFatSyntheticTest`, `generalSecondaryFlags` was corrected from `0x01` to `0x03` (`AllocationPossible | NoFatChain`) per exFAT spec §6.3.5.2, aligning with `ExFatDriver`'s check `(flags & 0x02) != 0`.
 
 ---
 
+## Comprehensive Documentation Index
 
+The `.context/` directory contains specialized, exhaustive architectural manuals for every layer of the product:
+1. **Shipping Formats, Electron App & Recovery Architecture**:
+   * [SHIPPING_AND_APPLICATION_ARCHITECTURE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/SHIPPING_AND_APPLICATION_ARCHITECTURE.md) — Covers the 3 distribution formats (Windows .exe, Linux .deb/AppImage, Live Boot RAM-disk ISO to sanitize Windows C: and system boot drives), Electron frontend + native C++ backend JSON-RPC IPC architecture, and the complete 4-phase Data Recovery subsystem (`Recovery/`).
+2. **Filesystem Execution Intensive Operations Manual**:
+   * [FILESYSTEM_EXECUTION_INTENSIVE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/FILESYSTEM_EXECUTION_INTENSIVE.md) — Line-by-line, code-level execution walkthrough of all 4 filesystem drivers (NTFS, XFS, ext4, exFAT), extent decoding, directory B-tree traversal, on-disk metadata wiping, and 3-pass DoD sanitization.
+3. **Multi-Filesystem Deep Dive & Forensic Matrix**:
+   * [FILESYSTEMS_DEEP_DIVE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/FILESYSTEMS_DEEP_DIVE.md) — Architectural overview, comparative feature tables, and Shannon entropy forensic verification suite.
