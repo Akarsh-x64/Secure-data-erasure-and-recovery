@@ -8,7 +8,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(secure_erasure_core, m) {
+PYBIND11_MODULE(core, m) {
     py::class_<Erasure::OS::LinuxStorageDevice>(m, "LinuxStorageDevice")
         .def(py::init<>())
         .def("Open", &Erasure::OS::LinuxStorageDevice::Open)
