@@ -19,9 +19,22 @@ namespace Core {
     struct DataRange {
         uint64_t offset;    // Byte offset from start of storage
         uint64_t length;    // Length in bytes
+        uint64_t logicalOffset;
+        bool sparse;
+        bool compressed;
+        uint16_t attributeId;
 
-        DataRange() : offset(0), length(0) {}
-        DataRange(uint64_t off, uint64_t len) : offset(off), length(len) {}
+        DataRange()
+            : offset(0), length(0), logicalOffset(0), sparse(false), compressed(false), attributeId(0) {}
+        DataRange(uint64_t off, uint64_t len, uint64_t logical = 0,
+                  bool isSparse = false, bool isCompressed = false,
+                  uint16_t attrId = 0)
+            : offset(off)
+            , length(len)
+            , logicalOffset(logical)
+            , sparse(isSparse)
+            , compressed(isCompressed)
+            , attributeId(attrId) {}
     };
 
 } // namespace Core

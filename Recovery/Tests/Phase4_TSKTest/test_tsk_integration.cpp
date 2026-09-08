@@ -62,11 +62,21 @@ int main(int argc, char** argv) {
     Check("Enumerate files", fs.EnumerateFiles(files));
     Check("At least one file discovered", !files.empty());
 
+    const auto& metadataStore = fs.GetMetadataStore();
+    Check("Metadata store mirrors enumerated records",
+            metadataStore.All().size() == files.size());
+
     bool sawDeleted = false;
     bool sawAnyRanges = false;
     bool sawOffsetInsidePartition = false;
+    bool metadataRoundTrip = true;
 
     for (const auto& rec : files) {
+        Recovery::Core::FileRecord metadata;
+        if (!fs.GetFileMetadata(rec.id, metadata) || metadata.filesystemRecordId != rec.filesystemRecordId) {
+            metadataRoundTrip = false;
+        }
+
         if (rec.deleted) {
             sawDeleted = true;
         }
@@ -82,11 +92,27 @@ int main(int argc, char** argv) {
         }
     }
 
+    Check("Metadata lookup round-trips TSK record IDs", metadataRoundTrip);
+
     Check("Data ranges surfaced where supported", sawAnyRanges);
     Check("Non-sparse data ranges include absolute offsets in partition", sawOffsetInsidePartition);
 
     if (sawDeleted) {
         Check("Deleted file metadata discovered", true);
+
+        bool readDeleted = false;
+        for (const auto& rec : files) {
+            if (!rec.deleted || rec.size == 0) {
+                continue;
+            }
+
+            std::vector<uint8_t> content;
+            if (fs.ReadFile(rec.id, content) && !content.empty()) {
+                readDeleted = true;
+                break;
+            }
+        }
+        Check("Read deleted file through metadata record", readDeleted);
     } else {
         std::cout << "  [INFO] No deleted entries surfaced in this test image.\n";
     }

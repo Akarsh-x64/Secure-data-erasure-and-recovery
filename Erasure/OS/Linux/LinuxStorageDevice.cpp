@@ -3,11 +3,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <linux/fs.h>
 #include <sys/file.h>
 #include <sys/mount.h>
 #include <cstdlib>   // For posix_memalign and free
 #include <cstring>   // For std::memcpy
+
+#include <linux/fs.h>
 
 namespace Erasure {
 namespace OS {
