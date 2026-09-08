@@ -1,10 +1,16 @@
 from flask import Flask,jsonify,request
+from flask_socketio import SocketIO
 from pydantic import BaseModel,ValidationError
 from typing import Literal,Optional
 import uuid
 import threading
+import time
 
 app = Flask(__name__)
+
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+active_operations = {}
 
 #Structures
 OperationState = Literal['queued',
@@ -110,6 +116,9 @@ class DriveEraseRequest(BaseModel):
     standard: str
     confirmation: Literal["CONFIRM_WIPE"]
     
+def background__get_storage_worker() :
+    return
+        
 @app.route('/api/v1/devices',methods=['GET'])
 def get_storage_device() :
     
@@ -138,6 +147,9 @@ def get_storage_device() :
     )
     
     devices_list = [device1]
+    socketio.start_background_task(
+        background_get_storage_worker
+    )
     
     return jsonify([device.model_dump() for device in devices_list])
 
