@@ -37,6 +37,12 @@ bool ExFatDriver::Mount() {
         return false; // Not an exFAT drive!
     }
 
+    // Validate shift parameters per Microsoft exFAT spec §3.1.5
+    if (m_vbr.bytesPerSectorShift < 9 || m_vbr.bytesPerSectorShift > 12 ||
+        m_vbr.sectorsPerClusterShift > 25) {
+        return false; // Sector size must be 512B..4096B, cluster size max 32MB
+    }
+
     // Decode the shift values into actual sizes
     m_bytesPerSector = 1 << m_vbr.bytesPerSectorShift;
     m_sectorsPerCluster = 1 << m_vbr.sectorsPerClusterShift;
@@ -67,6 +73,14 @@ bool ExFatDriver::Mount() {
         }
     }
 
+    // Verify Sector 11 Main Boot Checksum if sectors 0..11 are accessible
+    std::vector<uint8_t> bootRegion(12 * m_bytesPerSector);
+    if (m_hardware->ReadSectors(0, 12, bootRegion.data())) {
+        if (VerifyBootChecksum(bootRegion.data(), m_bytesPerSector)) {
+            std::cout << "[ExFatDriver] Sector 11 Main Boot Checksum verified successfully.\n";
+        }
+    }
+
     return true; // Successfully mounted and mapped the drive!
 }
 
@@ -94,7 +108,7 @@ bool ExFatDriver::WriteFatEntry(uint32_t cluster, uint32_t value) {
 }
 
 bool ExFatDriver::ClearBitmapBit(uint32_t cluster) {
-    if (cluster < 2 || m_bitmapFirstCluster == 0) return false;
+    if (cluster < 2 || m_bitmapFirstCluster == 0 || m_bytesPerSector == 0) return false;
     
     uint64_t bitmapSector = ClusterToSector(m_bitmapFirstCluster) + ((cluster - 2) / (m_bytesPerSector * 8));
     uint32_t bitOffset = (cluster - 2) % (m_bytesPerSector * 8);
@@ -129,9 +143,10 @@ std::vector<std::wstring> ExFatDriver::TokenizePath(const std::wstring& path) co
 
 std::vector<uint32_t> ExFatDriver::GetClusterChain(uint32_t startCluster, uint64_t dataLength, bool noFatChain) const {
     std::vector<uint32_t> clusters;
-    if (startCluster < 2) return clusters;
+    if (startCluster < 2 || m_bytesPerSector == 0 || m_sectorsPerCluster == 0) return clusters;
 
     uint32_t currentCluster = startCluster;
+    uint32_t clusterBytes = m_bytesPerSector * m_sectorsPerCluster;
 
     if (dataLength == 0) {
         // Unknown length (e.g. Root Directory). Must follow FAT chain until EOF.
@@ -140,7 +155,7 @@ std::vector<uint32_t> ExFatDriver::GetClusterChain(uint32_t startCluster, uint64
             currentCluster = ReadFatEntry(currentCluster);
         }
     } else {
-        uint32_t clusterCount = (dataLength + (m_bytesPerSector * m_sectorsPerCluster) - 1) / (m_bytesPerSector * m_sectorsPerCluster);
+        uint32_t clusterCount = static_cast<uint32_t>((dataLength + clusterBytes - 1) / clusterBytes);
         for (uint32_t i = 0; i < clusterCount; ++i) {
             clusters.push_back(currentCluster);
             if (!noFatChain) {
@@ -273,7 +288,9 @@ bool ExFatDriver::EraseFile(const std::string& relativePath) {
         }
     }
 
-    // Erase the metadata in RAM
+    // Mark directory metadata entry set as deleted per Microsoft exFAT spec §6.2.1.1
+    // Clearing bit 7 of EntryType (InUse = 0) marks each entry as deleted (e.g. 0x85 -> 0x05, 0xC0 -> 0x40, 0xC1 -> 0x41)
+    // while preserving directory traversal so subsequent entries in the directory are not truncated.
     size_t wipeLength = 32; 
     for (size_t offset = searchRes.entryIndex + 32; offset < currentDirBuffer.size(); offset += 32) {
         uint8_t type = currentDirBuffer[offset];
@@ -284,8 +301,11 @@ bool ExFatDriver::EraseFile(const std::string& relativePath) {
         }
     }
 
-    std::memset(&currentDirBuffer[searchRes.entryIndex], 0, wipeLength);
-    std::cout << "[Erasure] Wiping Directory Metadata (" << wipeLength << " bytes)...\n";
+    std::cout << "[Erasure] Marking Directory Metadata Deleted (" << wipeLength << " bytes)...\n";
+    for (size_t offset = searchRes.entryIndex; offset < searchRes.entryIndex + wipeLength; offset += 32) {
+        currentDirBuffer[offset] &= 0x7F; // Clear InUse bit (0x85 -> 0x05, 0xC0 -> 0x40, 0xC1 -> 0x41)
+        std::memset(&currentDirBuffer[offset + 1], 0, 31); // Zero out all filenames, timestamps, cluster pointers, and sizes
+    }
     
     // Write the dirty directory buffer back to disk
     for (size_t i = 0; i < currentDirClusters.size(); ++i) {
@@ -441,5 +461,61 @@ void ExFatDriver::PrintVBRInfo() const {
     std::cout << "======================================\n";
 }
 
+// =============================================================================
+// Checksum & Hash Algorithms (Microsoft exFAT Specification Compliant)
+// =============================================================================
+
+uint16_t ExFatDriver::ComputeNameHash(const std::u16string& name) {
+    uint16_t hash = 0;
+    for (char16_t ch : name) {
+        char16_t up = (ch >= u'a' && ch <= u'z') ? static_cast<char16_t>(ch - 32) : ch;
+        uint8_t low = static_cast<uint8_t>(up & 0xFF);
+        uint8_t high = static_cast<uint8_t>((up >> 8) & 0xFF);
+        hash = static_cast<uint16_t>(((hash << 15) | (hash >> 1)) + low);
+        hash = static_cast<uint16_t>(((hash << 15) | (hash >> 1)) + high);
+    }
+    return hash;
+}
+
+uint16_t ExFatDriver::ComputeEntrySetChecksum(const uint8_t* entrySet, size_t entryCount) {
+    uint16_t checksum = 0;
+    size_t byteCount = entryCount * 32;
+    for (size_t i = 0; i < byteCount; ++i) {
+        // Skip SetChecksum field at byte offset 2 and 3 of the primary entry
+        if (i == 2 || i == 3) continue;
+        checksum = static_cast<uint16_t>(((checksum << 15) | (checksum >> 1)) + entrySet[i]);
+    }
+    return checksum;
+}
+
+uint32_t ExFatDriver::ComputeBootChecksum(const uint8_t* bootSectors, size_t byteCount) {
+    uint32_t checksum = 0;
+    for (size_t i = 0; i < byteCount; ++i) {
+        // VolumeFlags (offset 106, 107) and PercentInUse (offset 112) of Sector 0 are skipped per spec §3.1.9
+        if (i == 106 || i == 107 || i == 112) continue;
+        checksum = ((checksum << 31) | (checksum >> 1)) + bootSectors[i];
+    }
+    return checksum;
+}
+
+bool ExFatDriver::VerifyBootChecksum(const uint8_t* bootRegion, size_t sectorSize) {
+    if (!bootRegion || sectorSize < 512) return false;
+    uint32_t calculated = ComputeBootChecksum(bootRegion, 11 * sectorSize);
+    const uint32_t* sector11 = reinterpret_cast<const uint32_t*>(bootRegion + (11 * sectorSize));
+    for (size_t i = 0; i < sectorSize / sizeof(uint32_t); ++i) {
+        if (sector11[i] != calculated) return false;
+    }
+    return true;
+}
+
+bool ExFatDriver::VerifyEntrySetChecksum(const uint8_t* entrySet, size_t entryCount) {
+    if (!entrySet || entryCount < 2) return false;
+    const auto* primary = reinterpret_cast<const ExFatFileDirectoryEntry*>(entrySet);
+    uint16_t expected = primary->setChecksum;
+    uint16_t calculated = ComputeEntrySetChecksum(entrySet, entryCount);
+    return expected == calculated;
+}
+
 } // namespace FileSystems
 } // namespace Erasure
+

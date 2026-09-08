@@ -93,18 +93,23 @@ static constexpr uint32_t INODES_PER_BLOCK = BLOCK_SIZE / INODE_SIZE;   // 16 in
 static constexpr uint64_t ROOT_INO = 64;                                // Inode 64: Block 4, index 0
 static constexpr uint64_t FILE1_INO = 65;                               // Inode 65: Block 4, index 1 ("secret.txt")
 static constexpr uint64_t FILE2_INO = 66;                               // Inode 66: Block 4, index 2 ("archive.bin")
+static constexpr uint64_t DIR1_INO = 67;                                // Inode 67: Block 4, index 3 ("docs")
+static constexpr uint64_t FILE3_INO = 68;                               // Inode 68: Block 4, index 4 ("docs/report.txt")
 
 /**
  * @brief Constructs a valid, synthetic XFS filesystem in memory.
  *
  * Structure created:
  *   - Block 0: Primary Superblock (XFSB, 4KB blocks, 1 AG, rootino=64)
- *   - Block 4, Inode 64: Root directory (Shortform, contains "secret.txt" and "archive.bin")
+ *   - Block 4, Inode 64: Root directory (Shortform, contains "secret.txt", "archive.bin", and "docs")
  *   - Block 4, Inode 65: "secret.txt" (Extent format, references data blocks 10 & 11)
  *   - Block 4, Inode 66: "archive.bin" (B+Tree format, BMDR root points to leaf block 20, data in block 30)
+ *   - Block 4, Inode 67: "docs" directory (Shortform, contains "report.txt")
+ *   - Block 4, Inode 68: "report.txt" (Extent format, references data block 35)
  *   - Blocks 10, 11: Populated with non-zero bytes (0xAA, 0xBB)
  *   - Block 20: Leaf B+Tree metadata block pointing to data block 30
  *   - Block 30: Populated with non-zero bytes (0xCC)
+ *   - Block 35: Populated with non-zero bytes (0xDD)
  */
 void BuildSyntheticXfsImage(MemoryDiskDevice& dev) {
     uint8_t* disk = dev.GetDiskData();
@@ -148,7 +153,7 @@ void BuildSyntheticXfsImage(MemoryDiskDevice& dev) {
     // Shortform directory payload starting at data fork offset 100
     uint8_t* sfPtr = rootPtr + 100;
     XfsDir2SfHdr* sfHdr = reinterpret_cast<XfsDir2SfHdr*>(sfPtr);
-    sfHdr->count = 2;   // Two active entries
+    sfHdr->count = 3;   // Three active entries: secret.txt, archive.bin, docs
     sfHdr->i8count = 0; // Inodes fit in 32-bit fields
     *reinterpret_cast<uint32_t*>(sfHdr->parent) = cpu_to_be32(ROOT_INO);
 
@@ -167,6 +172,14 @@ void BuildSyntheticXfsImage(MemoryDiskDevice& dev) {
     sfPtr[e2Off + 2] = 0;
     std::memcpy(&sfPtr[e2Off + 3], "archive.bin", 11);
     *reinterpret_cast<uint32_t*>(&sfPtr[e2Off + 3 + 11]) = cpu_to_be32(FILE2_INO);
+
+    // Entry 3: "docs" -> Inode 67 (Directory)
+    size_t e3Off = e2Off + 3 + 11 + 4; // 41
+    sfPtr[e3Off + 0] = 4; // namelen
+    sfPtr[e3Off + 1] = 0;
+    sfPtr[e3Off + 2] = 0;
+    std::memcpy(&sfPtr[e3Off + 3], "docs", 4);
+    *reinterpret_cast<uint32_t*>(&sfPtr[e3Off + 3 + 4]) = cpu_to_be32(DIR1_INO);
 
     // -------------------------------------------------------------------------
     // 3. Setup File 1 Inode (65): "secret.txt" (Extent Format)
@@ -227,6 +240,52 @@ void BuildSyntheticXfsImage(MemoryDiskDevice& dev) {
 
     // Populate data block 30 with distinct non-zero bytes (0xCC)
     std::memset(disk + 30 * BLOCK_SIZE, 0xCC, BLOCK_SIZE);
+
+    // -------------------------------------------------------------------------
+    // 5. Setup Directory Inode (67): "docs" (Shortform Directory containing Inode 68)
+    // -------------------------------------------------------------------------
+    size_t dir1Offset = 4 * BLOCK_SIZE + 3 * INODE_SIZE;
+    uint8_t* dir1Ptr = disk + dir1Offset;
+
+    *reinterpret_cast<uint16_t*>(dir1Ptr + 0) = cpu_to_be16(XFS_DINODE_MAGIC);
+    *reinterpret_cast<uint16_t*>(dir1Ptr + 2) = cpu_to_be16(XFS_S_IFDIR | 0755);
+    dir1Ptr[4] = 2;
+    dir1Ptr[5] = XFS_DINODE_FMT_LOCAL;
+    *reinterpret_cast<uint64_t*>(dir1Ptr + 56) = cpu_to_be64(48);
+
+    uint8_t* sfDir1Ptr = dir1Ptr + 100;
+    XfsDir2SfHdr* sfDir1Hdr = reinterpret_cast<XfsDir2SfHdr*>(sfDir1Ptr);
+    sfDir1Hdr->count = 1;   // One child: "report.txt"
+    sfDir1Hdr->i8count = 0;
+    *reinterpret_cast<uint32_t*>(sfDir1Hdr->parent) = cpu_to_be32(ROOT_INO);
+
+    // Child entry: "report.txt" -> Inode 68
+    size_t de1Off = 6;
+    sfDir1Ptr[de1Off + 0] = 10; // namelen
+    sfDir1Ptr[de1Off + 1] = 0;
+    sfDir1Ptr[de1Off + 2] = 0;
+    std::memcpy(&sfDir1Ptr[de1Off + 3], "report.txt", 10);
+    *reinterpret_cast<uint32_t*>(&sfDir1Ptr[de1Off + 3 + 10]) = cpu_to_be32(FILE3_INO);
+
+    // -------------------------------------------------------------------------
+    // 6. Setup Child File Inode (68): "docs/report.txt" (Extent Format)
+    // -------------------------------------------------------------------------
+    size_t f3Offset = 4 * BLOCK_SIZE + 4 * INODE_SIZE;
+    uint8_t* f3Ptr = disk + f3Offset;
+
+    *reinterpret_cast<uint16_t*>(f3Ptr + 0) = cpu_to_be16(XFS_DINODE_MAGIC);
+    *reinterpret_cast<uint16_t*>(f3Ptr + 2) = cpu_to_be16(XFS_S_IFREG | 0644);
+    f3Ptr[4] = 2;
+    f3Ptr[5] = XFS_DINODE_FMT_EXTENTS;
+    *reinterpret_cast<uint64_t*>(f3Ptr + 56) = cpu_to_be64(4096);
+    *reinterpret_cast<uint64_t*>(f3Ptr + 64) = cpu_to_be64(1);
+    *reinterpret_cast<uint32_t*>(f3Ptr + 76) = cpu_to_be32(1);
+
+    XfsBmbtRec ext3 = MakeExtentRec(0, 35, 1); // Points to Block 35
+    std::memcpy(f3Ptr + 100, &ext3, sizeof(ext3));
+
+    // Populate data block 35 with distinct non-zero bytes (0xDD)
+    std::memset(disk + 35 * BLOCK_SIZE, 0xDD, BLOCK_SIZE);
 }
 
 // ============================================================================
@@ -314,9 +373,43 @@ void TestXfsDriver() {
     std::cout << "  -> [PASSED] Target Inode 66 metadata on disk completely zeroed!\n\n";
 
     // -------------------------------------------------------------------------
-    // Test 4: WipeVolume() - Surgical Volume-Wide Wipe
+    // Test 4: EraseDirectory("docs") - Recursive Folder Erasure
     // -------------------------------------------------------------------------
-    std::cout << "[Test 4] Testing Surgical WipeVolume()...\n";
+    std::cout << "[Test 4] Testing Recursive Folder Erasure for 'docs'...\n";
+    // Verify Block 35 has initial non-zero data (0xDD)
+    assert(rawDisk[35 * BLOCK_SIZE] == 0xDD);
+
+    bool eraseDirOk = driver.EraseDirectory("docs");
+    assert(eraseDirOk);
+
+    // 1. Verify child file data block 35 was overwritten with 0x00
+    for (size_t i = 0; i < BLOCK_SIZE; ++i) {
+        assert(rawDisk[35 * BLOCK_SIZE + i] == 0x00);
+    }
+    std::cout << "  -> [PASSED] Nested file data block 35 completely zeroed!\n";
+
+    // 2. Verify child file Inode 68 metadata on disk was overwritten with 0x00
+    size_t f3Offset = 4 * BLOCK_SIZE + 4 * INODE_SIZE;
+    for (size_t i = 0; i < INODE_SIZE; ++i) {
+        assert(rawDisk[f3Offset + i] == 0x00);
+    }
+    std::cout << "  -> [PASSED] Child Inode 68 metadata on disk completely zeroed!\n";
+
+    // 3. Verify directory Inode 67 metadata on disk was overwritten with 0x00
+    size_t dir1Offset = 4 * BLOCK_SIZE + 3 * INODE_SIZE;
+    for (size_t i = 0; i < INODE_SIZE; ++i) {
+        assert(rawDisk[dir1Offset + i] == 0x00);
+    }
+    std::cout << "  -> [PASSED] Directory Inode 67 metadata on disk completely zeroed!\n";
+
+    // 4. Verify directory name was scrubbed from root directory
+    assert(!driver.EraseFile("docs"));
+    std::cout << "  -> [PASSED] Directory 'docs' is unresolvable after erasure!\n\n";
+
+    // -------------------------------------------------------------------------
+    // Test 5: WipeVolume() - Surgical Volume-Wide Wipe
+    // -------------------------------------------------------------------------
+    std::cout << "[Test 5] Testing Surgical WipeVolume()...\n";
     // Write test data in unreserved user blocks
     std::memset(rawDisk + 50 * BLOCK_SIZE, 0x55, BLOCK_SIZE);
     std::memset(rawDisk + 51 * BLOCK_SIZE, 0x66, BLOCK_SIZE);

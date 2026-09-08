@@ -235,6 +235,27 @@ private:
         uint64_t parentDirIno,
         const DirectorySearchResult& entry);
 
+    /**
+     * @brief Lists all entries in a directory inode (excluding "." and "..").
+     *
+     * @param dirIno Inode number of the directory to enumerate.
+     * @param outEntries Vector of pairs (entry name, child inode number).
+     * @param outIsDir Vector of booleans indicating if each child is a directory.
+     * @return bool True if directory contents were successfully parsed.
+     */
+    bool ListDirectoryContents(
+        uint64_t dirIno,
+        std::vector<std::pair<std::string, uint64_t>>& outEntries,
+        std::vector<bool>& outIsDir) const;
+
+    /**
+     * @brief Recursively erases all children of a directory inode.
+     *
+     * @param dirIno Inode number of the directory.
+     * @return bool True if all contents were eradicated.
+     */
+    bool EraseDirectoryRecursive(uint64_t dirIno);
+
 public:
     /**
      * @brief Constructs the XfsDriver with a pointer to the hardware demolition layer.
@@ -269,6 +290,14 @@ public:
      * @return bool True if data and all traces of metadata were permanently eradicated.
      */
     bool EraseFile(const std::string& relativePath) override;
+
+    /**
+     * @brief Recursively destroys an entire folder and all nested files and subdirectories.
+     *
+     * @param relativePath Relative path to directory (e.g., "docs" or "docs/finance").
+     * @return bool True if directory and all nested contents were permanently obliterated.
+     */
+    bool EraseDirectory(const std::string& relativePath);
 
     /**
      * @brief Performs a surgical volume-wide wipe of all user data.

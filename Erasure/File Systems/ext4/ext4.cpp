@@ -70,6 +70,10 @@ bool Ext4Driver::Mount() {
     }
 
     // Calculate block size
+    if (m_sb.s_log_block_size > 6) {
+        std::cerr << "[Ext4Driver] Error: Invalid log block size: " << m_sb.s_log_block_size << "\n";
+        return false;
+    }
     m_blockSize = 1024 << m_sb.s_log_block_size;
     if (m_blockSize < m_bytesPerSector || (m_blockSize % m_bytesPerSector) != 0) {
         std::cerr << "[Ext4Driver] Error: Unsupported block size: " << m_blockSize << " bytes.\n";
@@ -82,6 +86,10 @@ bool Ext4Driver::Mount() {
     if (m_inodeSize < Ext4::EXT4_GOOD_OLD_INODE_SIZE) {
         m_inodeSize = Ext4::EXT4_GOOD_OLD_INODE_SIZE;
     }
+    if (m_inodeSize > m_blockSize || (m_blockSize % m_inodeSize) != 0) {
+        std::cerr << "[Ext4Driver] Error: Invalid inode size (" << m_inodeSize << " bytes) for block size (" << m_blockSize << " bytes).\n";
+        return false;
+    }
 
     // Check 64-bit feature
     m_is64Bit = (m_sb.s_feature_incompat & Ext4::EXT4_FEATURE_INCOMPAT_64BIT) != 0;
@@ -92,8 +100,8 @@ bool Ext4Driver::Mount() {
         totalBlocks |= (static_cast<uint64_t>(m_sb.s_blocks_count_hi) << 32);
     }
 
-    if (m_sb.s_blocks_per_group == 0) {
-        std::cerr << "[Ext4Driver] Error: blocks_per_group is 0.\n";
+    if (m_sb.s_blocks_per_group == 0 || totalBlocks < m_sb.s_first_data_block) {
+        std::cerr << "[Ext4Driver] Error: Invalid blocks_per_group or totalBlocks.\n";
         return false;
     }
 

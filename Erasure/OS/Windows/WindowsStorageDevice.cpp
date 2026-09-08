@@ -1,5 +1,6 @@
 #include "WindowsStorageDevice.h"
 #include <iostream>
+#include <cstring>
 
 namespace Erasure {
 namespace OS {
@@ -59,35 +60,64 @@ void WindowsStorageDevice::Close() {
 }
 
 bool WindowsStorageDevice::UpdateGeometry() {
-  DISK_GEOMETRY_EX diskGeometry = {0}; // Struct to hold the hardware response
-  DWORD bytesReturned = 0; // How many bytes Windows actually gave back to us
+  DISK_GEOMETRY_EX diskGeometryEx;
+  std::memset(&diskGeometryEx, 0, sizeof(diskGeometryEx));
+  DWORD bytesReturned = 0;
 
-  // Send the IOCTL_DISK_GET_DRIVE_GEOMETRY_EX command to the hardware to ask
-  // for its sector size
+  // 1. Try IOCTL_DISK_GET_DRIVE_GEOMETRY_EX (standard for physical drives)
   bool success = DeviceIoControl(
-      m_hDevice,                        // The handle to our drive
-      IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, // The specific Windows control code to
-                                        // ask for geometry
-      nullptr, 0, // Input buffer (we aren't sending any data, just asking a
-                  // question, so it's null)
-      &diskGeometry,
-      sizeof(
-          diskGeometry), // Output buffer (where Windows will write the answer)
-      &bytesReturned,    // Where Windows will write the size of the answer
-      nullptr // Overlapped struct for async I/O (we use sync, so null)
+      m_hDevice,
+      IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+      nullptr, 0,
+      &diskGeometryEx,
+      sizeof(diskGeometryEx),
+      &bytesReturned,
+      nullptr
   );
 
-  if (success) {
-    // Successfully got the geometry! Now we translate it into our custom
-    // struct.
-    m_geometry.bytesPerSector = diskGeometry.Geometry.BytesPerSector;
-
-    // DiskSize is the total capacity in bytes.
-    // We divide by bytesPerSector to calculate exactly how many sectors exist
-    // on the drive.
+  if (success && diskGeometryEx.Geometry.BytesPerSector > 0) {
+    m_geometry.bytesPerSector = diskGeometryEx.Geometry.BytesPerSector;
     m_geometry.totalSectors =
-        diskGeometry.DiskSize.QuadPart / diskGeometry.Geometry.BytesPerSector;
+        diskGeometryEx.DiskSize.QuadPart / diskGeometryEx.Geometry.BytesPerSector;
+    m_geometry.devicePath = m_devicePath;
+    return true;
+  }
 
+  // 2. Fallback: Legacy IOCTL_DISK_GET_DRIVE_GEOMETRY
+  DISK_GEOMETRY diskGeometry;
+  std::memset(&diskGeometry, 0, sizeof(diskGeometry));
+  bytesReturned = 0;
+  if (DeviceIoControl(m_hDevice, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0,
+                      &diskGeometry, sizeof(diskGeometry), &bytesReturned, nullptr) &&
+      diskGeometry.BytesPerSector > 0) {
+    m_geometry.bytesPerSector = diskGeometry.BytesPerSector;
+
+    // Query exact partition/volume length if available
+    GET_LENGTH_INFORMATION lengthInfo;
+    std::memset(&lengthInfo, 0, sizeof(lengthInfo));
+    bytesReturned = 0;
+    if (DeviceIoControl(m_hDevice, IOCTL_DISK_GET_LENGTH_INFO, nullptr, 0,
+                        &lengthInfo, sizeof(lengthInfo), &bytesReturned, nullptr) &&
+        lengthInfo.Length.QuadPart > 0) {
+      m_geometry.totalSectors = lengthInfo.Length.QuadPart / m_geometry.bytesPerSector;
+    } else {
+      m_geometry.totalSectors = diskGeometry.Cylinders.QuadPart *
+                                diskGeometry.TracksPerCylinder *
+                                diskGeometry.SectorsPerTrack;
+    }
+    m_geometry.devicePath = m_devicePath;
+    return true;
+  }
+
+  // 3. Fallback: Direct IOCTL_DISK_GET_LENGTH_INFO (common for mounted volume handles like \\.\E:)
+  GET_LENGTH_INFORMATION lengthInfo;
+  std::memset(&lengthInfo, 0, sizeof(lengthInfo));
+  bytesReturned = 0;
+  if (DeviceIoControl(m_hDevice, IOCTL_DISK_GET_LENGTH_INFO, nullptr, 0,
+                      &lengthInfo, sizeof(lengthInfo), &bytesReturned, nullptr) &&
+      lengthInfo.Length.QuadPart > 0) {
+    m_geometry.bytesPerSector = 512; // Default standard sector size
+    m_geometry.totalSectors = lengthInfo.Length.QuadPart / 512;
     m_geometry.devicePath = m_devicePath;
     return true;
   }
@@ -97,7 +127,7 @@ bool WindowsStorageDevice::UpdateGeometry() {
 
 bool WindowsStorageDevice::ReadSectors(uint64_t startSector,
                                        uint32_t sectorCount, void *buffer) {
-  if (m_hDevice == INVALID_HANDLE_VALUE || buffer == nullptr)
+  if (m_hDevice == INVALID_HANDLE_VALUE || buffer == nullptr || m_geometry.bytesPerSector == 0)
     return false;
 
   LARGE_INTEGER offset;
@@ -120,7 +150,7 @@ bool WindowsStorageDevice::ReadSectors(uint64_t startSector,
 bool WindowsStorageDevice::WriteSectors(uint64_t startSector,
                                         uint32_t sectorCount,
                                         const void *buffer) {
-  if (m_hDevice == INVALID_HANDLE_VALUE || buffer == nullptr)
+  if (m_hDevice == INVALID_HANDLE_VALUE || buffer == nullptr || m_geometry.bytesPerSector == 0)
     return false;
 
   LARGE_INTEGER offset;

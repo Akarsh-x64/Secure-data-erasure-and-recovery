@@ -9,15 +9,29 @@ HDDController::HDDController(Core::IStorageDevice* device) : m_device(device) {
 }
 
 bool HDDController::OverwriteWithPattern(uint64_t startSector, uint32_t sectorCount, uint8_t pattern) {
-    if (!m_device) return false;
+    if (!m_device || sectorCount == 0) return false;
 
     uint32_t sectorSize = m_device->GetGeometry().bytesPerSector;
     if (sectorSize == 0) return false;
 
-    // Create a buffer filled with the pattern
-    std::vector<uint8_t> buffer(sectorCount * sectorSize, pattern);
+    // Allocate bounded buffer (1024 sectors = 512KB for standard 512B sectors)
+    const uint32_t MAX_CHUNK = 1024;
+    uint32_t bufferSectors = (sectorCount < MAX_CHUNK) ? sectorCount : MAX_CHUNK;
+    std::vector<uint8_t> buffer(static_cast<size_t>(bufferSectors) * sectorSize, pattern);
 
-    return m_device->WriteSectors(startSector, sectorCount, buffer.data());
+    uint64_t currentSector = startSector;
+    uint32_t remainingSectors = sectorCount;
+
+    while (remainingSectors > 0) {
+        uint32_t sectorsToWrite = (remainingSectors > bufferSectors) ? bufferSectors : remainingSectors;
+        if (!m_device->WriteSectors(currentSector, sectorsToWrite, buffer.data())) {
+            return false;
+        }
+        currentSector += sectorsToWrite;
+        remainingSectors -= sectorsToWrite;
+    }
+
+    return true;
 }
 
 bool HDDController::SecureEraseSectors(uint64_t startSector, uint32_t sectorCount) {

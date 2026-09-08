@@ -847,6 +847,276 @@ bool XfsDriver::WipeDirectoryEntry(
 }
 
 // =============================================================================
+// Directory Enumeration & Recursive Folder Erasure
+// =============================================================================
+
+bool XfsDriver::ListDirectoryContents(
+    uint64_t dirIno,
+    std::vector<std::pair<std::string, uint64_t>>& outEntries,
+    std::vector<bool>& outIsDir) const
+{
+    outEntries.clear();
+    outIsDir.clear();
+
+    XFS::XfsDinodeCore dirCore;
+    std::vector<uint8_t> dirFork;
+    if (!ReadInode(dirIno, dirCore, dirFork)) return false;
+
+    // 1. Shortform Directory (LOCAL)
+    if (dirCore.di_format == XFS::XFS_DINODE_FMT_LOCAL) {
+        if (dirFork.size() < sizeof(XFS::XfsDir2SfHdr)) return true;
+
+        const auto* sfHdr = reinterpret_cast<const XFS::XfsDir2SfHdr*>(dirFork.data());
+        uint8_t count = sfHdr->count;
+        uint8_t i8count = sfHdr->i8count;
+
+        size_t offset = (i8count > 0) ? 10 : 6;
+        for (uint8_t i = 0; i < count && offset < dirFork.size(); ++i) {
+            uint8_t namelen = dirFork[offset];
+            if (offset + 3 + namelen > dirFork.size()) break;
+
+            std::string name(reinterpret_cast<const char*>(&dirFork[offset + 3]), namelen);
+            size_t inoOffset = offset + 3 + namelen + (m_hasFtype ? 1 : 0);
+
+            uint64_t entryIno = 0;
+            if (i8count > 0) {
+                if (inoOffset + 8 > dirFork.size()) break;
+                entryIno = XFS::be64_to_cpu(*reinterpret_cast<const uint64_t*>(&dirFork[inoOffset]));
+            } else {
+                if (inoOffset + 4 > dirFork.size()) break;
+                entryIno = XFS::be32_to_cpu(*reinterpret_cast<const uint32_t*>(&dirFork[inoOffset]));
+            }
+
+            size_t entryLen = (inoOffset + (i8count > 0 ? 8 : 4)) - offset;
+
+            if (name != "." && name != "..") {
+                bool isDir = false;
+                XFS::XfsDinodeCore childCore;
+                std::vector<uint8_t> childFork;
+                if (ReadInode(entryIno, childCore, childFork)) {
+                    isDir = (childCore.di_mode & XFS::XFS_S_IFMT) == XFS::XFS_S_IFDIR;
+                }
+                outEntries.push_back({ name, entryIno });
+                outIsDir.push_back(isDir);
+            }
+
+            offset += entryLen;
+        }
+    }
+    // 2. Block or Extent Directory (EXTENTS / BTREE)
+    else if (dirCore.di_format == XFS::XFS_DINODE_FMT_EXTENTS || dirCore.di_format == XFS::XFS_DINODE_FMT_BTREE) {
+        std::vector<uint64_t> btreeBlocks;
+        std::vector<XFS::XfsBmbtRec::ExtentInfo> dirExtents = GetInodeExtents(dirCore, dirFork, btreeBlocks);
+
+        std::vector<uint8_t> blockBuf(m_blockSize);
+        for (const auto& ext : dirExtents) {
+            for (uint32_t b = 0; b < ext.blockcount; ++b) {
+                uint64_t linearBlock = FsbToBlock(ext.startblock + b);
+                if (!ReadBlock(linearBlock, blockBuf.data())) continue;
+
+                uint32_t magic = XFS::be32_to_cpu(*reinterpret_cast<const uint32_t*>(blockBuf.data()));
+                size_t hdrSize = 16;
+                if (magic == XFS::XFS_DIR3_BLOCK_MAGIC || magic == XFS::XFS_DIR3_DATA_MAGIC) {
+                    hdrSize = 64;
+                }
+
+                size_t off = hdrSize;
+                while (off + 8 < m_blockSize) {
+                    uint16_t freetag = *reinterpret_cast<const uint16_t*>(&blockBuf[off]);
+                    if (freetag == 0xFFFF) {
+                        uint16_t freeLen = XFS::be16_to_cpu(*reinterpret_cast<const uint16_t*>(&blockBuf[off + 2]));
+                        if (freeLen == 0) break;
+                        off += freeLen;
+                        continue;
+                    }
+
+                    uint64_t entryIno = XFS::be64_to_cpu(*reinterpret_cast<const uint64_t*>(&blockBuf[off]));
+                    uint8_t namelen = blockBuf[off + 8];
+                    if (namelen == 0 || off + 9 + namelen > m_blockSize) break;
+
+                    std::string name(reinterpret_cast<const char*>(&blockBuf[off + 9]), namelen);
+                    size_t entryLen = ((namelen + 8 + 1 + (m_hasFtype ? 1 : 0) + 2 + 7) & ~7);
+
+                    if (name != "." && name != "..") {
+                        bool isDir = false;
+                        XFS::XfsDinodeCore childCore;
+                        std::vector<uint8_t> childFork;
+                        if (ReadInode(entryIno, childCore, childFork)) {
+                            isDir = (childCore.di_mode & XFS::XFS_S_IFMT) == XFS::XFS_S_IFDIR;
+                        }
+                        outEntries.push_back({ name, entryIno });
+                        outIsDir.push_back(isDir);
+                    }
+
+                    off += entryLen;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+bool XfsDriver::EraseDirectoryRecursive(uint64_t dirIno) {
+    std::vector<std::pair<std::string, uint64_t>> entries;
+    std::vector<bool> isDirList;
+
+    if (!ListDirectoryContents(dirIno, entries, isDirList)) {
+        return false;
+    }
+
+    for (size_t i = 0; i < entries.size(); ++i) {
+        const std::string& childName = entries[i].first;
+        uint64_t childIno = entries[i].second;
+        bool childIsDir = isDirList[i];
+
+        if (childIsDir) {
+            std::cout << "  -> Recursing into sub-folder: " << childName << " (Inode " << childIno << ")...\n";
+            EraseDirectoryRecursive(childIno);
+
+            // Wipe sub-folder's own directory data blocks / extents
+            XFS::XfsDinodeCore subCore;
+            std::vector<uint8_t> subFork;
+            if (ReadInode(childIno, subCore, subFork) &&
+                (subCore.di_format == XFS::XFS_DINODE_FMT_EXTENTS || subCore.di_format == XFS::XFS_DINODE_FMT_BTREE)) {
+                std::vector<uint64_t> btreeBlocks;
+                std::vector<XFS::XfsBmbtRec::ExtentInfo> subExtents = GetInodeExtents(subCore, subFork, btreeBlocks);
+                for (const auto& ext : subExtents) {
+                    if (ext.blockcount == 0) continue;
+                    uint64_t linearBlock = FsbToBlock(ext.startblock);
+                    uint64_t startSector = BlockToSector(linearBlock);
+                    uint32_t sectorCount = ext.blockcount * m_sectorsPerBlock;
+                    m_hardware->SecureEraseSectors(startSector, sectorCount);
+                }
+                for (uint64_t btreeFsb : btreeBlocks) {
+                    uint64_t linearBlock = FsbToBlock(btreeFsb);
+                    uint64_t startSector = BlockToSector(linearBlock);
+                    m_hardware->SecureEraseSectors(startSector, m_sectorsPerBlock);
+                }
+            }
+
+            WipeInodeOnDisk(childIno);
+            ScrubJournalForInode(childIno, childName);
+        } else {
+            std::cout << "  -> Erasing child file: " << childName << " (Inode " << childIno << ")...\n";
+
+            XFS::XfsDinodeCore fileCore;
+            std::vector<uint8_t> fileFork;
+            if (ReadInode(childIno, fileCore, fileFork)) {
+                if (fileCore.di_format != XFS::XFS_DINODE_FMT_LOCAL) {
+                    std::vector<uint64_t> btreeBlocks;
+                    std::vector<XFS::XfsBmbtRec::ExtentInfo> extents = GetInodeExtents(fileCore, fileFork, btreeBlocks);
+                    for (const auto& ext : extents) {
+                        if (ext.blockcount == 0) continue;
+                        uint64_t linearBlock = FsbToBlock(ext.startblock);
+                        uint64_t startSector = BlockToSector(linearBlock);
+                        uint32_t sectorCount = ext.blockcount * m_sectorsPerBlock;
+                        m_hardware->SecureEraseSectors(startSector, sectorCount);
+                    }
+                    for (uint64_t btreeFsb : btreeBlocks) {
+                        uint64_t linearBlock = FsbToBlock(btreeFsb);
+                        uint64_t startSector = BlockToSector(linearBlock);
+                        m_hardware->SecureEraseSectors(startSector, m_sectorsPerBlock);
+                    }
+                }
+            }
+
+            WipeInodeOnDisk(childIno);
+            ScrubJournalForInode(childIno, childName);
+        }
+
+        // Scrub directory entry from parent directory
+        DirectorySearchResult res = FindEntryInDirectory(dirIno, childName);
+        if (res.found) {
+            WipeDirectoryEntry(dirIno, res);
+        }
+    }
+    return true;
+}
+
+bool XfsDriver::EraseDirectory(const std::string& relativePath) {
+    if (m_blockSize == 0 || m_sectorsPerBlock == 0) {
+        std::cerr << "[XfsDriver] Error: Filesystem not mounted.\n";
+        return false;
+    }
+
+    std::vector<std::string> pathTokens = TokenizePath(relativePath);
+    if (pathTokens.empty()) {
+        std::cerr << "[XfsDriver] Error: Root directory cannot be erased via EraseDirectory. Use WipeVolume instead.\n";
+        return false;
+    }
+
+    std::cout << "\n--- Initiating Recursive XFS Directory Erasure for: " << relativePath << " ---\n";
+
+    uint64_t parentDirIno = m_rootIno;
+    DirectorySearchResult searchRes;
+
+    for (size_t i = 0; i < pathTokens.size(); ++i) {
+        const std::string& token = pathTokens[i];
+        bool isLastToken = (i == pathTokens.size() - 1);
+
+        searchRes = FindEntryInDirectory(parentDirIno, token);
+        if (!searchRes.found) {
+            std::cerr << "[Parser] Error: Path component '" << token << "' not found!\n";
+            return false;
+        }
+
+        if (!isLastToken) {
+            if (!searchRes.isDirectory) {
+                std::cerr << "[Parser] Error: '" << token << "' is not a directory!\n";
+                return false;
+            }
+            parentDirIno = searchRes.inodeNum;
+        }
+    }
+
+    if (!searchRes.isDirectory) {
+        std::cerr << "[XfsDriver] Error: Target '" << pathTokens.back() << "' is a file, not a directory.\n";
+        return false;
+    }
+
+    uint64_t targetDirIno = searchRes.inodeNum;
+    std::cout << "[Erasure] Target directory located. Target Inode: " << targetDirIno << "\n";
+
+    // 1. Recursively erase all contents of the directory
+    if (!EraseDirectoryRecursive(targetDirIno)) {
+        std::cerr << "[XfsDriver] Warning: Errors encountered while erasing directory contents.\n";
+    }
+
+    // 2. Erase target directory's own allocated blocks (if extents or B+tree)
+    XFS::XfsDinodeCore dirCore;
+    std::vector<uint8_t> dirFork;
+    if (ReadInode(targetDirIno, dirCore, dirFork) &&
+        (dirCore.di_format == XFS::XFS_DINODE_FMT_EXTENTS || dirCore.di_format == XFS::XFS_DINODE_FMT_BTREE)) {
+        std::vector<uint64_t> btreeBlocks;
+        std::vector<XFS::XfsBmbtRec::ExtentInfo> dirExtents = GetInodeExtents(dirCore, dirFork, btreeBlocks);
+        for (const auto& ext : dirExtents) {
+            if (ext.blockcount == 0) continue;
+            uint64_t linearBlock = FsbToBlock(ext.startblock);
+            uint64_t startSector = BlockToSector(linearBlock);
+            uint32_t sectorCount = ext.blockcount * m_sectorsPerBlock;
+            m_hardware->SecureEraseSectors(startSector, sectorCount);
+        }
+        for (uint64_t btreeFsb : btreeBlocks) {
+            uint64_t linearBlock = FsbToBlock(btreeFsb);
+            uint64_t startSector = BlockToSector(linearBlock);
+            m_hardware->SecureEraseSectors(startSector, m_sectorsPerBlock);
+        }
+    }
+
+    // 3. Wipe target directory's on-disk inode
+    WipeInodeOnDisk(targetDirIno);
+
+    // 4. Scrub entry from parent directory
+    WipeDirectoryEntry(parentDirIno, searchRes);
+
+    // 5. Scrub journal for target directory
+    ScrubJournalForInode(targetDirIno, pathTokens.back());
+
+    std::cout << "--- XFS Directory Recursive Erasure Successfully Completed! ---\n";
+    return true;
+}
+
+// =============================================================================
 // File Erasure Lifecycle (EraseFile)
 // =============================================================================
 
@@ -890,6 +1160,12 @@ bool XfsDriver::EraseFile(const std::string& relativePath) {
             }
             currentDirIno = searchRes.inodeNum;
         }
+    }
+
+    // If target is a directory, delegate to recursive folder eradication
+    if (searchRes.isDirectory) {
+        std::cout << "[XfsDriver] Target is a directory. Delegating to recursive folder eradication...\n";
+        return EraseDirectory(relativePath);
     }
 
     uint64_t targetIno = searchRes.inodeNum;
