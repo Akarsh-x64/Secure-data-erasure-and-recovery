@@ -776,6 +776,56 @@ Phase 8 implements a high-performance, forensic-grade `Fat32Driver` adhering str
 
 ---
 
+# Phase 9 — Multi-Tier Forensic Verification Engine & Visual Audit Reporting: Walkthrough
+
+## Overview & Background
+
+Merely issuing overwrite commands without mathematically and forensically proving data destruction fails enterprise compliance mandates (DoD 5220.22-M, NIST SP 800-88 Rev. 1, GDPR Art. 17, HIPAA). 
+
+Phase 9 implements an autonomous, multi-tier **Forensic Verification Engine** (`Erasure/Verification/`) that audits every single file erasure, directory eradication, and volume wipe across all 5 filesystems (NTFS, XFS, ext4, exFAT, FAT32) without violating the project's **3-Layer Decoupled Architecture**.
+
+### 1. Verification Subsystems Created (`Erasure/Verification/`)
+- **Statistical Tests & Visual Renderers** ([`StatisticalTests.h`](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/Erasure/Verification/StatisticalTests.h) / [`StatisticalTests.cpp`](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/Erasure/Verification/StatisticalTests.cpp)):
+  - **Shannon Entropy ($H$)**: Computes $H(X) = -\sum P(x) \log_2 P(x)$ across all 256 byte bins ($H = 0.0000$ for Zero-fill; $H \approx 7.999\text{ bits/byte}$ for PRNG noise).
+  - **Chi-Square ($\chi^2$) Goodness-of-Fit**: Tests uniformity across 256 byte bins with degrees of freedom $df=255$ and Wilson-Hilferty $Z$-transformation p-value.
+  - **Serial Correlation Coefficient**: Measures adjacent byte autocorrelation ($r$) to identify generator periodicity.
+  - **Monte Carlo $\pi$ Approximation**: Calculates circle-quadrant hits $4 \times \frac{\text{hits}}{\text{total}}$, asserting error $< 0.1\%$.
+  - **Cryptographic Hashing**: Zero-dependency FIPS 180-4 compliant SHA-256 implementation producing 64-char hex digests.
+  - **ASCII Graph Renderers**:
+    - Shannon entropy gauge: `[====================] 7.9994 / 8.0000 bits/byte`
+    - 16/32-column ASCII 256-bin byte frequency histogram with multi-level block characters (`█`, `▄`).
+    - NIST SP 800-88 confidence meter.
+- **Adversarial File Signature Carver** ([`SignatureCarver.h`](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/Erasure/Verification/SignatureCarver.h) / [`SignatureCarver.cpp`](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/Erasure/Verification/SignatureCarver.cpp)):
+  - Database of **120+ magic file signatures** across 6 categories:
+    - *Documents*: PDF (`%PDF-`), MS Office OLE2, Office OpenXML/ZIP (`PK\x03\x04`), RTF, PostScript, ODT, EPUB.
+    - *Images*: JPEG (JFIF/Exif/Raw), PNG, GIF (87a/89a), BMP, TIFF, WebP, PSD, ICO, RAW (CR2/NEF), HEIC.
+    - *Archives*: 7Z, RAR (v4/v5), GZ, BZ2, XZ, TAR, Zstandard, LZ4, CAB, DEB, RPM.
+    - *Audio/Video*: MP3 (ID3/sync), FLAC, WAV, OGG, MP4/MOV (`ftyp`), AVI, MKV/WebM (EBML), WMV, FLV.
+    - *Binaries*: Windows PE (`MZ`), Linux ELF (`\x7FELF`), Mach-O (32/64 LE/BE), Java Class, WASM, DEX.
+    - *Databases/Disks*: SQLite 3, PCAP, PCAPNG, VMDK, VHD, VHDX, Windows Registry, BitLocker (`-FVE-FS-`).
+  - Fast scanner sweeping target LBAs and sector boundaries. Passing requires strictly **0 detected signatures**.
+- **Audit Report & Serializers** ([`VerificationReport.h`](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/Erasure/Verification/VerificationReport.h) / [`VerificationReport.cpp`](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/Erasure/Verification/VerificationReport.cpp)):
+  - Struct `AuditReport` encapsulating targets, timestamps, sector counts, pre/post hashes, entropy scores, carving results, slack space metrics, and NIST confidence.
+  - `PrintTerminalReport()`: High-visibility ASCII forensic audit certificate with visual graphs.
+  - `ToJson()`: Machine-readable JSON string formatted for immediate Electron JSON-RPC IPC dispatch.
+- **Verification Engine Orchestrator** ([`VerificationEngine.h`](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/Erasure/Verification/VerificationEngine.h) / [`VerificationEngine.cpp`](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/Erasure/Verification/VerificationEngine.cpp)):
+  - `CapturePreWipeDigest()`: Reads target sectors through `IHardwareController` and computes baseline SHA-256.
+  - `AuditFileErasure()`: Reads erased sectors, computes post-wipe SHA-256, verifies cluster slack space, calculates entropy/$\chi^2$, and executes adversarial carving.
+  - `AuditDirectoryErasure()`: Validates recursive directory sanitization and parent unlinking.
+  - `AuditVolumeWipe()`: Executes **NIST SP 800-88 Rev. 1 Stratified Sampling** across 128 to 1,024 equidistant capacity zones, sampling random clusters and calculating binomial confidence interval:
+    $$C = 1 - (1 - p)^N \quad (p = 0.003 \implies C > 99.999\%)$$
+
+### 2. Master Test Runner Integration (`Tests/main.cpp`)
+- Added `[6/6] EXECUTING FORENSIC VERIFICATION & AUDIT REPORTING SUITE` to `RunSyntheticSuite()`:
+  - Subtest 6A: Mathematical validation of zero-fill entropy ($0.0000$) vs PRNG noise ($>7.95$).
+  - Subtest 6B: Plants PDF and PNG magic headers $\to$ confirms adversarial detection $\to$ executes DoD 3-pass sanitize $\to$ audits 0 surviving signatures $\to$ prints visual audit certificate.
+  - Subtest 6C: NIST SP 800-88 volume wipe audit with stratified sampling and Electron JSON output.
+- Interactive Live Session updated:
+  - Any file or directory erasure automatically captures baseline, verifies sanitization, and prints both the ASCII certificate and the Electron JSON-RPC IPC event.
+  - Volume `WIPE` automatically runs the NIST SP 800-88 stratified audit and displays graphs.
+
+---
+
 ## Comprehensive Documentation Index
 
 The `.context/` directory contains specialized, exhaustive architectural manuals for every layer of the product:
@@ -785,4 +835,5 @@ The `.context/` directory contains specialized, exhaustive architectural manuals
    * [FILESYSTEM_EXECUTION_INTENSIVE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/FILESYSTEM_EXECUTION_INTENSIVE.md) — Line-by-line, code-level execution walkthrough of all 5 filesystem drivers (NTFS, XFS, ext4, exFAT, FAT32), extent decoding, directory B-tree traversal, on-disk metadata wiping, and 3-pass DoD sanitization.
 3. **Multi-Filesystem Deep Dive & Forensic Matrix**:
    * [FILESYSTEMS_DEEP_DIVE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/FILESYSTEMS_DEEP_DIVE.md) — Architectural overview, comparative feature tables across all 5 filesystems, and Shannon entropy forensic verification suite.
+
 
