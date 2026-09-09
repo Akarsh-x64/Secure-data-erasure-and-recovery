@@ -116,7 +116,10 @@ class DriveEraseRequest(BaseModel):
     standard: str
     confirmation: Literal["CONFIRM_WIPE"]
     
-def background__get_storage_worker() :
+def background_get_storage_worker() :
+    while True:
+        #DLL call
+        break
     return
         
 @app.route('/api/v1/devices',methods=['GET'])
@@ -211,6 +214,49 @@ def get_file_node() :
     )
     return jsonify(root_drive.model_dump())
 
+def background_file_erase_worker(operation_id: str, targets: list, config: dict):
+    active_operations[operation_id] = {
+        "operationId": operation_id,
+        "state": "running",
+        "phase": "preparing",
+        "percent": 0,
+        "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+    }
+    
+
+    socketio.emit('progress', active_operations[operation_id])
+    
+    try:
+        total_targets = len(targets)
+        
+        for index, target in enumerate(targets):
+            file_path = target.get('canonicalPath')
+            
+            socketio.sleep(2) 
+            percent_complete = int(((index + 1) / total_targets) * 100)
+
+            active_operations[operation_id].update({
+                "phase": "erasing",
+                "percent": percent_complete,
+                "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+            })
+    
+            socketio.emit('progress', active_operations[operation_id])
+            
+        active_operations[operation_id].update({
+            "state": "completed",
+            "phase": "verifying",
+            "percent": 100
+        })
+        socketio.emit('progress', active_operations[operation_id])
+        
+    except Exception as e:
+        active_operations[operation_id].update({
+            "state": "failed",
+            "message": str(e)
+        })
+        socketio.emit('progress', active_operations[operation_id])
+
 @app.route('/api/v1/erase/files/validate',methods=['POST'])
 def file_erase_validate() :
     try:
@@ -249,12 +295,55 @@ def execute_file_erase():
     }
 
     file_cache[idem_key] = response_payload
+    socketio.start_background_task(
+        background_file_erase_worker,
+        operation_id,
+        data.get("targets", []),
+        data.get("config", {})
+    )
     return jsonify(response_payload), 202
     
+
+def background_drive_erase_worker(operation_id: str, targets: list, config: dict):
+    active_operations[operation_id] = {
+        "operationId": operation_id,
+        "state": "running",
+        "phase": "preparing",
+        "percent": 0,
+        "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+    }
+    socketio.emit('progress', active_operations[operation_id])
+    
+    try:
+
+        for i in range(1, 11):
+            socketio.sleep(5) 
+            
+            active_operations[operation_id].update({
+                "phase": "erasing",
+                "percent": i * 10,
+                "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+            })
+            socketio.emit('progress', active_operations[operation_id])
+            
+        active_operations[operation_id].update({
+            "state": "completed",
+            "phase": "verifying",
+            "percent": 100
+        })
+        socketio.emit('progress', active_operations[operation_id])
+        
+    except Exception as e:
+        active_operations[operation_id].update({
+            "state": "failed",
+            "message": str(e)
+        })
+        socketio.emit('progress', active_operations[operation_id])
+        
 @app.route('/api/v1/erase/drives/validate')
 def drive_erase_validate() :
     try:
-        validated_data = FileEraseRequest(**request.json)
+        validated_data = DriveEraseRequest(**request.json)
         
         return jsonify({"message": "Valid request"}), 200
         
@@ -270,7 +359,7 @@ def execute_drive_erase():
         return jsonify({"error": "Idempotency-Key header is required"}), 400
         
     if idem_key in drive_cache:
-        return jsonify(file_cache[idem_key]), 200
+        return jsonify(drive_cache[idem_key]), 200
     
     try:
         data = DriveEraseRequest(**request.json)
@@ -287,7 +376,13 @@ def execute_drive_erase():
     }
     
     drive_cache[idem_key] = response_payload
+    socketio.start_background_task(
+        background_drive_erase_worker,
+        operation_id,
+        request.json.get('targets', []),
+        request.json.get('config', {})
+    )
     return jsonify(response_payload), 202
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    socketio.run(port=5000)
