@@ -29,6 +29,7 @@ PYBIND11_MODULE(osdevice, m) {
         .def("Open", &Erasure::OS::WindowsStorageDevice::Open, "Open handle to Windows device")
         .def("LockVolume", &Erasure::OS::WindowsStorageDevice::LockVolume, "Lock Windows volume")
         .def("DismountVolume", &Erasure::OS::WindowsStorageDevice::DismountVolume, "Dismount Windows volume")
+        .def("Close",  &Erasure::OS::WindowsStorageDevice::Close, "Close device handle")
         .def("GetGeometry", &Erasure::OS::WindowsStorageDevice::GetGeometry, "Get drive geometry details");
 #elif defined(__linux__)
     py::class_<Erasure::OS::LinuxStorageDevice>(m, "LinuxStorageDevice")
@@ -36,6 +37,7 @@ PYBIND11_MODULE(osdevice, m) {
         .def("Open", &Erasure::OS::LinuxStorageDevice::Open, "Open handle to device path")
         .def("LockVolume", &Erasure::OS::LinuxStorageDevice::LockVolume, "Lock the volume")
         .def("DismountVolume", &Erasure::OS::LinuxStorageDevice::DismountVolume, "Dismount the volume")
-        .def("Close", &Erasure::OS::LinuxStorageDevice::Close, "Close device handle");
+        .def("Close", &Erasure::OS::LinuxStorageDevice::Close, "Close device handle")
+        .def("GetGeometry", &Erasure::OS::LinuxStorageDevice::GetGeometry, "Get drive geometry details");
 #endif
 }
