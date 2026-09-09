@@ -2,6 +2,7 @@
 
 #include "AuditLog.h"
 #include "../Carving/Core/CarvingCandidate.h"
+#include "../Core/FileRecord.h"
 
 #include <chrono>
 #include <optional>
@@ -60,6 +61,18 @@ namespace Audit {
             if (candidate.sourceOffsetKnown) {
                 event.sourceOffset = candidate.sourceOffset;
             }
+            m_log.Add(std::move(event));
+        }
+
+        void RecordCandidateRecovered(
+            const std::string& sessionId,
+            const Core::FileRecord& record,
+            std::optional<uint64_t> candidateId = std::nullopt) {
+            AuditEvent event = NewEvent(
+                AuditEventType::CandidateRecovered, sessionId,
+                record.recoveryBackend, "Candidate recovered.");
+            event.candidateId = candidateId;
+            event.dataLength = record.size;
             m_log.Add(std::move(event));
         }
 

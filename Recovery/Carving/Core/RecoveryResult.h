@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../Audit/AuditLog.h"
+#include "../../Audit/EvidenceRecord.h"
 #include "../../Core/FileRecord.h"
 #include "../../Core/PartitionInfo.h"
 #include "CarvingResult.h"
@@ -33,6 +35,10 @@ namespace Carving {
         std::string photoRecErrorMessage;
         std::string errorMessage;
         std::string limitationMessage;
+        Audit::AuditLog auditLog;
+        std::vector<Audit::EvidenceRecord> evidenceRecords;
+        std::string evidenceManifest;
+        std::string evidenceManifestHash;
     };
 
 } // namespace Carving

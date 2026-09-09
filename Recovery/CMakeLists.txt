@@ -16,6 +16,7 @@ set(RECOVERY_SOURCES
     Carving/Verification/Sha256.cpp
     Carving/Verification/VerificationEngine.cpp
     Carving/Verification/ZipVerifier.cpp
+    Audit/EvidenceManifest.cpp
     Filesystems/Ext4Detector.cpp
     Filesystems/FilesystemDetector.cpp
     Filesystems/NTFS/DataRunParser.cpp
