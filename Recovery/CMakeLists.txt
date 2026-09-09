@@ -37,6 +37,10 @@ add_library(recovery STATIC ${RECOVERY_SOURCES})
 target_compile_features(recovery PUBLIC cxx_std_17)
 target_include_directories(recovery PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+add_executable(recover recover.cpp)
+target_compile_features(recover PRIVATE cxx_std_17)
+target_link_libraries(recover PRIVATE recovery)
+
 if(RECOVERY_ENABLE_TSK)
     find_path(RECOVERY_TSK_INCLUDE_DIR NAMES tsk/libtsk.h REQUIRED)
     find_library(RECOVERY_TSK_LIBRARY NAMES tsk tsk3 REQUIRED)
