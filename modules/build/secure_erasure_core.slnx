@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<BuildType Name="RelWithDebInfo"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="beb5bb03-8508-36db-9c37-3f4da19f8db3" DefaultStartup="true">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="exfat.vcxproj"/>
+		<BuildDependency Project="exfat_cpp.vcxproj"/>
+		<BuildDependency Project="ext4.vcxproj"/>
+		<BuildDependency Project="ext4_cpp.vcxproj"/>
+		<BuildDependency Project="hdd.vcxproj"/>
+		<BuildDependency Project="hdd_cpp.vcxproj"/>
+		<BuildDependency Project="osdevice.vcxproj"/>
+		<BuildDependency Project="osdevice_cpp.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2f8631cd-9dcf-38cb-8170-87543785227e"/>
+	<Project Path="exfat.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e8bd483a-d943-307a-b944-0097895947c3">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="exfat_cpp.vcxproj"/>
+		<BuildDependency Project="hdd_cpp.vcxproj"/>
+		<BuildDependency Project="osdevice_cpp.vcxproj"/>
+	</Project>
+	<Project Path="exfat_cpp.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a89347c6-65f7-3fa9-a959-ba1dd353555b">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="hdd_cpp.vcxproj"/>
+		<BuildDependency Project="osdevice_cpp.vcxproj"/>
+	</Project>
+	<Project Path="ext4.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f1d4f40a-7552-374d-9287-a68ba5c55059">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="ext4_cpp.vcxproj"/>
+		<BuildDependency Project="hdd_cpp.vcxproj"/>
+		<BuildDependency Project="osdevice_cpp.vcxproj"/>
+	</Project>
+	<Project Path="ext4_cpp.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="bc1ae127-e3cc-3c98-ad3b-adb1850c4785">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="hdd_cpp.vcxproj"/>
+		<BuildDependency Project="osdevice_cpp.vcxproj"/>
+	</Project>
+	<Project Path="hdd.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="38746346-29fc-3b5b-a2f9-ba1ff3868c5e">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="hdd_cpp.vcxproj"/>
+		<BuildDependency Project="osdevice_cpp.vcxproj"/>
+	</Project>
+	<Project Path="hdd_cpp.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b8da4a7d-eb03-3045-9ce1-afd3c4452834">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="osdevice_cpp.vcxproj"/>
+	</Project>
+	<Project Path="osdevice.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b534e313-6181-3a1f-a6c9-71d33c61d36c">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="osdevice_cpp.vcxproj"/>
+	</Project>
+	<Project Path="osdevice_cpp.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="40da5a3e-7dcb-38bc-a5fc-afed1c38d991">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+</Solution>

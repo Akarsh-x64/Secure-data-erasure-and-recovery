@@ -1,0 +1,10 @@
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/osdevice_cpp.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/hdd_cpp.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/exfat_cpp.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/ext4_cpp.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/osdevice.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/hdd.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/exfat.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/ext4.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/ALL_BUILD.dir
+C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/ZERO_CHECK.dir

@@ -1,0 +1,10 @@
+^C:\CS\PROJECTS\SECURE-DATA-ERASURE-AND-RECOVERY\MODULES\CMAKELISTS.TXT
+setlocal
+C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\bin\cmake.exe -SC:/CS/Projects/Secure-data-erasure-and-recovery/modules -BC:/CS/Projects/Secure-data-erasure-and-recovery/modules/build --check-stamp-file C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

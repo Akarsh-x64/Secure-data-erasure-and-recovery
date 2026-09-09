@@ -6,6 +6,41 @@ import uuid
 import threading
 import time
 
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'modules'))
+
+try:
+    import osdevice
+    import hdd
+    import exfat
+    import ext4
+except ImportError as e:
+    print(f"Warning: Failed to import erasure modules: {e}")
+
+def ensure_admin():
+    if os.name == 'nt':
+        try:
+            import ctypes
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+        except:
+            is_admin = False
+        
+        if not is_admin:
+            print("[INFO] Requesting Windows Administrator privileges...")
+            import ctypes, sys
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+            )
+            sys.exit(0)
+    else:
+        if os.geteuid() != 0:
+            print("[ERROR] Please run this script with sudo.")
+            sys.exit(1)
+
+ensure_admin()
+
 app = Flask(__name__)
 
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -90,6 +125,7 @@ class EraseTarget(BaseModel):
     nodeId: str
     canonicalPath: str
     kind: Optional[str] = None
+    filesystem: str  # Required for selecting the correct driver
 
 class EraseConfig(BaseModel):
     clearMetadata: bool
@@ -101,19 +137,17 @@ class FileEraseRequest(BaseModel):
     targets: list[EraseTarget]
     config: EraseConfig
 
-class DriveEraseRequest(BaseModel):
-    deviceID: str
-    config: EraseConfig
-
 class DriveEraseValidateRequest(BaseModel):
     deviceId: str
     identityToken: str
     standard: str
+    filesystem: str
 
 class DriveEraseRequest(BaseModel):
     deviceId: str
     identityToken: str
     standard: str
+    filesystem: str
     confirmation: Literal["CONFIRM_WIPE"]
     
 def background_get_storage_worker() :
@@ -214,6 +248,25 @@ def get_file_node() :
     )
     return jsonify(root_drive.model_dump())
 
+MOCK_DEVICES = {
+    "dev-123": {
+        "path": "\\\\.\\X:",  # Safe dummy drive path instead of PhysicalDrive0
+        "filesystem": "exfat"
+    }
+}
+
+def get_fs_driver(fs_type: str, hdd_controller):
+    if not fs_type:
+        raise ValueError("Filesystem type must be specified")
+    
+    fs_type = fs_type.lower()
+    if fs_type == 'exfat':
+        return exfat.ExFatDriver(hdd_controller)
+    elif fs_type == 'ext4':
+        return ext4.Ext4Driver(hdd_controller)
+    else:
+        raise NotImplementedError(f"Filesystem {fs_type} is not supported yet.")
+
 def background_file_erase_worker(operation_id: str, targets: list, config: dict):
     active_operations[operation_id] = {
         "operationId": operation_id,
@@ -223,37 +276,79 @@ def background_file_erase_worker(operation_id: str, targets: list, config: dict)
         "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
     }
     
-
     socketio.emit('progress', active_operations[operation_id])
     
     try:
         total_targets = len(targets)
         
-        for index, target in enumerate(targets):
-            file_path = target.get('canonicalPath')
+        # Group targets by (drive, filesystem)
+        drive_targets = {}
+        for target in targets:
+            canonical_path = target.get('canonicalPath', '')
+            fs_type = target.get('filesystem', '')
             
-            socketio.sleep(2) 
-            percent_complete = int(((index + 1) / total_targets) * 100)
+            if not canonical_path or len(canonical_path) < 3 or canonical_path[1] != ':':
+                raise ValueError(f"Invalid path format: {canonical_path}")
+            
+            drive_letter = canonical_path[:2] # e.g. "C:"
+            relative_path = canonical_path[3:].replace('\\', '/') # e.g. "evidence/audit.log"
+            
+            group_key = (drive_letter, fs_type)
+            if group_key not in drive_targets:
+                drive_targets[group_key] = []
+            drive_targets[group_key].append(relative_path)
+            
+        completed_targets = 0
+        
+        for (drive_letter, fs_type), rel_paths in drive_targets.items():
+            device_path = f"\\\\.\\{drive_letter}"
+            
+            if os.name == 'nt':
+                device = osdevice.WindowsStorageDevice()
+            else:
+                device = osdevice.LinuxStorageDevice()
+                
+            if not device.Open(device_path):
+                raise Exception(f"Failed to open device {device_path}")
+                
+            hdd_controller = hdd.HDDController(device)
+            device.LockVolume()
+            device.DismountVolume()
+            
+            fs_driver = get_fs_driver(fs_type, hdd_controller)
+            if not fs_driver.Mount():
+                device.Close()
+                raise Exception(f"Failed to mount {fs_type} on {device_path}")
+            
+            for rel_path in rel_paths:
+                active_operations[operation_id].update({
+                    "phase": "erasing",
+                    "percent": int((completed_targets / total_targets) * 100),
+                    "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+                })
+                socketio.emit('progress', active_operations[operation_id])
+                
+                success = fs_driver.EraseFile(rel_path)
+                if not success:
+                    raise Exception(f"Failed to erase file: {rel_path} on {device_path}")
+                    
+                completed_targets += 1
+                
+            device.Close()
 
-            active_operations[operation_id].update({
-                "phase": "erasing",
-                "percent": percent_complete,
-                "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
-            })
-    
-            socketio.emit('progress', active_operations[operation_id])
-            
         active_operations[operation_id].update({
             "state": "completed",
             "phase": "verifying",
-            "percent": 100
+            "percent": 100,
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
         })
         socketio.emit('progress', active_operations[operation_id])
         
     except Exception as e:
         active_operations[operation_id].update({
             "state": "failed",
-            "message": str(e)
+            "message": str(e),
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
         })
         socketio.emit('progress', active_operations[operation_id])
 
@@ -304,7 +399,7 @@ def execute_file_erase():
     return jsonify(response_payload), 202
     
 
-def background_drive_erase_worker(operation_id: str, targets: list, config: dict):
+def background_drive_erase_worker(operation_id: str, device_id: str, standard: str, fs_type: str):
     active_operations[operation_id] = {
         "operationId": operation_id,
         "state": "running",
@@ -315,28 +410,56 @@ def background_drive_erase_worker(operation_id: str, targets: list, config: dict
     socketio.emit('progress', active_operations[operation_id])
     
     try:
-
-        for i in range(1, 11):
-            socketio.sleep(5) 
+        # Resolve device path from deviceId 
+        device_info = MOCK_DEVICES.get(device_id)
+        if not device_info:
+            raise Exception(f"Device not found: {device_id}")
             
-            active_operations[operation_id].update({
-                "phase": "erasing",
-                "percent": i * 10,
-                "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
-            })
-            socketio.emit('progress', active_operations[operation_id])
+        device_path = device_info["path"]
+        
+        if os.name == 'nt':
+            device = osdevice.WindowsStorageDevice()
+        else:
+            device = osdevice.LinuxStorageDevice()
+            
+        if not device.Open(device_path):
+            raise Exception(f"Failed to open device {device_path}")
+            
+        hdd_controller = hdd.HDDController(device)
+        device.LockVolume()
+        device.DismountVolume()
+        
+        fs_driver = get_fs_driver(fs_type, hdd_controller)
+        if not fs_driver.Mount():
+            device.Close()
+            raise Exception(f"Failed to mount {fs_type} on {device_path}")
+
+        active_operations[operation_id].update({
+            "phase": "erasing",
+            "percent": 50, # intermediate progress
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+        })
+        socketio.emit('progress', active_operations[operation_id])
+        
+        success = fs_driver.WipeVolume()
+        if not success:
+            raise Exception(f"Failed to wipe volume on {device_path}")
+            
+        device.Close()
             
         active_operations[operation_id].update({
             "state": "completed",
             "phase": "verifying",
-            "percent": 100
+            "percent": 100,
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
         })
         socketio.emit('progress', active_operations[operation_id])
         
     except Exception as e:
         active_operations[operation_id].update({
             "state": "failed",
-            "message": str(e)
+            "message": str(e),
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
         })
         socketio.emit('progress', active_operations[operation_id])
         
@@ -379,10 +502,11 @@ def execute_drive_erase():
     socketio.start_background_task(
         background_drive_erase_worker,
         operation_id,
-        request.json.get('targets', []),
-        request.json.get('config', {})
+        data.deviceId,
+        data.standard,
+        data.filesystem
     )
     return jsonify(response_payload), 202
 
 if __name__ == '__main__':
-    socketio.run(port=5000)
+    socketio.run(app, port=5000, allow_unsafe_werkzeug=True)

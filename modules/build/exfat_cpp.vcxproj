@@ -1,0 +1,321 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A89347C6-65F7-3FA9-A959-BA1DD353555B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>exfat_cpp</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">exfat_cpp.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">exfat_cpp</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">exfat_cpp.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">exfat_cpp</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">exfat_cpp.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">exfat_cpp</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">exfat_cpp.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">exfat_cpp</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\CS\Projects\Secure-data-erasure-and-recovery\modules\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/CS/Projects/Secure-data-erasure-and-recovery/modules/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\bin\cmake.exe -SC:/CS/Projects/Secure-data-erasure-and-recovery/modules -BC:/CS/Projects/Secure-data-erasure-and-recovery/modules/build --check-stamp-file C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeCCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeCXXCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeRCCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeSystem.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCXXInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeGenericSystem.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeInitializeConfigs.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeLanguageInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeRCInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CheckCXXCompilerFlag.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CheckCXXSourceCompiles.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPackageHandleStandardArgs.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPackageMessage.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPython\Support.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPython3.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckCommon.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckCompilerFlag.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckSourceCompiles.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-Initialize.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\WindowsPaths.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Common.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Config.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11ConfigVersion.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11NewTools.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Targets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/CS/Projects/Secure-data-erasure-and-recovery/modules/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\bin\cmake.exe -SC:/CS/Projects/Secure-data-erasure-and-recovery/modules -BC:/CS/Projects/Secure-data-erasure-and-recovery/modules/build --check-stamp-file C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeCCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeCXXCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeRCCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeSystem.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCXXInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeGenericSystem.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeInitializeConfigs.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeLanguageInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeRCInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CheckCXXCompilerFlag.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CheckCXXSourceCompiles.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPackageHandleStandardArgs.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPackageMessage.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPython\Support.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPython3.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckCommon.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckCompilerFlag.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckSourceCompiles.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-Initialize.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\WindowsPaths.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Common.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Config.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11ConfigVersion.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11NewTools.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Targets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/CS/Projects/Secure-data-erasure-and-recovery/modules/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\bin\cmake.exe -SC:/CS/Projects/Secure-data-erasure-and-recovery/modules -BC:/CS/Projects/Secure-data-erasure-and-recovery/modules/build --check-stamp-file C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeCCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeCXXCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeRCCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeSystem.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCXXInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeGenericSystem.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeInitializeConfigs.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeLanguageInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeRCInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CheckCXXCompilerFlag.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CheckCXXSourceCompiles.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPackageHandleStandardArgs.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPackageMessage.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPython\Support.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPython3.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckCommon.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckCompilerFlag.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckSourceCompiles.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-Initialize.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\WindowsPaths.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Common.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Config.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11ConfigVersion.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11NewTools.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Targets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/CS/Projects/Secure-data-erasure-and-recovery/modules/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\bin\cmake.exe -SC:/CS/Projects/Secure-data-erasure-and-recovery/modules -BC:/CS/Projects/Secure-data-erasure-and-recovery/modules/build --check-stamp-file C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeCCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeCXXCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeRCCompiler.cmake;C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\4.4.3\CMakeSystem.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCXXInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeGenericSystem.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeInitializeConfigs.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeLanguageInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeRCInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CheckCXXCompilerFlag.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\CheckCXXSourceCompiles.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Compiler\MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPackageHandleStandardArgs.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPackageMessage.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPython\Support.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\FindPython3.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckCommon.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckCompilerFlag.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Internal\CheckSourceCompiles.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Linker\MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-Initialize.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows-MSVC.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\Windows.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\share\cmake-4.4\Modules\Platform\WindowsPaths.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Common.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Config.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11ConfigVersion.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11NewTools.cmake;C:\Users\devan\AppData\Local\Programs\Python\Python314\Lib\site-packages\pybind11\share\cmake\pybind11\pybind11Targets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\CS\Projects\Secure-data-erasure-and-recovery\Erasure\File Systems\exFAT\exFAT.cpp" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\ZERO_CHECK.vcxproj">
+      <Project>{2F8631CD-9DCF-38CB-8170-87543785227E}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\hdd_cpp.vcxproj">
+      <Project>{B8DA4A7D-EB03-3045-9CE1-AFD3C4452834}</Project>
+      <Name>hdd_cpp</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\osdevice_cpp.vcxproj">
+      <Project>{40DA5A3E-7DCB-38BC-A5FC-AFED1C38D991}</Project>
+      <Name>osdevice_cpp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
