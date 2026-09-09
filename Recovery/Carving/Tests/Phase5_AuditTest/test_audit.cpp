@@ -1,5 +1,6 @@
 #include "../../../Audit/AuditCollector.h"
 #include "../../../Audit/EvidenceBuilder.h"
+#include "../../../Audit/EvidenceManifest.h"
 #include "../../../Audit/EvidenceRecord.h"
 
 #include <cassert>
@@ -180,6 +181,38 @@ int main() {
     const auto unknownOffsetEvidence = builder.Build(unknownOffset);
     assert(unknownOffsetEvidence.size() == 1);
     assert(!unknownOffsetEvidence[0].sourceOffset.has_value());
+
+    const auto manifest = EvidenceManifest::Canonicalize(evidence);
+    assert(manifest == EvidenceManifest::Canonicalize(evidenceAgain));
+    assert(EvidenceManifest::Hash(evidence) == EvidenceManifest::Hash(evidenceAgain));
+    assert(manifest.find("evidence_manifest_version=1\n") == 0);
+    assert(manifest.find("record_count=2\n") != std::string::npos);
+
+    auto changed = evidence;
+    changed[0].path = "/docs/changed.pdf";
+    assert(EvidenceManifest::Hash(changed) != EvidenceManifest::Hash(evidence));
+
+    auto reordered = evidence;
+    std::swap(reordered[0], reordered[1]);
+    assert(EvidenceManifest::Hash(reordered) != EvidenceManifest::Hash(evidence));
+
+    auto absentOffset = candidate;
+    absentOffset.sourceOffsetKnown = false;
+    const auto absentEvidence =
+        EvidenceRecord::FromCarvingCandidate("offset", absentOffset);
+    auto zeroOffset = candidate;
+    zeroOffset.sourceOffsetKnown = true;
+    zeroOffset.sourceOffset = 0;
+    const auto zeroEvidence =
+        EvidenceRecord::FromCarvingCandidate("offset", zeroOffset);
+    assert(EvidenceManifest::Hash({absentEvidence}) !=
+           EvidenceManifest::Hash({zeroEvidence}));
+    assert(EvidenceManifest::Hash({}) == EvidenceManifest::Hash({}));
+
+    auto changedVerification = evidence;
+    changedVerification[0].verificationScore = 94.0;
+    assert(EvidenceManifest::Hash(changedVerification) !=
+           EvidenceManifest::Hash(evidence));
 
     return 0;
 }
