@@ -16,7 +16,7 @@ declare global {
     selectDirectory?: () => Promise<{ path: string; name: string; nodes: any[] } | null>
     selectFiles?: () => Promise<SelectedFileItem[] | null>
     getPathForFile?: (file: File) => string
-    eraseFiles?: (request: unknown) => Promise<{ accepted: boolean; message?: string; directErased?: boolean; count?: number }>
+    eraseFiles?: (request: unknown) => Promise<{ accepted: boolean; message?: string; directErased?: boolean; count?: number; verifications?: any[] }>
   }
 
   interface Window {
