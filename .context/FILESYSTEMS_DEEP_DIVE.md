@@ -411,7 +411,27 @@ exFAT employs a dual allocation mechanism:
 
 ---
 
-# 5. Cross-Filesystem Comparative Matrix
+# 5. FAT32 Deep Dive (`Fat32Driver`)
+
+## 5.1 Architecture & On-Disk Geometry
+FAT32 organizes disks using a BIOS Parameter Block (BPB) at Sector 0, two redundant File Allocation Tables (FAT1 and FAT2), and a cluster heap starting at `rootCluster` (typically Cluster 2).
+
+### Dynamic Geometry Mathematics
+$$\text{firstDataSector} = \text{reservedSectorCount} + (\text{numFATs} \times \text{fatSize32})$$
+$$\text{LBA}(C) = \text{firstDataSector} + (C - 2) \times \text{sectorsPerCluster}$$
+
+## 5.2 28-Bit Cluster Addressing & Dual FAT Synchronization
+FAT32 cluster entries are 32 bits wide, but only the lower 28 bits contain the cluster address; the upper 4 bits are reserved for hardware flags.
+* **Dual FAT Synchronization**: All cluster deallocations write `0x00000000` to both FAT1 and FAT2 while preserving the upper 4 reserved bits (`*entryPtr = (*entryPtr & 0xF0000000) | 0x00000000`).
+
+## 5.3 SFN and VFAT LFN Sanitization
+* **Short File Names (8.3 SFN)**: `name[0] = 0xE5` (deleted), and all remaining 31 bytes (timestamps, cluster references, file size) are overwritten with `0x00`.
+* **Long File Names (VFAT LFN)**: All preceding 32-byte LFN entries have their order byte marked with `0xE5` and remaining 31 bytes zeroed.
+* **FSInfo Synchronization**: Increments `freeCount` and updates the `nextFree` cluster hint in both Sector 1 and backup Sector 7.
+
+---
+
+# 6. Cross-Filesystem Comparative Matrix
 
 | Feature | NTFS | XFS | ext4 | exFAT | FAT32 |
 |---|---|---|---|---|---|
@@ -429,7 +449,7 @@ exFAT employs a dual allocation mechanism:
 
 ---
 
-# 6. Forensic Verification & Inspection Engine
+# 7. Forensic Verification & Inspection Engine
 
 The engine incorporates forensic inspection capabilities directly into `Tests/main.cpp`:
 
@@ -441,7 +461,18 @@ The engine incorporates forensic inspection capabilities directly into `Tests/ma
    * **XFS**: Explains Superblock magic (`XFSB`), block sizes, Dinode magic (`IN` vs `0x0000`), modes, extent counts.
    * **ext4**: Explains Superblock (`0xEF53`), Inode modes, Extent tree roots (`0xF30A` vs `0x0000`).
    * **exFAT**: Explains VBR shifts, entry types (`0x85`, `0xC0`, `0xC1`), and checksum validation.
+   * **FAT32**: Explains BPB parameters, dual FAT mirroring, SFN `0xE5` deletion, and LFN scrub.
 3. **Shannon Entropy Analysis**:
    Computes real-time information density:
    $$H(X) = - \sum_{i=0}^{255} P(x_i) \log_2 P(x_i)$$
    * Distinguishes between **Active User Payload** ($H < 3.5$ or repeated patterns) and **DoD 3-Pass PRNG Gibberish** ($H > 7.5\text{ bits/byte}$).
+
+---
+
+## Modular Architecture References
+
+For deep dives into individual subsystems:
+* Master Index: [00_INDEX.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/00_INDEX.md)
+* Execution Intensive Walkthrough: [03_FILESYSTEMS_ERASURE_ENGINE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/03_FILESYSTEMS_ERASURE_ENGINE.md)
+* Forensic Verification Suite: [05_VERIFICATION_AND_AUDIT.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/05_VERIFICATION_AND_AUDIT.md)
+* Build & Test Guide: [10_BUILD_AND_TEST_GUIDE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/10_BUILD_AND_TEST_GUIDE.md)

@@ -53,8 +53,14 @@ It details the exact on-disk binary layouts, in-memory state tracking, mount rou
    - 5.6 [Single File Erasure Pipeline (`EraseFile`)](#56-single-file-erasure-pipeline-erasefile)
    - 5.7 [Spec §6.2.1.1 Directory Deletion (`0x85` $\to$ `0x05`) vs `0x00` EndOfDirectory](#57-spec-6211-directory-deletion-0x85-to-0x05-vs-0x00-endofdirectory)
    - 5.8 [Volume-Wide Surgical Wipe (`WipeVolume`)](#58-volume-wide-surgical-wipe-wipevolume)
-6. [Cross-Filesystem Comparative Matrix](#6-cross-filesystem-comparative-matrix)
-7. [Forensic Verification & Inspection Engine](#7-forensic-verification--inspection-engine)
+6. [FAT32 Driver Internals (`Fat32Driver`)](#6-fat32-driver-internals-fat32driver)
+   - 6.1 [BPB Decoding & Geometry Calculations](#61-bpb-decoding--geometry-calculations)
+   - 6.2 [28-Bit Cluster Addressing & Dual FAT Synchronization](#62-28-bit-cluster-addressing--dual-fat-synchronization)
+   - 6.3 [Short (8.3) & Long File Name (VFAT LFN) Directory Architecture](#63-short-83--long-file-name-vfat-lfn-directory-architecture)
+   - 6.4 [Forensic Sanitization Pipeline (`EraseFile`, `EraseDirectory`, `WipeVolume`)](#64-forensic-sanitization-pipeline)
+7. [Cross-Filesystem Comparative Matrix](#7-cross-filesystem-comparative-matrix)
+8. [Forensic Verification & Inspection Engine](#8-forensic-verification--inspection-engine)
+9. [Modular Architecture References (`.context/00_INDEX.md`)](#9-modular-architecture-references)
 
 ---
 

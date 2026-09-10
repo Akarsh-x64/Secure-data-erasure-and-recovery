@@ -19,10 +19,16 @@ function guessFileSystem(path: string): FileSystemType {
 interface FileEraseTabProps {
   treeTarget?: ForensicNode | null
   onTargetRemoved?: (id: string) => void
+  onEraseCompleted?: (erasedTargets: EraseTarget[]) => void
   queueResetToken?: number
 }
 
-export function FileEraseTab({ treeTarget, onTargetRemoved, queueResetToken = 0 }: FileEraseTabProps): ReactElement {
+export function FileEraseTab({
+  treeTarget,
+  onTargetRemoved,
+  onEraseCompleted,
+  queueResetToken = 0
+}: FileEraseTabProps): ReactElement {
   const [targets, setTargets] = useState<EraseTarget[]>([])
   const [config, setConfig] = useState<EraseConfig>(INITIAL_CONFIG)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -31,17 +37,18 @@ export function FileEraseTab({ treeTarget, onTargetRemoved, queueResetToken = 0 
   )
 
   useEffect(() => {
-    if (!treeTarget || targets.some((target) => target.id === treeTarget.id)) return
+    if (!treeTarget || targets.some((target) => target.id === treeTarget.id || target.path === (treeTarget.path || treeTarget.name))) return
     // The tree action is an external event delivered through the prop.
     // eslint-disable-next-line react-hooks/set-state-in-effect
+    const targetPath = treeTarget.path || treeTarget.name
     setTargets((current) => [
       ...current,
       {
         id: treeTarget.id,
-        path: treeTarget.name,
+        path: targetPath,
         kind: treeTarget.isDirectory ? 'folder' : 'file',
         clusterSize: '4 KB',
-        fileSystem: guessFileSystem(treeTarget.name),
+        fileSystem: guessFileSystem(targetPath),
         size: treeTarget.size ?? 'Pending scan'
       }
     ])
@@ -52,11 +59,66 @@ export function FileEraseTab({ treeTarget, onTargetRemoved, queueResetToken = 0 
     setExecutionState('ready')
   }, [queueResetToken])
 
+  const handleAddFiles = async (): Promise<void> => {
+    if (window.api?.selectFiles) {
+      const selected = await window.api.selectFiles()
+      if (selected && selected.length > 0) {
+        setTargets((current) => [
+          ...current,
+          ...selected
+            .filter((item) => !current.some((t) => t.path === item.path))
+            .map((item) => ({
+              id: item.id,
+              path: item.path,
+              kind: item.isDirectory ? ('folder' as const) : ('file' as const),
+              clusterSize: '4 KB',
+              fileSystem: guessFileSystem(item.path),
+              size: item.size
+            }))
+        ])
+      }
+    }
+  }
+
+  const handleAddFolder = async (): Promise<void> => {
+    if (window.api?.selectDirectory) {
+      const res = await window.api.selectDirectory()
+      if (res && res.path) {
+        setTargets((current) => {
+          if (current.some((t) => t.path === res.path)) return current
+          return [
+            ...current,
+            {
+              id: res.path,
+              path: res.path,
+              kind: 'folder' as const,
+              clusterSize: '4 KB',
+              fileSystem: guessFileSystem(res.path),
+              size: 'Directory'
+            }
+          ]
+        })
+      }
+    }
+  }
+
   const executeErase = async (): Promise<void> => {
     setDialogOpen(false)
     setExecutionState('dispatching')
-    if (window.api.eraseFiles) await window.api.eraseFiles({ targets, config })
-    setExecutionState('dispatched')
+    if (window.api?.eraseFiles) {
+      const res = await window.api.eraseFiles({ targets, config })
+      if (res?.accepted) {
+        setExecutionState('dispatched')
+        const finishedTargets = [...targets]
+        setTimeout(() => {
+          setTargets([])
+          onEraseCompleted?.(finishedTargets)
+          setExecutionState('ready')
+        }, 800)
+        return
+      }
+    }
+    setExecutionState('ready')
   }
 
   const statusLabel =
@@ -97,6 +159,8 @@ export function FileEraseTab({ treeTarget, onTargetRemoved, queueResetToken = 0 
             setTargets((current) => current.filter((target) => target.id !== id))
             onTargetRemoved?.(id)
           }}
+          onAddFiles={handleAddFiles}
+          onAddFolder={handleAddFolder}
         />
         <EraseConfigPanel
           config={config}

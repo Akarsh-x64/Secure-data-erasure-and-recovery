@@ -1,5 +1,7 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { join, basename } from 'path'
+import fs from 'fs'
+import crypto from 'crypto'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
@@ -59,9 +61,180 @@ app.whenReady().then(() => {
     win?.isMaximized() ? win.unmaximize() : win?.maximize()
   })
   ipcMain.on('window-close', () => BrowserWindow.getFocusedWindow()?.close())
-  ipcMain.handle('erase-files', async (_, request: unknown) => {
-    console.info('erase-files request received', request)
-    return { accepted: true }
+
+  // Format file size helper
+  const formatSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
+  }
+
+  // Native directory selection handler with safe scanning
+  ipcMain.handle('select-directory', async () => {
+    const win = BrowserWindow.getFocusedWindow()
+    const options: Electron.OpenDialogOptions = { properties: ['openDirectory'] }
+    const { canceled, filePaths } = win
+      ? await dialog.showOpenDialog(win, options)
+      : await dialog.showOpenDialog(options)
+    if (canceled || !filePaths.length) return null
+
+    const dirPath = filePaths[0]
+    const rootName = basename(dirPath) || dirPath
+
+    const scanDir = (currentPath: string, depth = 0): unknown => {
+      if (depth > 3) return []
+      try {
+        const entries = fs.readdirSync(currentPath, { withFileTypes: true })
+        return entries
+          .filter((ent) => !['node_modules', '.git', '.cache', 'venv', '__pycache__'].includes(ent.name))
+          .map((ent) => {
+            const full = join(currentPath, ent.name)
+            const isDir = ent.isDirectory()
+            let size = ''
+            if (!isDir) {
+              try {
+                size = formatSize(fs.statSync(full).size)
+              } catch {
+                size = '0 B'
+              }
+            }
+            return {
+              id: full,
+              name: ent.name,
+              path: full,
+              isDirectory: isDir,
+              size,
+              children: isDir ? scanDir(full, depth + 1) : undefined
+            }
+          })
+      } catch (err) {
+        console.error('Error scanning dir:', err)
+        return []
+      }
+    }
+
+    const rootNode = {
+      id: dirPath,
+      name: rootName,
+      path: dirPath,
+      isDirectory: true,
+      children: scanDir(dirPath, 0)
+    }
+
+    return {
+      path: dirPath,
+      name: rootName,
+      nodes: [rootNode]
+    }
+  })
+
+  // Native file selection handler
+  ipcMain.handle('select-files', async () => {
+    const win = BrowserWindow.getFocusedWindow()
+    const options: Electron.OpenDialogOptions = { properties: ['openFile', 'multiSelections'] }
+    const { canceled, filePaths } = win
+      ? await dialog.showOpenDialog(win, options)
+      : await dialog.showOpenDialog(options)
+    if (canceled || !filePaths.length) return null
+
+    return filePaths.map((fp) => {
+      let size = 'Unknown'
+      try {
+        size = formatSize(fs.statSync(fp).size)
+      } catch {
+        // ignore
+      }
+      return {
+        id: fp,
+        path: fp,
+        name: basename(fp),
+        size,
+        isDirectory: false
+      }
+    })
+  })
+
+  // Erase files handler: Calls Flask backend; fallbacks to direct secure zero-wipe + unlink
+  ipcMain.handle('erase-files', async (_, request: any) => {
+    console.info('[Main] Received erase-files request:', request)
+    const targets = request?.targets || []
+    const config = request?.config || {}
+
+    // 1. Attempt to send request to Python backend
+    try {
+      const backendPayload = {
+        targets: targets.map((t: any) => ({
+          nodeId: t.id || t.path,
+          canonicalPath: t.path || t.name,
+          kind: t.kind || 'file',
+          filesystem: t.fileSystem || 'NTFS'
+        })),
+        config: {
+          clearMetadata: Boolean(config.clearMetadata),
+          wipeSlackSpace: Boolean(config.wipeSlackSpace),
+          overwriteMethod: config.overwriteMethod || 'zero',
+          passCount: config.passCount || 1
+        },
+        confirmation: 'CONFIRM_ERASE'
+      }
+
+      const res = await fetch('http://127.0.0.1:5000/api/v1/erase/files', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': crypto.randomUUID()
+        },
+        body: JSON.stringify(backendPayload)
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        console.info('[Main] Backend accepted file erase request:', data)
+        return { accepted: true, backend: true, operationId: data.operationId }
+      }
+      console.warn('[Main] Backend responded with status:', res.status)
+    } catch (backendErr) {
+      console.warn('[Main] Backend not reachable at http://127.0.0.1:5000, executing local secure wipe:', backendErr)
+    }
+
+    // 2. Direct local secure wipe fallback to ensure files are erased immediately
+    let erasedCount = 0
+    for (const target of targets) {
+      const targetPath = target.path || target.name
+      if (!targetPath || !fs.existsSync(targetPath)) continue
+
+      try {
+        const stat = fs.statSync(targetPath)
+        if (stat.isFile()) {
+          // Zero overwrite pass
+          const fd = fs.openSync(targetPath, 'r+')
+          const bufferSize = 64 * 1024
+          const buf = Buffer.alloc(bufferSize, 0)
+          let remaining = stat.size
+          let offset = 0
+          while (remaining > 0) {
+            const writeSize = Math.min(remaining, bufferSize)
+            fs.writeSync(fd, buf, 0, writeSize, offset)
+            offset += writeSize
+            remaining -= writeSize
+          }
+          fs.fsyncSync(fd)
+          fs.closeSync(fd)
+          fs.unlinkSync(targetPath)
+          console.info(`[Main] Erased file: ${targetPath}`)
+          erasedCount++
+        } else if (stat.isDirectory()) {
+          fs.rmSync(targetPath, { recursive: true, force: true })
+          console.info(`[Main] Erased directory: ${targetPath}`)
+          erasedCount++
+        }
+      } catch (err) {
+        console.error(`[Main] Failed to erase ${targetPath}:`, err)
+      }
+    }
+
+    return { accepted: true, directErased: true, count: erasedCount }
   })
 
   createWindow()

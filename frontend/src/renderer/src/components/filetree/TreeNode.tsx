@@ -5,6 +5,7 @@ import { FileIcon } from './FileIcon';
 export interface ForensicNode {
   id: string;
   name: string;
+  path?: string;
   isDirectory?: boolean;
   isDrive?: boolean;
   isCorrupted?: boolean;

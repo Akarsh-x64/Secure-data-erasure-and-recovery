@@ -60,19 +60,21 @@ const formatFileSize = (bytes: number): string => {
 };
 
 const createDirectoryTree = (files: FileList): ForensicNode[] => {
-  const firstFile = files[0] as File & { webkitRelativePath?: string };
+  const firstFile = files[0] as File & { webkitRelativePath?: string; path?: string };
   const relativePath = firstFile.webkitRelativePath || firstFile.name;
-  const rootName = relativePath.split('/')[0] || 'Selected directory';
+  const rootName = relativePath.split(/[/\\]/)[0] || 'Selected directory';
   const root: ForensicNode = {
     id: `directory-${rootName}`,
     name: rootName,
+    path: (firstFile as any).path || rootName,
     isDirectory: true,
     children: [],
   };
 
   Array.from(files).forEach((file) => {
-    const path = (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name;
-    const parts = path.split('/').filter(Boolean);
+    const fileWithProp = file as File & { webkitRelativePath?: string; path?: string };
+    const pathStr = fileWithProp.webkitRelativePath || fileWithProp.name;
+    const parts = pathStr.split(/[/\\]/).filter(Boolean);
     const pathParts = parts[0] === rootName ? parts.slice(1) : parts;
     let current = root;
 
@@ -84,9 +86,11 @@ const createDirectoryTree = (files: FileList): ForensicNode[] => {
         return;
       }
 
+      const realPath = isFile && window.api?.getPathForFile ? window.api.getPathForFile(file) : ((fileWithProp as any).path || `${current.path || current.id}/${part}`);
       const next: ForensicNode = {
         id: `${current.id}/${part}`,
         name: part,
+        path: realPath,
         isDirectory: !isFile,
         ...(isFile ? { size: formatFileSize(file.size) } : { children: [] }),
       };
@@ -140,6 +144,21 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
     onAction?.(node);
   };
 
+  const handleOpenDirectory = async (): Promise<void> => {
+    if (window.api?.selectDirectory) {
+      try {
+        const res = await window.api.selectDirectory();
+        if (res?.nodes && onDirectorySelected) {
+          onDirectorySelected(res.nodes);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to select directory via native API:', err);
+      }
+    }
+    directoryInputRef.current?.click();
+  };
+
   const filteredData = useMemo(
     () => filterTreeNodes(nodes, searchQuery, flagFilter),
     [nodes, searchQuery, flagFilter]
@@ -179,7 +198,7 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
               <>
                 <button
                   type="button"
-                  onClick={() => directoryInputRef.current?.click()}
+                  onClick={handleOpenDirectory}
                   title="Change directory"
                   aria-label="Change directory"
                   className="p-1 transition-colors hover:bg-[var(--ui-selection)] hover:text-[var(--text-pure)]"
@@ -271,7 +290,7 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
                 <p className="text-sm text-[var(--text-pure)]">
                   <button
                     type="button"
-                    onClick={() => directoryInputRef.current?.click()}
+                    onClick={handleOpenDirectory}
                     className="text-[var(--status-valid)] underline-offset-2 hover:underline"
                   >
                     Choose a directory

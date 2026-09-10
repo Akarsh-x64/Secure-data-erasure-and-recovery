@@ -670,3 +670,49 @@ An automated interactive test runner is provided in `modules/test.py`:
 - Detects administrative privileges on Windows and automatically prompts for UAC elevation via `ShellExecuteW("runas", ...)`.
 - Provides an interactive console menu to mount any detected partition (exFAT, ext4, NTFS, FAT32), execute surgical file or volume wipes, run filesystem consistency checks, and trigger post-erasure forensic verification.
 
+---
+
+# 6. Production Implementation: Python Flask Backend & Electron Desktop App
+
+In the production desktop deployment, the application architecture connects the Electron frontend to the native C++ engine through a high-performance Python Flask and Socket.IO middleware layer:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        PRODUCTION DESKTOP EXECUTION MODEL                              │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  ELECTRON 44 + REACT 19 FRONTEND (`frontend/`)                                         │
+│  • Custom frameless dark UI (`frame: false`), responsive ActivityBar navigation        │
+│  • FileSystemTree, Drive Selector, 120+ Carver Checklist, and Live Audit Gauges        │
+│  • ContextBridge preload exposing typed `window.api`                                   │
+│     │                                                                                  │
+│     ▼ HTTP REST & WebSocket Events (localhost:5000)                                    │
+│  PYTHON FLASK + SOCKET.IO BACKEND (`backend/main.py`)                                  │
+│  • Elevated process supervisor (`ensure_admin()` via Windows UAC / Linux root)         │
+│  • Threaded background workers: `background_file_erase_worker` / `drive_erase_worker`  │
+│  • Real-time progress streaming: `socketio.emit('progress', event)`                    │
+│  • Automated OS filesystem consistency repair: `chkdsk /f /x` / `e2fsck -y -f`         │
+│     │                                                                                  │
+│     ▼ Direct In-Process C-API Calls                                                    │
+│  MODULAR PYBIND11 C++ EXTENSIONS (`modules/`)                                          │
+│  • osdevice.pyd (Layer 1 OS handle pipe & volume locking)                              │
+│  • hdd.pyd (Layer 2 DoD 5220.22-M 3-pass hardware demolition)                          │
+│  • ntfs.pyd, ext4.pyd, exfat.pyd, fat32.pyd (Layer 3 surgical filesystem drivers)      │
+│  • verification.pyd (Entropy, Chi-Square, 120+ Carver, and NIST SP 800-88 Audit)       │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Modular Context Documentation References
+
+For exhaustive, code-level documentation on individual subsystems:
+* **Master Index**: [00_INDEX.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/00_INDEX.md)
+* **Storage & Hardware Abstraction**: [02_STORAGE_AND_HARDWARE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/02_STORAGE_AND_HARDWARE.md)
+* **Filesystem Erasure Engine**: [03_FILESYSTEMS_ERASURE_ENGINE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/03_FILESYSTEMS_ERASURE_ENGINE.md)
+* **Data Recovery Subsystem**: [04_FORENSIC_RECOVERY_ENGINE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/04_FORENSIC_RECOVERY_ENGINE.md)
+* **Verification & Audit Engine**: [05_VERIFICATION_AND_AUDIT.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/05_VERIFICATION_AND_AUDIT.md)
+* **pybind11 Native Modules**: [06_PYBIND11_NATIVE_MODULES.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/06_PYBIND11_NATIVE_MODULES.md)
+* **Flask Backend & IPC**: [07_BACKEND_AND_IPC.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/07_BACKEND_AND_IPC.md)
+* **Electron Desktop Frontend**: [08_FRONTEND_ELECTRON_REACT.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/08_FRONTEND_ELECTRON_REACT.md)
+* **Shipping Formats & LiveBoot OS**: [09_SHIPPING_AND_LIVEBOOT.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/09_SHIPPING_AND_LIVEBOOT.md)
+* **Build & Verification Guide**: [10_BUILD_AND_TEST_GUIDE.md](file:///c:/Users/Sudhit/Documents/Study%20Material/Projects/SIH%20v2/.context/10_BUILD_AND_TEST_GUIDE.md)
+
+

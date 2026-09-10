@@ -9,6 +9,8 @@ import { RecoveryTab } from './components/modules/recovery/RecoveryTab'
 import { AuditLogsTab } from './components/modules/audit-logs/AuditLogsTabs'
 import type { ForensicNode } from './components/filetree/TreeNode'
 
+import type { EraseTarget } from './components/modules/file-erase/SelectedFilesPanel'
+
 function App(): ReactElement {
   const [activeTab, setActiveTab] = useState<NavItem>('file-erase')
   const [explorerOpen, setExplorerOpen] = useState(true)
@@ -34,6 +36,38 @@ function App(): ReactElement {
     setEraseUnmarkRequest({ id, request: Date.now() })
   }
 
+  const handleEraseCompleted = (erasedTargets: EraseTarget[]): void => {
+    const idsAndPaths = new Set<string>()
+    erasedTargets.forEach((t) => {
+      idsAndPaths.add(t.id)
+      idsAndPaths.add(t.path)
+      idsAndPaths.add(t.path.replace(/\\/g, '/'))
+      idsAndPaths.add(t.path.replace(/\//g, '\\'))
+    })
+
+    const filterNodesRecursively = (nodes: ForensicNode[]): ForensicNode[] => {
+      return nodes
+        .filter((node) => {
+          const pFwd = (node.path || '').replace(/\\/g, '/')
+          const pBack = (node.path || '').replace(/\//g, '\\')
+          return !(
+            idsAndPaths.has(node.id) ||
+            idsAndPaths.has(node.name) ||
+            idsAndPaths.has(node.path || '') ||
+            idsAndPaths.has(pFwd) ||
+            idsAndPaths.has(pBack)
+          )
+        })
+        .map((node) => ({
+          ...node,
+          children: node.children ? filterNodesRecursively(node.children) : undefined
+        }))
+    }
+
+    setEraseTreeNodes((prev) => filterNodesRecursively(prev))
+    setEraseTreeTarget(null)
+  }
+
   const renderModule = (): ReactElement => {
     if (activeTab === 'file-erase') {
       return (
@@ -55,6 +89,7 @@ function App(): ReactElement {
             <FileEraseTab
               treeTarget={eraseTreeTarget}
               onTargetRemoved={removeEraseTarget}
+              onEraseCompleted={handleEraseCompleted}
               queueResetToken={eraseQueueResetToken}
             />
           </section>

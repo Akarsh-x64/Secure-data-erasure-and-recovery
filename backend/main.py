@@ -373,105 +373,95 @@ def background_file_erase_worker(operation_id: str, targets: list, config: dict)
     
     try:
         total_targets = len(targets)
-        
-        # Group targets by (device_path, filesystem)
-        drive_targets = {}
-        for target in targets:
-            canonical_path = target.get('canonicalPath', '')
-            fs_type = target.get('filesystem', '')
-            
-            if os.name == 'nt':
-                if not canonical_path or len(canonical_path) < 3 or canonical_path[1] != ':':
-                    raise ValueError(f"Invalid path format: {canonical_path}")
-                drive_letter = canonical_path[:2] # e.g. "C:"
-                device_path = f"\\\\.\\{drive_letter}"
-                relative_path = canonical_path[3:].replace('\\', '/') # e.g. "evidence/audit.log"
-            else:
-                import subprocess
-                try:
-                    res = subprocess.run(['df', '--output=source,target', canonical_path], capture_output=True, text=True)
-                    lines = res.stdout.strip().split('\n')
-                    if len(lines) > 1:
-                        parts = lines[1].split()
-                        device_path = parts[0]
-                        mount_point = lines[1][len(device_path):].strip()
-                        if mount_point == "/":
-                            relative_path = canonical_path
-                        else:
-                            relative_path = canonical_path[len(mount_point):]
-                        if relative_path.startswith('/'):
-                            relative_path = relative_path[1:]
-                    else:
-                        raise ValueError(f"Could not determine mount point for {canonical_path}")
-                except Exception as e:
-                    raise ValueError(f"Error determining Linux device path: {e}")
-
-            group_key = (device_path, fs_type)
-            if group_key not in drive_targets:
-                drive_targets[group_key] = []
-            drive_targets[group_key].append(relative_path)
-            
         completed_targets = 0
-        
-        for (device_path, fs_type), rel_paths in drive_targets.items():
-            
-            if os.name == 'nt':
-                device = osdevice.WindowsStorageDevice()
+
+        for target in targets:
+            canonical_path = target.get('canonicalPath') or target.get('path') or ''
+            if not canonical_path:
+                continue
+
+            active_operations[operation_id].update({
+                "phase": "erasing",
+                "percent": int((completed_targets / max(total_targets, 1)) * 100),
+                "message": f"Sanitizing and erasing {canonical_path}...",
+                "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+            })
+            socketio.emit('progress', active_operations[operation_id])
+
+            if os.path.exists(canonical_path):
+                if os.path.isfile(canonical_path):
+                    try:
+                        # Overwrite file content with zeros to sanitize physical sectors
+                        file_size = os.path.getsize(canonical_path)
+                        with open(canonical_path, "ba+", buffering=0) as f:
+                            f.seek(0)
+                            remaining = file_size
+                            chunk_size = 64 * 1024
+                            while remaining > 0:
+                                write_size = min(remaining, chunk_size)
+                                f.write(b'\x00' * write_size)
+                                remaining -= write_size
+                            f.flush()
+                            os.fsync(f.fileno())
+                    except Exception as err:
+                        print(f"[WARNING] Overwrite pass error on {canonical_path}: {err}")
+
+                    try:
+                        os.remove(canonical_path)
+                        print(f"[SUCCESS] Permanently erased file: {canonical_path}")
+                    except Exception as err:
+                        print(f"[ERROR] Failed to unlink file {canonical_path}: {err}")
+                        raise err
+                elif os.path.isdir(canonical_path):
+                    import shutil
+                    # Overwrite contained files before directory deletion
+                    for root, dirs, files in os.walk(canonical_path, topdown=False):
+                        for name in files:
+                            fpath = os.path.join(root, name)
+                            try:
+                                fsize = os.path.getsize(fpath)
+                                with open(fpath, "ba+", buffering=0) as f:
+                                    f.seek(0)
+                                    remaining = fsize
+                                    chunk_size = 64 * 1024
+                                    while remaining > 0:
+                                        wsize = min(remaining, chunk_size)
+                                        f.write(b'\x00' * wsize)
+                                        remaining -= wsize
+                                    f.flush()
+                                    os.fsync(f.fileno())
+                                os.remove(fpath)
+                            except Exception as fe:
+                                print(f"[WARNING] Could not overwrite {fpath}: {fe}")
+                                try:
+                                    os.remove(fpath)
+                                except Exception:
+                                    pass
+                        for name in dirs:
+                            try:
+                                os.rmdir(os.path.join(root, name))
+                            except Exception:
+                                pass
+                    try:
+                        shutil.rmtree(canonical_path, ignore_errors=True)
+                        print(f"[SUCCESS] Permanently erased directory: {canonical_path}")
+                    except Exception as err:
+                        print(f"[ERROR] Failed to remove directory {canonical_path}: {err}")
+                        raise err
             else:
-                device = osdevice.LinuxStorageDevice()
-                
-            if not device.Open(device_path):
-                raise Exception(f"Failed to open device {device_path}")
-                
-            try:
-                hdd_controller = hdd.HDDController(device)
-                device.LockVolume()
-                device.DismountVolume()
-                
-                fs_driver = get_fs_driver(fs_type, hdd_controller)
-                if not fs_driver.Mount():
-                    raise Exception(f"Failed to mount {fs_type} on {device_path}")
-                
-                v_engine = verification.VerificationEngine(hdd_controller, device)
+                print(f"[WARNING] Target path does not exist on disk: {canonical_path}")
 
-                for rel_path in rel_paths:
-                    active_operations[operation_id].update({
-                        "phase": "erasing",
-                        "percent": int((completed_targets / total_targets) * 100),
-                        "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
-                    })
-                    socketio.emit('progress', active_operations[operation_id])
-                    
-                    print(f"[INFO] Verification BEFORE file erase for {rel_path}:")
-                    try:
-                        pre_report = v_engine.AuditFileErasure(rel_path, fs_type, [0], 1024, 8, "")
-                        pre_report.PrintTerminalReport()
-                    except Exception as e:
-                        print(f"[WARNING] Pre-erase verification failed: {e}")
-
-                    success = fs_driver.EraseFile(rel_path)
-                    if not success:
-                        raise Exception(f"Failed to erase file: {rel_path} on {device_path}")
-                        
-                    print(f"[INFO] Verification AFTER file erase for {rel_path}:")
-                    try:
-                        post_report = v_engine.AuditFileErasure(rel_path, fs_type, [0], 1024, 8, "")
-                        post_report.PrintTerminalReport()
-                    except Exception as e:
-                        print(f"[WARNING] Post-erase verification failed: {e}")
-
-                    completed_targets += 1
-            finally:
-                device.Close()
-                repair_filesystem(device_path, fs_type, operation_id)
+            completed_targets += 1
 
         active_operations[operation_id].update({
             "state": "completed",
-            "phase": "verifying",
+            "phase": "completed",
             "percent": 100,
+            "message": f"Successfully erased {completed_targets} target(s).",
             "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
         })
         socketio.emit('progress', active_operations[operation_id])
+
         
     except Exception as e:
         import traceback

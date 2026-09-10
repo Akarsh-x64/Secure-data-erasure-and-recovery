@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -6,6 +6,9 @@ const api = {
   minimizeWindow: () => ipcRenderer.send('window-minimize'),
   maximizeWindow: () => ipcRenderer.send('window-maximize'),
   closeWindow: () => ipcRenderer.send('window-close'),
+  selectDirectory: () => ipcRenderer.invoke('select-directory'),
+  selectFiles: () => ipcRenderer.invoke('select-files'),
+  getPathForFile: (file: File) => webUtils.getPathForFile(file),
   eraseFiles: (request: unknown) => ipcRenderer.invoke('erase-files', request)
 }
 

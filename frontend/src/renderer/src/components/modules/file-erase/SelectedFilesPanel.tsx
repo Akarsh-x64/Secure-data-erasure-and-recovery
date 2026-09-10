@@ -1,4 +1,4 @@
-import { File, Folder, Trash2 } from 'lucide-react'
+import { File, Folder, Trash2, Plus, FolderPlus } from 'lucide-react'
 import type { ReactElement } from 'react'
 
 export type FileSystemType = 'NTFS' | 'ext4' | 'FAT32'
@@ -15,9 +15,11 @@ export interface EraseTarget {
 interface SelectedFilesPanelProps {
   targets: EraseTarget[]
   onRemove: (id: string) => void
+  onAddFiles?: () => void
+  onAddFolder?: () => void
 }
 
-export function SelectedFilesPanel({ targets, onRemove }: SelectedFilesPanelProps): ReactElement {
+export function SelectedFilesPanel({ targets, onRemove, onAddFiles, onAddFolder }: SelectedFilesPanelProps): ReactElement {
   return (
     <section className="flex min-h-0 flex-1 flex-col rounded-lg border border-ui-outline bg-background-sidebar">
       <div className="flex items-center justify-between border-b border-ui-outline px-4 py-3">
@@ -27,10 +29,32 @@ export function SelectedFilesPanel({ targets, onRemove }: SelectedFilesPanelProp
             {targets.length} {targets.length === 1 ? 'item' : 'items'} selected
           </p>
         </div>
-        <span className="flex items-center gap-1.5 rounded-full border border-ui-outline bg-background-main px-2.5 py-1 text-xs text-status-warning">
-          <span className="h-1.5 w-1.5 rounded-full bg-status-warning" />
-          Awaiting erase
-        </span>
+        <div className="flex items-center gap-2">
+          {onAddFiles && (
+            <button
+              type="button"
+              onClick={onAddFiles}
+              className="flex items-center gap-1 rounded-md border border-ui-outline bg-background-main px-2.5 py-1 text-xs text-text-pure transition-colors hover:bg-ui-selection"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Add files
+            </button>
+          )}
+          {onAddFolder && (
+            <button
+              type="button"
+              onClick={onAddFolder}
+              className="flex items-center gap-1 rounded-md border border-ui-outline bg-background-main px-2.5 py-1 text-xs text-text-pure transition-colors hover:bg-ui-selection"
+            >
+              <FolderPlus className="h-3.5 w-3.5" />
+              Add folder
+            </button>
+          )}
+          <span className="flex items-center gap-1.5 rounded-full border border-ui-outline bg-background-main px-2.5 py-1 text-xs text-status-warning">
+            <span className="h-1.5 w-1.5 rounded-full bg-status-warning" />
+            Awaiting erase
+          </span>
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto">
