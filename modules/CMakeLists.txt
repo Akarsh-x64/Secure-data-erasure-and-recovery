@@ -4,12 +4,24 @@ project(secure_erasure_core)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-execute_process(
-  COMMAND python3 -m pybind11 --cmakedir
-  OUTPUT_VARIABLE pybind11_DIR
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-find_package(pybind11 REQUIRED)
+if(WIN32)
+    find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+
+    execute_process(
+      COMMAND "${Python3_EXECUTABLE}" -m pybind11 --cmakedir
+      OUTPUT_VARIABLE pybind11_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    find_package(pybind11 REQUIRED)
+elseif(UNIX)
+    
+    execute_process(
+      COMMAND python3 -m pybind11 --cmakedir
+      OUTPUT_VARIABLE pybind11_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    find_package(pybind11 REQUIRED)
+endif()
 
 # 1. Compile underlying C++ code into STATIC libraries
 if(WIN32)

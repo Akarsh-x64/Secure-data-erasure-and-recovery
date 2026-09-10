@@ -49,6 +49,14 @@ int main(int argc, char** argv) {
     Check("TSK version string is not empty", !version.empty());
     std::cout << "  TSK Version: " << version << "\n";
 
+    if (!fs.IsTskAvailable()) {
+        Check("Unavailable TSK backend reports a clear error", !fs.Mount());
+        Check("Unavailable TSK backend exposes an error",
+              fs.GetLastError().find("not available") != std::string::npos);
+        storage.Close();
+        return g_failed > 0 ? 1 : 0;
+    }
+
     Check("Mount partition via TSK", fs.Mount());
     if (g_failed > 0) {
         storage.Close();
@@ -69,6 +77,7 @@ int main(int argc, char** argv) {
     bool sawDeleted = false;
     bool sawAnyRanges = false;
     bool sawOffsetInsidePartition = false;
+    bool rangeStatusConsistent = true;
     bool metadataRoundTrip = true;
 
     for (const auto& rec : files) {
@@ -83,6 +92,9 @@ int main(int argc, char** argv) {
 
         for (const auto& r : rec.dataRanges) {
             sawAnyRanges = true;
+            if (rec.dataRangeStatus != Recovery::Core::DataRangeStatus::Complete) {
+                rangeStatusConsistent = false;
+            }
             if (r.offset == 0) {
                 continue;
             }
@@ -95,6 +107,8 @@ int main(int argc, char** argv) {
     Check("Metadata lookup round-trips TSK record IDs", metadataRoundTrip);
 
     Check("Data ranges surfaced where supported", sawAnyRanges);
+    Check("Data range status is explicit for surfaced ranges",
+          rangeStatusConsistent);
     Check("Non-sparse data ranges include absolute offsets in partition", sawOffsetInsidePartition);
 
     if (sawDeleted) {
