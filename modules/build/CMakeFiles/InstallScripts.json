@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

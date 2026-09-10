@@ -2,7 +2,6 @@
 #include <cstring>
 #include <iostream>
 
-
 namespace Erasure {
 namespace OS {
 
