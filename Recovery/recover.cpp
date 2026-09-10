@@ -1,5 +1,9 @@
 #include "recover.h"
+#ifdef _WIN32
+#include "Acquisition/WindowsReadOnlyStorage.h"
+#else
 #include "Acquisition/LinuxReadOnlyStorage.h"
+#endif
 #include "Audit/AuditCollector.h"
 #include "Audit/AuditLog.h"
 #include "Carving/PhotoRec/PhotoRecCarver.h"
@@ -194,7 +198,11 @@ bool RecoverMetadataInternal(const std::string& diskImage, RunState& state) {
     audit.RecordBackendStarted(session, Core::RecoveryBackend::TSK_METADATA,
                                "Starting filesystem metadata recovery.");
 
+#ifdef _WIN32
+    Acquisition::WindowsReadOnlyStorage storage;
+#else
     Acquisition::LinuxReadOnlyStorage storage;
+#endif
     if (!storage.Open(diskImage)) {
         state.metadataError = "Failed to open source image read-only.";
         audit.RecordBackendFailed(session, Core::RecoveryBackend::TSK_METADATA,
