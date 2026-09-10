@@ -70,6 +70,9 @@ target_link_libraries(recover PRIVATE recovery)
 
 pybind11_add_module(recovery_python bindings_recovery.cpp)
 set_target_properties(recovery_python PROPERTIES OUTPUT_NAME recovery)
+if(MSVC)
+    set_target_properties(recovery_python PROPERTIES ARCHIVE_OUTPUT_NAME recovery_python)
+endif()
 target_link_libraries(recovery_python PRIVATE recovery)
 
 if(RECOVERY_ENABLE_TSK)
