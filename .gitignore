@@ -4,3 +4,4 @@ plans/
 build/
 Recovery/output/
 Recovery/Carving/Tests/PhotoRecCarverTest/disk.img
+.venv/
