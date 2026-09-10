@@ -126,20 +126,18 @@ public:
     bool EraseDirectory(const std::string& relativePath);
     bool FormatDrive(bool fullDriveSanitize = false);
 
-    // =========================================================================
-    // Forensic Verification & Byte Explanation Suite
-    // =========================================================================
-    static void PrintHexDump(const void* data, size_t size, uint64_t basePhysicalOffset, const std::string& label);
-    void ExplainMftRecordBytes(const uint8_t* recordData, size_t size, uint64_t baseOffset) const;
-    void ExplainDirectoryEntryBytes(const uint8_t* entryData, size_t size, uint64_t baseOffset) const;
-    void ExplainDataSectorBytes(const uint8_t* data, size_t size, uint64_t baseOffset) const;
-    void ExplainBitmapBytes(uint8_t byteVal, uint8_t mask, uint64_t cluster, uint64_t baseOffset) const;
-
+    // Location Query Interface for Forensic Auditing & Verification
     bool LocateTargetLocations(const std::string& relativePath, NTFS::TargetLocations& outLocs) const;
 
-    // High-level verification runners (intakes file, folder, or disk, performs before/after dumps and byte breakdown)
-    bool VerifyAndErase(const std::string& targetPath);
-    bool VerifyAndFormatDrive(bool fullDriveSanitize = false);
+    // High-level convenience forwarders for backwards compatibility
+    bool VerifyAndErase(const std::string& targetPath) {
+        NTFS::TargetLocations locs;
+        if (!LocateTargetLocations(targetPath, locs)) return false;
+        return locs.isDirectory ? EraseDirectory(targetPath) : EraseFile(targetPath);
+    }
+    bool VerifyAndFormatDrive(bool fullDriveSanitize = false) {
+        return FormatDrive(fullDriveSanitize);
+    }
 
     // Diagnostics
     void PrintBootInfo() const;

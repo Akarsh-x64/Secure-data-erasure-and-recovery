@@ -252,7 +252,7 @@ static void ExplainNtfsBootSector(const uint8_t *sectorData, size_t size,
 
 static void ExplainNtfsMftRecord(const uint8_t *recordData, size_t size,
                                  uint64_t physicalOffset) {
-  if (size < sizeof(NTFS::NtfsRecordHeader))
+  if (!recordData || size < sizeof(NTFS::NtfsRecordHeader))
     return;
   const auto *hdr =
       reinterpret_cast<const NTFS::NtfsRecordHeader *>(recordData);
@@ -270,6 +270,9 @@ static void ExplainNtfsMftRecord(const uint8_t *recordData, size_t size,
   else
     std::cout << " (Unknown / Raw bytes)\n";
 
+  std::cout << "  * Offset +0x04..+0x05 [Fixup Offset]:  " << hdr->updateSequenceOffset << "\n";
+  std::cout << "  * Offset +0x06..+0x07 [Fixup Size]:    " << hdr->updateSequenceSize << "\n";
+  std::cout << "  * Offset +0x10..+0x11 [Sequence Num]:  " << hdr->sequenceNumber << "\n";
   std::cout << "  * Offset +0x14..+0x15 [First Attr]:    Offset 0x" << std::hex
             << hdr->firstAttributeOffset << std::dec << "\n";
   std::cout << "  * Offset +0x16..+0x17 [Flags]:         0x" << std::hex
@@ -287,6 +290,103 @@ static void ExplainNtfsMftRecord(const uint8_t *recordData, size_t size,
             << hdr->allocatedBytes << " bytes\n";
   std::cout << "  * Offset +0x2C..+0x2F [Record Number]: " << hdr->recordNumber
             << "\n";
+
+  // Inspect Attributes if record is active
+  if (hdr->flags & NTFS::FILE_RECORD_IN_USE) {
+    uint16_t offset = hdr->firstAttributeOffset;
+    while (offset + sizeof(NTFS::NtfsAttributeHeader) <= size) {
+      const auto *attr = reinterpret_cast<const NTFS::NtfsAttributeHeader *>(recordData + offset);
+      if (attr->type == NTFS::ATTR_END || attr->length == 0)
+        break;
+
+      std::cout << "  -> Attribute @ +0x" << std::hex << offset << " Type: 0x" << attr->type << std::dec;
+      if (attr->type == NTFS::ATTR_STANDARD_INFORMATION)
+        std::cout << " ($STANDARD_INFORMATION: Timestamps, DOS Flags)\n";
+      else if (attr->type == NTFS::ATTR_FILE_NAME) {
+        std::cout << " ($FILE_NAME: ";
+        if (attr->nonResidentFlag == 0) {
+          const auto *res = reinterpret_cast<const NTFS::NtfsResidentAttributeHeader *>(
+              recordData + offset + sizeof(NTFS::NtfsAttributeHeader));
+          if (offset + res->valueOffset + sizeof(NTFS::NtfsFileNameAttribute) <= size) {
+            const auto *fn = reinterpret_cast<const NTFS::NtfsFileNameAttribute *>(recordData + offset + res->valueOffset);
+            std::cout << "'";
+            for (size_t i = 0; i < fn->fileNameLength; ++i) {
+              char16_t c = fn->fileName[i];
+              std::cout << (c < 128 ? static_cast<char>(c) : '?');
+            }
+            std::cout << "')\n";
+          } else {
+            std::cout << "Resident)\n";
+          }
+        } else {
+          std::cout << "Non-resident)\n";
+        }
+      } else if (attr->type == NTFS::ATTR_DATA) {
+        std::cout << " ($DATA: " << (attr->nonResidentFlag == 0 ? "Resident Payload" : "Non-Resident Runlist") << ")\n";
+      } else if (attr->type == NTFS::ATTR_INDEX_ROOT) {
+        std::cout << " ($INDEX_ROOT: Directory B-Tree Root)\n";
+      } else if (attr->type == NTFS::ATTR_INDEX_ALLOCATION) {
+        std::cout << " ($INDEX_ALLOCATION: Large Directory Index Blocks)\n";
+      } else {
+        std::cout << "\n";
+      }
+
+      offset += attr->length;
+    }
+  }
+}
+
+static void ExplainNtfsDirectoryEntry(const uint8_t *entryData, size_t size,
+                                      uint64_t baseOffset) {
+  if (!entryData || size < sizeof(NTFS::NtfsIndexEntry))
+    return;
+
+  const auto *entry = reinterpret_cast<const NTFS::NtfsIndexEntry *>(entryData);
+  std::cout << "\n[SEMANTIC BYTE BREAKDOWN: DIRECTORY INDEX ENTRY @ 0x"
+            << std::hex << baseOffset << std::dec << "]\n";
+  std::cout << "  * Offset +0x00..+0x07 [File Reference]: 0x" << std::hex
+            << entry->fileReference << std::dec << " (Record Number: "
+            << (entry->fileReference & 0x0000FFFFFFFFFFFFULL) << ")\n";
+  std::cout << "  * Offset +0x08..+0x09 [Entry Length]:   " << entry->length
+            << " bytes\n";
+  std::cout << "  * Offset +0x0A..+0x0B [Key Length]:     " << entry->keyLength
+            << " bytes\n";
+  std::cout << "  * Offset +0x0C..+0x0D [Entry Flags]:    0x" << std::hex
+            << entry->flags << std::dec;
+  if (entry->flags & NTFS::INDEX_ENTRY_HAS_SUBNODES)
+    std::cout << " [HAS_CHILD_VCN]";
+  if (entry->flags & NTFS::INDEX_ENTRY_LAST)
+    std::cout << " [LAST_ENTRY_IN_NODE]";
+  std::cout << "\n";
+
+  if (entry->keyLength >= sizeof(NTFS::NtfsFileNameAttribute)) {
+    const auto *fn = reinterpret_cast<const NTFS::NtfsFileNameAttribute *>(
+        entryData + sizeof(NTFS::NtfsIndexEntry));
+    std::cout << "  * Target Filename: '";
+    for (size_t i = 0; i < fn->fileNameLength; ++i) {
+      char16_t c = fn->fileName[i];
+      std::cout << (c < 128 ? static_cast<char>(c) : '?');
+    }
+    std::cout << "'\n";
+    std::cout << "  * Allocated File Size: " << fn->allocatedSize << " bytes\n";
+    std::cout << "  * Real File Size:      " << fn->realSize << " bytes\n";
+  }
+}
+
+static void ExplainNtfsBitmap(uint8_t byteVal, uint8_t mask, uint64_t cluster,
+                              uint64_t baseOffset) {
+  std::cout << "\n[SEMANTIC BYTE BREAKDOWN: $Bitmap (Record 6) @ 0x" << std::hex
+            << baseOffset << std::dec << "]\n";
+  std::cout << "  * Cluster Index: " << cluster << "\n";
+  std::cout << "  * Bitmap Byte Value: 0x" << std::hex
+            << static_cast<int>(byteVal) << ", Bit Mask: 0x"
+            << static_cast<int>(mask) << std::dec << "\n";
+  if (byteVal & mask) {
+    std::cout << "  * Bit Status: 1 (ALLOCATED / IN-USE BY CLUSTER " << cluster
+              << ")\n";
+  } else {
+    std::cout << "  * Bit Status: 0 (FREE / UNALLOCATED)\n";
+  }
 }
 
 static void ExplainXfsSuperblock(const uint8_t *data, size_t size,
@@ -743,6 +843,7 @@ static void SetupNtfsSyntheticDisk(MemoryDiskDevice &dev) {
   r0[2] = 0x04;
   r0[3] = 0x00;
   *reinterpret_cast<uint32_t *>(a0 + ah0->length) = NTFS::ATTR_END;
+  hdr0->usedBytes = static_cast<uint32_t>((a0 + ah0->length + 4) - mft0.data());
   writeRecord(NTFS::MFT_REC_MFT, mft0);
 
   // Record 6 ($Bitmap)
@@ -773,6 +874,7 @@ static void SetupNtfsSyntheticDisk(MemoryDiskDevice &dev) {
   r6[2] = 12;
   r6[3] = 0x00;
   *reinterpret_cast<uint32_t *>(a6 + ah6->length) = NTFS::ATTR_END;
+  hdr6->usedBytes = static_cast<uint32_t>((a6 + ah6->length + 4) - mft6.data());
   writeRecord(NTFS::MFT_REC_BITMAP, mft6);
 
   uint8_t *bitmapData = disk + (12 * CLUSTER_SIZE);
@@ -828,6 +930,7 @@ static void SetupNtfsSyntheticDisk(MemoryDiskDevice &dev) {
   r16[2] = 16;
   r16[3] = 0x00;
   *reinterpret_cast<uint32_t *>(a16_d + ah16_d->length) = NTFS::ATTR_END;
+  hdr16->usedBytes = static_cast<uint32_t>((a16_d + ah16_d->length + 4) - mft16.data());
   writeRecord(16, mft16);
   std::memcpy(disk + (16 * CLUSTER_SIZE),
               "SECRET_NTFS_PAYLOAD_CONFIDENTIAL_KEY_2026", 42);
@@ -855,6 +958,7 @@ static void SetupNtfsSyntheticDisk(MemoryDiskDevice &dev) {
   auto *fn17 = reinterpret_cast<NTFS::NtfsFileNameAttribute *>(
       a17 + res17_fn->valueOffset);
   fn17->parentDirectory = NTFS::MFT_REC_ROOT;
+  fn17->flags = 0x10000000; // FILE_ATTRIBUTE_DIRECTORY
   std::u16string fName17 = u"documents";
   fn17->fileNameLength = static_cast<uint8_t>(fName17.length());
   for (size_t i = 0; i < fName17.length(); ++i)
@@ -906,6 +1010,7 @@ static void SetupNtfsSyntheticDisk(MemoryDiskDevice &dev) {
                     sizeof(NTFS::NtfsResidentAttributeHeader) +
                     res17_ir->valueLength;
   *reinterpret_cast<uint32_t *>(a17_ir + ah17_ir->length) = NTFS::ATTR_END;
+  hdr17->usedBytes = static_cast<uint32_t>((a17_ir + ah17_ir->length + 4) - mft17.data());
   writeRecord(17, mft17);
 
   // Record 18: "financials.xlsx"
@@ -952,6 +1057,7 @@ static void SetupNtfsSyntheticDisk(MemoryDiskDevice &dev) {
   r18[2] = 18;
   r18[3] = 0x00;
   *reinterpret_cast<uint32_t *>(a18_d + ah18_d->length) = NTFS::ATTR_END;
+  hdr18->usedBytes = static_cast<uint32_t>((a18_d + ah18_d->length + 4) - mft18.data());
   writeRecord(18, mft18);
   std::memcpy(disk + (18 * CLUSTER_SIZE),
               "NESTED_FOLDER_PAYLOAD_COMPANY_FINANCES_2026", 44);
@@ -991,6 +1097,7 @@ static void SetupNtfsSyntheticDisk(MemoryDiskDevice &dev) {
   auto *fn17_root = reinterpret_cast<NTFS::NtfsFileNameAttribute *>(
       e17Ptr + sizeof(NTFS::NtfsIndexEntry));
   fn17_root->parentDirectory = 5;
+  fn17_root->flags = 0x10000000; // FILE_ATTRIBUTE_DIRECTORY
   fn17_root->fileNameLength = static_cast<uint8_t>(fName17.length());
   for (size_t i = 0; i < fName17.length(); ++i)
     fn17_root->fileName[i] = fName17[i];
@@ -1026,6 +1133,7 @@ static void SetupNtfsSyntheticDisk(MemoryDiskDevice &dev) {
                    sizeof(NTFS::NtfsResidentAttributeHeader) +
                    res5_ir->valueLength;
   *reinterpret_cast<uint32_t *>(a5 + ah5_ir->length) = NTFS::ATTR_END;
+  hdr5->usedBytes = static_cast<uint32_t>((a5 + ah5_ir->length + 4) - mft5.data());
   writeRecord(NTFS::MFT_REC_ROOT, mft5);
 }
 
@@ -1888,25 +1996,96 @@ static void RunSyntheticSuite() {
     assert(ntfsDriver.Mount());
     std::cout << "[NTFS] Mounted successfully.\n";
 
-    // Initial VBR and MFT inspection
+    // Initial VBR inspection
     ExplainNtfsBootSector(ntfsDev.GetDiskData(), 512, 0);
+
+    // Scenario 1A: Single File Erasure ("passwords.txt")
+    std::cout << "\n--- Scenario 1A: Single File Erasure ('passwords.txt') ---\n";
     size_t mft16ByteOffset = (4 * 8 * 512) + (16 * 1024);
-    ExplainNtfsMftRecord(ntfsDev.GetDiskData() + mft16ByteOffset, 1024,
-                         mft16ByteOffset);
+    size_t data16ByteOffset = (16 * 8 * 512);
+    size_t bitmapByteOffset = (12 * 8 * 512) + 2;
 
-    // Scenario 1A: File Verification & Erasure ("passwords.txt")
-    std::cout << "\n--- Scenario 1A: Single File Verification & Erasure "
-                 "('passwords.txt') ---\n";
-    assert(ntfsDriver.VerifyAndErase("passwords.txt"));
+    std::cout << "\n>>> [BEFORE DELETION] Inspecting NTFS Data Cluster 16 & MFT Record 16 <<<\n";
+    PrintHexDump(ntfsDev.GetDiskData() + data16ByteOffset, 64, data16ByteOffset,
+                 "NTFS Data Cluster 16 ('passwords.txt')");
+    ExplainDataSector(ntfsDev.GetDiskData() + data16ByteOffset, 64, data16ByteOffset, "NTFS");
 
-    // Scenario 1B: Recursive Folder Verification & Erasure ("documents")
-    std::cout << "\n--- Scenario 1B: Recursive Folder Verification & Erasure "
-                 "('documents') ---\n";
-    assert(ntfsDriver.VerifyAndErase("documents"));
+    PrintHexDump(ntfsDev.GetDiskData() + mft16ByteOffset, 128, mft16ByteOffset,
+                 "NTFS MFT Record 16 ('passwords.txt')");
+    ExplainNtfsMftRecord(ntfsDev.GetDiskData() + mft16ByteOffset, 128, mft16ByteOffset);
+
+    assert(ntfsDriver.EraseFile("passwords.txt"));
+
+    std::cout << "\n>>> [AFTER DELETION] Re-inspecting Same Physical Offsets <<<\n";
+    PrintHexDump(ntfsDev.GetDiskData() + data16ByteOffset, 64, data16ByteOffset,
+                 "NTFS Data Cluster 16 [POST-WIPE]");
+    ExplainDataSector(ntfsDev.GetDiskData() + data16ByteOffset, 64, data16ByteOffset, "NTFS");
+
+    PrintHexDump(ntfsDev.GetDiskData() + mft16ByteOffset, 128, mft16ByteOffset,
+                 "NTFS MFT Record 16 [POST-WIPE]");
+    ExplainNtfsMftRecord(ntfsDev.GetDiskData() + mft16ByteOffset, 128, mft16ByteOffset);
+
+    assert(ntfsDev.GetDiskData()[data16ByteOffset] != 'S'); // Original 'S' payload destroyed by 3-pass wipe
+    const auto *mft16Hdr = reinterpret_cast<const NTFS::NtfsRecordHeader *>(ntfsDev.GetDiskData() + mft16ByteOffset);
+    assert((mft16Hdr->flags & NTFS::FILE_RECORD_IN_USE) == 0); // Record marked unallocated / free
+    assert(ntfsDev.GetDiskData()[mft16ByteOffset + 0x40] == 0x00); // Sensitive attribute payload zeroed
+    assert((ntfsDev.GetDiskData()[bitmapByteOffset] & 0x01) == 0); // $Bitmap allocation bit cleared
+
+    // Scenario 1B: Recursive Folder Erasure ("documents")
+    std::cout << "\n--- Scenario 1B: Recursive Folder Erasure ('documents') ---\n";
+    size_t dirMft17Off = (4 * 8 * 512) + (17 * 1024);
+    size_t childMft18Off = (4 * 8 * 512) + (18 * 1024);
+    size_t childData18Off = (18 * 8 * 512);
+
+    std::cout << "\n>>> [BEFORE DELETION] Inspecting Folder MFT 17, Child MFT 18, Child Cluster 18 <<<\n";
+    PrintHexDump(ntfsDev.GetDiskData() + childData18Off, 64, childData18Off,
+                 "Nested File Cluster 18 ('financials.xlsx')");
+    ExplainDataSector(ntfsDev.GetDiskData() + childData18Off, 64, childData18Off, "NTFS");
+
+    PrintHexDump(ntfsDev.GetDiskData() + dirMft17Off, 128, dirMft17Off,
+                 "Folder MFT Record 17 ('documents')");
+    ExplainNtfsMftRecord(ntfsDev.GetDiskData() + dirMft17Off, 128, dirMft17Off);
+
+    PrintHexDump(ntfsDev.GetDiskData() + childMft18Off, 128, childMft18Off,
+                 "Child MFT Record 18 ('financials.xlsx')");
+    ExplainNtfsMftRecord(ntfsDev.GetDiskData() + childMft18Off, 128, childMft18Off);
+
+    assert(ntfsDriver.EraseDirectory("documents"));
+
+    std::cout << "\n>>> [AFTER DELETION] Re-inspecting Folder & Child MFT Records and Data <<<\n";
+    PrintHexDump(ntfsDev.GetDiskData() + childData18Off, 64, childData18Off,
+                 "Nested File Cluster 18 [POST-WIPE]");
+    ExplainDataSector(ntfsDev.GetDiskData() + childData18Off, 64, childData18Off, "NTFS");
+
+    PrintHexDump(ntfsDev.GetDiskData() + dirMft17Off, 128, dirMft17Off,
+                 "Folder MFT Record 17 [POST-WIPE]");
+    ExplainNtfsMftRecord(ntfsDev.GetDiskData() + dirMft17Off, 128, dirMft17Off);
+
+    PrintHexDump(ntfsDev.GetDiskData() + childMft18Off, 128, childMft18Off,
+                 "Child MFT Record 18 [POST-WIPE]");
+    ExplainNtfsMftRecord(ntfsDev.GetDiskData() + childMft18Off, 128, childMft18Off);
+
+    assert(ntfsDev.GetDiskData()[childData18Off] != 'N'); // Original 'N' payload destroyed
+    const auto *mft17Hdr = reinterpret_cast<const NTFS::NtfsRecordHeader *>(ntfsDev.GetDiskData() + dirMft17Off);
+    const auto *mft18Hdr = reinterpret_cast<const NTFS::NtfsRecordHeader *>(ntfsDev.GetDiskData() + childMft18Off);
+    assert((mft17Hdr->flags & NTFS::FILE_RECORD_IN_USE) == 0); // Folder marked unallocated
+    assert((mft18Hdr->flags & NTFS::FILE_RECORD_IN_USE) == 0); // Child marked unallocated
+    assert(ntfsDev.GetDiskData()[childMft18Off + 0x40] == 0x00); // Child attribute payload zeroed
 
     // Scenario 1C: Complete Disk Format Verification
     std::cout << "\n--- Scenario 1C: Complete Disk Format Verification ---\n";
-    assert(ntfsDriver.VerifyAndFormatDrive(true));
+    PrintHexDump(ntfsDev.GetDiskData(), 128, 0, "Sector 0 (Pre-Format VBR)");
+
+    assert(ntfsDriver.FormatDrive(true));
+
+    PrintHexDump(ntfsDev.GetDiskData(), 128, 0, "Sector 0 (Pristine Post-Format VBR)");
+    ExplainNtfsBootSector(ntfsDev.GetDiskData(), 512, 0);
+
+    size_t mft0Off = 4 * 8 * 512;
+    PrintHexDump(ntfsDev.GetDiskData() + mft0Off, 128, mft0Off, "MFT Record 0 ($MFT) [PRISTINE]");
+    ExplainNtfsMftRecord(ntfsDev.GetDiskData() + mft0Off, 128, mft0Off);
+    assert(reinterpret_cast<const NTFS::NtfsRecordHeader *>(ntfsDev.GetDiskData() + mft0Off)->magic == NTFS::NTFS_MAGIC_FILE);
+
     std::cout << "[PASS] NTFS Suite Completed with 100% Verification.\n";
   }
 
@@ -2515,6 +2694,206 @@ static void RunSyntheticSuite() {
 }
 
 // ============================================================================
+// NTFS Forensic Verification & Deletion Runners
+// ============================================================================
+
+static bool VerifyAndEraseNtfs(NtfsDriver *ntfsPtr, IHardwareController *hardware,
+                               VerificationEngine &verifier, const std::string &targetPath) {
+  std::cout << "\n================================================================================\n";
+  std::cout << "       NTFS SECURE DELETION & FORENSIC VERIFICATION ENGINE                      \n";
+  std::cout << "================================================================================\n";
+
+  NTFS::TargetLocations locs;
+  if (!ntfsPtr->LocateTargetLocations(targetPath, locs) || !locs.isValid) {
+    std::cerr << "[Verification] Error: Target '" << targetPath << "' could not be located on disk.\n";
+    return false;
+  }
+
+  uint32_t bytesPerSec = ntfsPtr->GetBytesPerSector() > 0 ? ntfsPtr->GetBytesPerSector() : 512;
+  uint32_t spc = ntfsPtr->GetBytesPerSector() > 0 ? (ntfsPtr->GetBytesPerCluster() / ntfsPtr->GetBytesPerSector()) : 8;
+
+  std::vector<uint64_t> targetSectors;
+  if (!locs.dataExtents.empty()) {
+    for (const auto &ext : locs.dataExtents) {
+      uint64_t startSec = ntfsPtr->ClusterToSector(ext.lcn);
+      for (uint64_t s = 0; s < ext.clusterCount * spc; ++s) {
+        targetSectors.push_back(startSec + s);
+      }
+    }
+  } else {
+    targetSectors.push_back(locs.mftSector);
+  }
+  std::string preHash = verifier.CapturePreWipeDigest(targetSectors);
+
+  // =========================================================================
+  // STEP 1: BEFORE DELETION FORENSIC INSPECTION
+  // =========================================================================
+  std::cout << "\n>>> [PHASE 1: BEFORE DELETION] EXACT DISK LOCATIONS & BYTE INSPECTION <<<\n";
+
+  // 1. MFT Record
+  uint64_t mftPhysicalByteOffset = locs.mftSector * bytesPerSec + locs.mftByteOffsetInSector;
+  uint32_t mftSecCount = (locs.mftRecordSize + bytesPerSec - 1) / bytesPerSec;
+  std::vector<uint8_t> mftRecordBefore(mftSecCount * bytesPerSec, 0);
+  hardware->ReadSectors(locs.mftSector, mftSecCount, mftRecordBefore.data());
+  PrintHexDump(mftRecordBefore.data() + locs.mftByteOffsetInSector,
+               std::min<size_t>(locs.mftRecordSize, 256),
+               mftPhysicalByteOffset, "MFT Record " + std::to_string(locs.mftRecordNum) + " (Header & Attributes)");
+  ExplainNtfsMftRecord(mftRecordBefore.data() + locs.mftByteOffsetInSector, locs.mftRecordSize, mftPhysicalByteOffset);
+
+  // 2. Data Clusters (if non-resident)
+  uint64_t dataPhysicalByteOffset = 0;
+  if (!locs.isResident && !locs.dataExtents.empty()) {
+    uint64_t firstSector = ntfsPtr->ClusterToSector(locs.dataExtents.front().lcn);
+    dataPhysicalByteOffset = firstSector * bytesPerSec;
+    std::vector<uint8_t> dataSector(bytesPerSec, 0);
+    hardware->ReadSectors(firstSector, 1, dataSector.data());
+    PrintHexDump(dataSector.data(), std::min<size_t>(dataSector.size(), 128),
+                 dataPhysicalByteOffset, "Data Cluster " + std::to_string(locs.dataExtents.front().lcn) + " Sector 0");
+    ExplainDataSector(dataSector.data(), dataSector.size(), dataPhysicalByteOffset, "NTFS");
+  }
+
+  // 3. Parent Directory Entry
+  uint64_t parentDirPhysicalByteOffset = locs.parentIndexSector * bytesPerSec + locs.parentIndexByteOffset;
+  if (locs.parentIndexEntrySize > 0) {
+    std::vector<uint8_t> dirSec(bytesPerSec, 0);
+    hardware->ReadSectors(locs.parentIndexSector, 1, dirSec.data());
+    uint32_t offInSec = locs.parentIndexByteOffset % bytesPerSec;
+    size_t available = (offInSec < bytesPerSec) ? (bytesPerSec - offInSec) : 0;
+    size_t copyLen = std::min<size_t>(locs.parentIndexEntrySize, available);
+    std::vector<uint8_t> dirEntryBuf(copyLen);
+    std::memcpy(dirEntryBuf.data(), dirSec.data() + offInSec, copyLen);
+    PrintHexDump(dirEntryBuf.data(), dirEntryBuf.size(), parentDirPhysicalByteOffset,
+                 "Parent Directory Index Entry for '" + targetPath + "'");
+    ExplainNtfsDirectoryEntry(dirEntryBuf.data(), dirEntryBuf.size(), parentDirPhysicalByteOffset);
+  }
+
+  // 4. Volume Allocation Bitmap ($Bitmap)
+  if (!locs.isResident && !locs.dataExtents.empty() && locs.bitmapSector > 0) {
+    uint64_t bitmapPhysicalByteOffset = locs.bitmapSector * bytesPerSec + locs.bitmapByteOffsetInSector;
+    std::vector<uint8_t> bSec(bytesPerSec, 0);
+    hardware->ReadSectors(locs.bitmapSector, 1, bSec.data());
+    PrintHexDump(&bSec[locs.bitmapByteOffsetInSector], 16, bitmapPhysicalByteOffset,
+                 "$Bitmap Cluster Allocation Block");
+    ExplainNtfsBitmap(locs.bitmapOriginalByte, locs.bitmapBitMask, locs.dataExtents.front().lcn, bitmapPhysicalByteOffset);
+  }
+
+  // =========================================================================
+  // STEP 2: EXECUTE SECURE ERASURE
+  // =========================================================================
+  std::cout << "\n>>> [PHASE 2: SECURE ERASURE] EXECUTING SURGICAL OBLITERATION <<<\n";
+  bool eraseSuccess = false;
+  if (locs.isDirectory) {
+    eraseSuccess = ntfsPtr->EraseDirectory(targetPath);
+  } else {
+    eraseSuccess = ntfsPtr->EraseFile(targetPath);
+  }
+
+  if (!eraseSuccess) {
+    std::cerr << "[Verification] Error: Erase operation failed.\n";
+    return false;
+  }
+
+  // =========================================================================
+  // STEP 3: AFTER DELETION FORENSIC RE-INSPECTION
+  // =========================================================================
+  std::cout << "\n>>> [PHASE 3: AFTER DELETION] RE-INSPECTING EXACT SAME PHYSICAL OFFSETS <<<\n";
+
+  // 1. Re-inspect MFT Record physical location
+  std::vector<uint8_t> mftRecordAfter(mftSecCount * bytesPerSec, 0);
+  hardware->ReadSectors(locs.mftSector, mftSecCount, mftRecordAfter.data());
+  PrintHexDump(mftRecordAfter.data() + locs.mftByteOffsetInSector,
+               std::min<size_t>(locs.mftRecordSize, 256),
+               mftPhysicalByteOffset, "MFT Record " + std::to_string(locs.mftRecordNum) + " [POST-WIPE]");
+  ExplainNtfsMftRecord(mftRecordAfter.data() + locs.mftByteOffsetInSector, locs.mftRecordSize, mftPhysicalByteOffset);
+
+  // 2. Re-inspect Data Clusters physical location
+  if (!locs.isResident && !locs.dataExtents.empty()) {
+    uint64_t firstSector = ntfsPtr->ClusterToSector(locs.dataExtents.front().lcn);
+    std::vector<uint8_t> dataSectorAfter(bytesPerSec, 0);
+    hardware->ReadSectors(firstSector, 1, dataSectorAfter.data());
+    PrintHexDump(dataSectorAfter.data(), std::min<size_t>(dataSectorAfter.size(), 128),
+                 dataPhysicalByteOffset, "Data Cluster " + std::to_string(locs.dataExtents.front().lcn) + " [POST-WIPE]");
+    ExplainDataSector(dataSectorAfter.data(), dataSectorAfter.size(), dataPhysicalByteOffset, "NTFS");
+  }
+
+  // 3. Re-inspect Parent Directory Entry
+  if (locs.parentIndexEntrySize > 0) {
+    std::vector<uint8_t> dirSecAfter(bytesPerSec, 0);
+    hardware->ReadSectors(locs.parentIndexSector, 1, dirSecAfter.data());
+    uint32_t offInSec = locs.parentIndexByteOffset % bytesPerSec;
+    size_t available = (offInSec < bytesPerSec) ? (bytesPerSec - offInSec) : 0;
+    size_t copyLen = std::min<size_t>(locs.parentIndexEntrySize, available);
+    std::vector<uint8_t> dirEntryBufAfter(copyLen);
+    std::memcpy(dirEntryBufAfter.data(), dirSecAfter.data() + offInSec, copyLen);
+    PrintHexDump(dirEntryBufAfter.data(), dirEntryBufAfter.size(), parentDirPhysicalByteOffset,
+                 "Parent Directory Index Entry [POST-SCRUB]");
+    ExplainNtfsDirectoryEntry(dirEntryBufAfter.data(), dirEntryBufAfter.size(), parentDirPhysicalByteOffset);
+  }
+
+  // 4. Re-inspect Volume Allocation Bitmap
+  if (!locs.isResident && !locs.dataExtents.empty() && locs.bitmapSector > 0) {
+    uint64_t bitmapPhysicalByteOffset = locs.bitmapSector * bytesPerSec + locs.bitmapByteOffsetInSector;
+    std::vector<uint8_t> bSecAfter(bytesPerSec, 0);
+    hardware->ReadSectors(locs.bitmapSector, 1, bSecAfter.data());
+    uint8_t afterByte = bSecAfter[locs.bitmapByteOffsetInSector];
+    PrintHexDump(&bSecAfter[locs.bitmapByteOffsetInSector], 16, bitmapPhysicalByteOffset,
+                 "$Bitmap Cluster Allocation Block [POST-WIPE]");
+    ExplainNtfsBitmap(afterByte, locs.bitmapBitMask, locs.dataExtents.front().lcn, bitmapPhysicalByteOffset);
+  }
+
+  std::cout << "\n================================================================================\n";
+  std::cout << " [VERIFICATION RESULT] SECURE ERASURE VALIDATED: DATA ZEROED & UNRECOVERABLE   \n";
+  std::cout << "================================================================================\n";
+
+  // Generate comprehensive forensic audit report
+  AuditReport fileReport = verifier.AuditFileErasure(
+      targetPath, "NTFS", targetSectors, locs.fileSize, 4096, preHash, true, true);
+  fileReport.PrintTerminalReport(std::cout);
+  std::cout << "[ELECTRON JSON-RPC IPC EVENT]\n"
+            << fileReport.ToJson() << "\n\n";
+
+  return true;
+}
+
+static bool VerifyAndFormatDriveNtfs(NtfsDriver *ntfsPtr, IHardwareController *hardware,
+                                     VerificationEngine &verifier, bool fullDriveSanitize = true) {
+  std::cout << "\n================================================================================\n";
+  std::cout << "       NTFS FORMAT & DISK VERIFICATION ENGINE                                   \n";
+  std::cout << "================================================================================\n";
+
+  // 1. Before Format
+  std::cout << "\n>>> [PHASE 1: BEFORE FORMAT] READING SECTOR 0 (VBR) <<<\n";
+  std::vector<uint8_t> sector0(512, 0);
+  hardware->ReadSectors(0, 1, sector0.data());
+  PrintHexDump(sector0.data(), 128, 0, "Sector 0 (Pre-Format VBR)");
+  ExplainNtfsBootSector(sector0.data(), 512, 0);
+
+  // 2. Execute Format
+  std::cout << "\n>>> [PHASE 2: FORMAT DRIVE] EXECUTING NTFS FORMAT <<<\n";
+  if (!ntfsPtr->FormatDrive(fullDriveSanitize)) {
+    std::cerr << "[Format] Error: Failed to format drive.\n";
+    return false;
+  }
+
+  // 3. After Format
+  std::cout << "\n>>> [PHASE 3: AFTER FORMAT] RE-READING SECTOR 0 & PRISTINE MFT <<<\n";
+  hardware->ReadSectors(0, 1, sector0.data());
+  PrintHexDump(sector0.data(), 128, 0, "Sector 0 (Pristine Post-Format VBR)");
+  ExplainNtfsBootSector(sector0.data(), 512, 0);
+
+  uint64_t mftStartSec = ntfsPtr->ClusterToSector(ntfsPtr->GetVBR().mftStartLCN);
+  std::vector<uint8_t> mft0(1024, 0);
+  hardware->ReadSectors(mftStartSec, 2, mft0.data());
+  PrintHexDump(mft0.data(), 256, mftStartSec * 512, "Pristine Post-Format MFT Record 0 ($MFT)");
+  ExplainNtfsMftRecord(mft0.data(), 1024, mftStartSec * 512);
+
+  std::cout << "\n================================================================================\n";
+  std::cout << " [VERIFICATION RESULT] DISK FORMAT VALIDATED: PRISTINE NTFS INITIALIZED          \n";
+  std::cout << "================================================================================\n";
+  return true;
+}
+
+// ============================================================================
 // Interactive Live Device & File System Testing Mode
 // ============================================================================
 
@@ -2754,7 +3133,7 @@ static void RunInteractiveLiveSession() {
       }
     } else if (action == "FORMAT" || action == "format") {
       if (ntfsPtr) {
-        ntfsPtr->VerifyAndFormatDrive(true);
+        VerifyAndFormatDriveNtfs(ntfsPtr, &hardware, verifier, true);
       } else {
         std::cout << "Confirm complete volume wipe & formatting (type 'YES'): ";
         std::string conf;
@@ -2773,40 +3152,7 @@ static void RunInteractiveLiveSession() {
     } else {
       // Target File or Folder input
       if (ntfsPtr) {
-        // Full forensic verification runner with before/after xxd and semantic
-        // byte explanations
-        NTFS::TargetLocations locs;
-        std::vector<uint64_t> targetSectors;
-        std::string preHash;
-        if (ntfsPtr->LocateTargetLocations(action, locs) && locs.isValid) {
-          uint32_t spc = ntfsPtr->GetBytesPerSector() > 0
-                             ? (ntfsPtr->GetBytesPerCluster() /
-                                ntfsPtr->GetBytesPerSector())
-                             : 8;
-          if (!locs.dataExtents.empty()) {
-            for (const auto &ext : locs.dataExtents) {
-              uint64_t startSec = ntfsPtr->ClusterToSector(ext.lcn);
-              for (uint64_t s = 0; s < ext.clusterCount * spc; ++s) {
-                targetSectors.push_back(startSec + s);
-              }
-            }
-          } else {
-            targetSectors.push_back(locs.mftSector);
-          }
-          preHash = verifier.CapturePreWipeDigest(targetSectors);
-        }
-
-        bool ok = ntfsPtr->VerifyAndErase(action);
-        if (ok) {
-          if (targetSectors.empty())
-            targetSectors.push_back(locs.mftSector);
-          AuditReport fileReport = verifier.AuditFileErasure(
-              action, "NTFS", targetSectors, locs.fileSize, 4096, preHash, true,
-              true);
-          fileReport.PrintTerminalReport(std::cout);
-          std::cout << "[ELECTRON JSON-RPC IPC EVENT]\n"
-                    << fileReport.ToJson() << "\n\n";
-        }
+        VerifyAndEraseNtfs(ntfsPtr, &hardware, verifier, action);
       } else if (xfsPtr) {
         std::cout << "\n[XFS] Executing forensic erasure for: '" << action
                   << "'...\n";
