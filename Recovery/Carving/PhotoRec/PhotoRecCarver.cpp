@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cstdlib>
 #include <filesystem>
 #include <sstream>
 
@@ -21,13 +20,7 @@ namespace Carving {
             m_runner = std::make_shared<PhotoRecProcessRunner>();
         }
         if (m_executablePath.empty()) {
-            const char* configuredPath = std::getenv("PHOTOREC_EXE");
-            if (configuredPath == nullptr) {
-                configuredPath = std::getenv("PHOTOREC_EXECUTABLE");
-            }
-            if (configuredPath != nullptr) {
-                m_executablePath = configuredPath;
-            }
+            m_executablePath = kPhotoRecExecutablePath;
         }
     }
 
@@ -64,9 +57,7 @@ namespace Carving {
             return result;
         }
         if (m_executablePath.empty()) {
-            result.errorMessage =
-                "PhotoRec executable path is not configured. Set PHOTOREC_EXECUTABLE "
-                "or pass it to PhotoRecCarver.";
+            result.errorMessage = "PhotoRec executable path is not configured.";
             return result;
         }
 
