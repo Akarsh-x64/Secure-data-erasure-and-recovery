@@ -5,3 +5,7 @@ build/
 Recovery/output/
 Recovery/Carving/Tests/PhotoRecCarverTest/disk.img
 .venv/
+node_modules/
+dist/
+out/
+*.log
