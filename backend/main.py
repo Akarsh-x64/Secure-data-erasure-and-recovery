@@ -21,8 +21,9 @@ try:
     import fat32
     import ntfs
     import verification
+    import recovery
 except ImportError as e:
-    print(f"Warning: Failed to import erasure modules: {e}")
+    print(f"Warning: Failed to import modules: {e}")
 
 def ensure_admin():
     if os.name == 'nt':
@@ -387,24 +388,30 @@ def background_file_erase_worker(operation_id: str, targets: list, config: dict)
                 device_path = f"\\\\.\\{drive_letter}"
                 relative_path = canonical_path[3:].replace('\\', '/') # e.g. "evidence/audit.log"
             else:
-                import subprocess
-                try:
-                    res = subprocess.run(['df', '--output=source,target', canonical_path], capture_output=True, text=True)
-                    lines = res.stdout.strip().split('\n')
-                    if len(lines) > 1:
-                        parts = lines[1].split()
-                        device_path = parts[0]
-                        mount_point = lines[1][len(device_path):].strip()
-                        if mount_point == "/":
-                            relative_path = canonical_path
+                canonical_path = canonical_path.replace('\\', '/')
+                if canonical_path.startswith('/dev/'):
+                    parts = canonical_path.split('/')
+                    device_path = '/'.join(parts[:3])
+                    relative_path = '/'.join(parts[3:])
+                else:
+                    import subprocess
+                    try:
+                        res = subprocess.run(['df', '--output=source,target', canonical_path], capture_output=True, text=True)
+                        lines = res.stdout.strip().split('\n')
+                        if len(lines) > 1:
+                            parts = lines[1].split()
+                            device_path = parts[0]
+                            mount_point = lines[1][len(device_path):].strip()
+                            if mount_point == "/":
+                                relative_path = canonical_path
+                            else:
+                                relative_path = canonical_path[len(mount_point):]
+                            if relative_path.startswith('/'):
+                                relative_path = relative_path[1:]
                         else:
-                            relative_path = canonical_path[len(mount_point):]
-                        if relative_path.startswith('/'):
-                            relative_path = relative_path[1:]
-                    else:
-                        raise ValueError(f"Could not determine mount point for {canonical_path}")
-                except Exception as e:
-                    raise ValueError(f"Error determining Linux device path: {e}")
+                            raise ValueError(f"Could not determine mount point for {canonical_path}")
+                    except Exception as e:
+                        raise ValueError(f"Error determining Linux device path: {e}")
 
             group_key = (device_path, fs_type)
             if group_key not in drive_targets:
@@ -674,14 +681,72 @@ def register_recovery_source():
         "path": data.get("path")
     }), 201
 
+def background_recovery_worker(operation_id: str, data: dict):
+    active_operations[operation_id] = {
+        "operationId": operation_id,
+        "state": "running",
+        "phase": "scanning",
+        "percent": 0,
+        "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+    }
+    socketio.emit('progress', active_operations[operation_id])
+    
+    try:
+        disk_image = data.get("path")
+        if not disk_image:
+            raise ValueError("Device path is required for recovery")
+            
+        output_root = data.get("output_root", "Recovery/output")
+        method = data.get("method", "metadata")
+        
+        # Update phase
+        active_operations[operation_id].update({
+            "phase": f"recovering via {method}",
+            "percent": 50,
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+        })
+        socketio.emit('progress', active_operations[operation_id])
+        
+        if method == "carving":
+            success = recovery.recover_carving(disk_image, output_root)
+        else:
+            success = recovery.recover_metadata(disk_image, output_root)
+            
+        if success:
+            active_operations[operation_id].update({
+                "state": "completed",
+                "phase": "finished",
+                "percent": 100,
+                "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+            })
+        else:
+            raise Exception("Recovery operation failed in module")
+            
+        socketio.emit('progress', active_operations[operation_id])
+        
+    except Exception as e:
+        active_operations[operation_id].update({
+            "state": "failed",
+            "message": str(e),
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+        })
+        socketio.emit('progress', active_operations[operation_id])
+
 @app.route('/api/v1/recovery/scans', methods=['POST'])
 def start_recovery_scan():
     data = request.json or {}
     operation_id = f"op-scan-{uuid.uuid4().hex[:8]}"
-    return jsonify({
+    
+    response_payload = {
         "operationId": operation_id,
         "state": "queued"
-    }), 202
+    }
+    socketio.start_background_task(
+        background_recovery_worker,
+        operation_id,
+        data
+    )
+    return jsonify(response_payload), 202
 
 @app.route('/api/v1/recovery/scans/<operation_id>/artifacts', methods=['GET'])
 def get_recovery_artifacts(operation_id):

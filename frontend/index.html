@@ -116,6 +116,23 @@
     </div>
 
     <div class="section">
+        <h3>Data Recovery</h3>
+        <div class="form-group">
+            <label for="recoveryPath">Device/Image Path:</label>
+            <input type="text" id="recoveryPath" placeholder="e.g. \\.\PhysicalDrive1 or X:" value="X:">
+        </div>
+        <div class="form-group">
+            <label for="recoveryOutput">Output Directory:</label>
+            <input type="text" id="recoveryOutput" placeholder="e.g. Recovery/output" value="Recovery/output">
+        </div>
+        <div class="form-group">
+            <label for="recoveryMethod">Method:</label>
+            <input type="text" id="recoveryMethod" placeholder="metadata or carving" value="metadata">
+        </div>
+        <button onclick="submitRecoveryScan()">Start Recovery Scan</button>
+    </div>
+
+    <div class="section">
         <h3>Verification / Audit Module</h3>
         <p>Fetch verification logs and audit reports.</p>
         <button onclick="fetchAuditLogs()" class="secondary">Get Audit Logs</button>
@@ -167,7 +184,18 @@
             }
             if(filePath.startsWith('/') || filePath.startsWith('\\')) filePath = filePath.substring(1);
             
-            const canonicalPath = `${driveName}\\${filePath}`;
+            let separator = '\\';
+            if (driveName.startsWith('/')) {
+                separator = '/';
+            } else if (driveName.endsWith(':')) {
+                separator = '\\';
+            } else if (!driveName.endsWith('\\') && !driveName.endsWith('/')) {
+                separator = '/'; // fallback if they type a plain mountpoint without trailing slash
+            } else {
+                separator = ''; // already has slash
+            }
+            
+            const canonicalPath = driveName.endsWith(separator) ? `${driveName}${filePath}` : `${driveName}${separator}${filePath}`;
             const payload = {
                 targets: [
                     { nodeId: "test-node-123", canonicalPath: canonicalPath, kind: "file", filesystem: fileSystem }
@@ -212,6 +240,25 @@
 
             log(`\n🚀 Sending Drive Erase Request for [${deviceId}]...`, 'warning');
             await makeApiRequest('http://127.0.0.1:5000/api/v1/erase/drives', 'POST', payload, true);
+        }
+
+        async function submitRecoveryScan() {
+            const recoveryPath = document.getElementById('recoveryPath').value.trim();
+            const recoveryOutput = document.getElementById('recoveryOutput').value.trim();
+            const recoveryMethod = document.getElementById('recoveryMethod').value.trim();
+
+            if(!recoveryPath || !recoveryOutput || !recoveryMethod) {
+                log('❌ Please fill in all fields for Data Recovery.', 'error'); return;
+            }
+
+            const payload = {
+                path: recoveryPath,
+                output_root: recoveryOutput,
+                method: recoveryMethod
+            };
+
+            log(`\n🚀 Sending Recovery Scan Request for [${recoveryPath}] via ${recoveryMethod}...`, 'warning');
+            await makeApiRequest('http://127.0.0.1:5000/api/v1/recovery/scans', 'POST', payload);
         }
 
         async function fetchAuditLogs() {
