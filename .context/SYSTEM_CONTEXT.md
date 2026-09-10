@@ -826,6 +826,102 @@ Phase 9 implements an autonomous, multi-tier **Forensic Verification Engine** (`
 
 ---
 
+# Phase 10 — Modular Python & pybind11 Native Extension Architecture (`modules/`)
+
+## Overview & Architecture
+
+To enable rapid automated integration testing, cross-platform scripting, CI/CD pipeline verification, and Python-based forensic analytical tools, Phase 10 establishes a modular, zero-leakage **Python 3 / pybind11 Native Extension Subsystem** located in `modules/`.
+
+Rather than compiling a single monolithic C++ wrapper, the subsystem mirrors the core project's **3-Layer Decoupled Architecture** by compiling isolated static libraries and exposing fine-grained Python extension modules (`.pyd` on Windows and `.so` on Linux):
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                   PYTHON PYBIND11 EXTENSION ARCHITECTURE (`modules/`)                  │
+├──────────────────────────┬─────────────────────────────┬───────────────────────────────┤
+│ LAYER                    │ C++ STATIC LIBRARY          │ PYBIND11 MODULE (.pyd / .so)  │
+├──────────────────────────┼─────────────────────────────┼───────────────────────────────┤
+│ Layer 1: OS Storage I/O  │ osdevice_cpp                │ osdevice                      │
+│                          │ (WindowsStorageDevice.cpp / │ (WindowsStorageDevice /       │
+│                          │  LinuxStorageDevice.cpp)    │  LinuxStorageDevice)          │
+├──────────────────────────┼─────────────────────────────┼───────────────────────────────┤
+│ Layer 2: Hardware Ctrl   │ hdd_cpp (HDDController.cpp) │ hdd (HDDController)           │
+├──────────────────────────┼─────────────────────────────┼───────────────────────────────┤
+│ Layer 3: Filesystems     │ ext4_cpp (ext4.cpp)         │ ext4 (Ext4Driver)             │
+│                          │ exfat_cpp (exFAT.cpp)       │ exfat (ExFatDriver)           │
+│                          │ ntfs_cpp (NTFS.cpp)         │ ntfs (NtfsDriver)             │
+│                          │ fat32_cpp (FAT32.cpp)       │ fat32 (Fat32Driver)           │
+├──────────────────────────┼─────────────────────────────┼───────────────────────────────┤
+│ Forensic Verification    │ verification_cpp            │ verification                  │
+│                          │ (VerificationEngine.cpp,    │ (VerificationEngine,          │
+│                          │  StatisticalTests.cpp,      │  StatisticalTests,            │
+│                          │  SignatureCarver.cpp,       │  SignatureCarver,             │
+│                          │  VerificationReport.cpp)    │  AuditReport)                 │
+└──────────────────────────┴─────────────────────────────┴───────────────────────────────┘
+```
+
+### 1. Modules Implemented
+
+1. **`osdevice`** (`modules/bindings_os.cpp`):
+   - Bridges `WindowsStorageDevice` (Win32 `CreateFileW`, `IOCTL_DISK_GET_DRIVE_GEOMETRY_EX`, `FSCTL_LOCK_VOLUME`, `FSCTL_DISMOUNT_VOLUME`) and `LinuxStorageDevice` (POSIX `open(O_RDWR | O_DIRECT | O_SYNC)`, `ioctl(BLKGETSIZE64)`).
+   - Methods: `Open(path)`, `Close()`, `LockVolume()`, `DismountVolume()`, `GetGeometry()`.
+
+2. **`hdd`** (`modules/bindings_hw.cpp`):
+   - Bridges Layer 2 `Erasure::Hardware::HDDController` managing 3-Pass DoD 5220.22-M magnetic domain sanitization.
+   - Initialized directly with `osdevice.WindowsStorageDevice` or `osdevice.LinuxStorageDevice`.
+
+3. **`ext4`** (`modules/bindings_ext4.cpp`):
+   - Bridges `Erasure::FileSystems::Ext4Driver`.
+   - Methods: `Mount()`, `PrintSuperblockInfo()`, `WipeVolume()`, `EraseFile(relativePath)`.
+
+4. **`exfat`** (`modules/bindings_exfat.cpp`):
+   - Bridges `Erasure::FileSystems::ExFatDriver`.
+   - Methods: `Mount()`, `PrintVBRInfo()`, `WipeVolume()`, `EraseFile(relativePath)`.
+
+5. **`ntfs`** (`modules/bindings_ntfs.cpp`):
+   - Bridges `Erasure::FileSystems::NtfsDriver`.
+   - Exposes `NtfsDriver`: `Mount()`, `PrintBootInfo()`, `WipeVolume()`, `EraseFile(relativePath)`, `EraseDirectory(relativePath)`, `FormatDrive(fullDriveSanitize)`, `VerifyAndErase(targetPath)`, `VerifyAndFormatDrive(fullDriveSanitize)`, geometry getters (`GetBytesPerSector()`, `GetBytesPerCluster()`, `GetMftRecordSize()`, `ClusterToSector(lcn)`).
+   - Exposes `LocateTargetLocations(relativePath)` returning `(bool, TargetLocations)` for physical LBA and MFT record auditing.
+   - Exposes `NTFS::TargetLocations` and `NTFS::NtfsExtent` struct properties (`mftRecordNum`, `mftSector`, `fileSize`, `dataExtents`, `bitmapSector`, etc.).
+
+6. **`fat32`** (`modules/bindings_fat32.cpp`):
+   - Bridges `Erasure::FileSystems::Fat32Driver`.
+   - Methods: `Mount()`, `PrintBootInfo()`, `WipeVolume()`, `EraseFile(relativePath)`, `EraseDirectory(relativePath)`, `FormatDrive(fullDriveSanitize)`, geometry getters (`GetBytesPerSector()`, `GetBytesPerCluster()`, `GetFirstDataSector()`, `GetRootCluster()`, `GetTotalClusters()`).
+
+7. **`verification`** (`modules/bindings_verification.cpp`):
+   - Bridges the Forensic Verification Suite:
+     - Enums: `VerificationScope` (`FILE_ERASURE`, `DIRECTORY_ERASURE`, `VOLUME_WIPE`), `SignatureCategory` (`DOCUMENT`, `IMAGE`, `ARCHIVE`, `EXECUTABLE`, `AUDIO_VIDEO`, `DATABASE_SYSTEM`).
+     - `CarvedArtifact`: Metadata for carver findings (`signatureName`, `extension`, `category`, `byteOffset`, `lba`).
+     - `StatisticalAuditResult`: Numerical outputs (`shannonEntropy`, `chiSquareValue`, `chiSquarePValue`, `serialCorrelation`, `monteCarloPi`, `monteCarloPiErrorPercent`, `totalBytesAnalyzed`, `byteHistogram`).
+     - `AuditReport`: Complete inspection bundle with `.ToJson()` and `.PrintTerminalReport()`.
+     - `StatisticalTests`: Python byte-buffer callable methods:
+       - `CalculateShannonEntropy(bytes) -> float`
+       - `CalculateChiSquare(bytes) -> (float, float)`
+       - `CalculateSerialCorrelation(bytes) -> float`
+       - `EstimateMonteCarloPi(bytes) -> (float, float)`
+       - `ComputeSha256(bytes) -> str`
+       - `RunFullAudit(bytes) -> StatisticalAuditResult`
+       - Visual renderers: `RenderAsciiGauge`, `RenderConfidenceGauge`, `RenderByteDistributionHistogram`.
+     - `SignatureCarver`: 120+ file header patterns, `GetSignatureCount()`, and `ScanBuffer(bytes, baseOffset, sectorSize)`.
+     - `VerificationEngine`: Multi-filesystem orchestrator taking `(HDDController*, StorageDevice*)` with `CapturePreWipeDigest`, `AuditFileErasure`, `AuditDirectoryErasure`, and `AuditVolumeWipe` (NIST SP 800-88 Stratified Sampling).
+
+### 2. Build System Architecture (`modules/CMakeLists.txt`)
+- Supports dual-platform compilation:
+  - Windows: Visual Studio 2022 / MSVC (`find_package(Python3 COMPONENTS Interpreter Development REQUIRED)`), compiling `.cp314-win_amd64.pyd` binary extensions.
+  - Linux: GCC / POSIX toolchain, compiling `.so` shared objects.
+- First compiles underlying C++ code into modular static libraries (`osdevice_cpp`, `hdd_cpp`, `ext4_cpp`, `exfat_cpp`, `ntfs_cpp`, `fat32_cpp`, `verification_cpp`) with `-fPIC` / `CMAKE_POSITION_INDEPENDENT_CODE ON`.
+- Emits isolated pybind11 modules (`pybind11_add_module`) with private link dependencies.
+
+### 3. Verification Test Harness & UAC Automation (`modules/test.py`)
+- Automatically detects missing administrative privileges on Windows and re-launches with elevation via `ctypes.windll.shell32.ShellExecuteW(None, "runas", ...)`.
+- Provides an interactive menu supporting:
+  - `[1] exFAT`
+  - `[2] ext4`
+  - `[3] NTFS`
+  - `[4] FAT32`
+- Dispatches targeted file deletion (`EraseFile`), volume wipe (`WipeVolume`), and forensic verification.
+
+---
+
 ## Comprehensive Documentation Index
 
 The `.context/` directory contains specialized, exhaustive architectural manuals for every layer of the product:

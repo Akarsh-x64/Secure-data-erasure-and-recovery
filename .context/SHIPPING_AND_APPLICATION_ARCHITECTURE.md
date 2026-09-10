@@ -24,6 +24,10 @@ This document details the complete end-to-end product architecture, packaging an
    - 4.1 [Architectural Philosophy: Recovery as the Verification Auditor](#41-architectural-philosophy-recovery-as-the-verification-auditor)
    - 4.2 [End-to-End Audit Sequence](#42-end-to-end-audit-sequence)
    - 4.3 [Forensic Certificate of Sanitization](#43-forensic-certificate-of-sanitization)
+5. [Native Python pybind11 Extension Subsystem (`modules/`)](#5-native-python-pybind11-extension-subsystem-modules)
+   - 5.1 [Architecture & Modular Isolation](#51-architecture--modular-isolation)
+   - 5.2 [Supported Python Extension Modules](#52-supported-python-extension-modules)
+   - 5.3 [Automated Cross-Platform Toolchains & Testing](#53-automated-cross-platform-toolchains--testing)
 
 ---
 
@@ -598,3 +602,71 @@ Upon successful verification, the engine exports a standardized audit certificat
 * **Sanitization Parameters**: Standard Applied (DoD 5220.22-M 3-Pass), Target Path/Volume, Total Physical Sectors Wiped.
 * **Audit Results**: Bit match rate ($0.00\%$), File signatures detected ($0$), Residual metadata found ($0$), Final average Shannon entropy ($7.95\text{ bits/byte}$).
 * **Cryptographic Signatures**: SHA-256 pre-erasure hash, SHA-256 post-erasure hash, and digital signature of the certificate payload.
+
+---
+
+# 5. Native Python pybind11 Extension Subsystem (`modules/`)
+
+## 5.1 Architecture & Modular Isolation
+
+In addition to the standalone C++ CLI executables and Electron desktop wrappers, the project provides a comprehensive, high-performance **Python 3 Native Extension Layer** built with `pybind11`. 
+
+Located in `modules/`, this subsystem is specifically designed for:
+- Automated hardware integration and regression testing in CI/CD pipelines.
+- External security auditor scripting, algorithmic verification, and headless forensic automation.
+- Rapid algorithmic prototyping without recompiling the entire application suite.
+
+To maintain architectural purity, the extension layer preserves the project's **3-Layer Decoupled Architecture**: each abstraction layer is compiled into its own isolated static library and exposed as an independent Python C-extension module (`.pyd` on Windows and `.so` on Linux).
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                   PYTHON EXTENSION SUBSYSTEM ARCHITECTURE (`modules/`)                 │
+├──────────────────────────┬─────────────────────────────┬───────────────────────────────┤
+│ LAYER                    │ C++ STATIC LIBRARY          │ PYTHON MODULE (.pyd / .so)    │
+├──────────────────────────┼─────────────────────────────┼───────────────────────────────┤
+│ Layer 1: OS Storage I/O  │ osdevice_cpp                │ osdevice                      │
+│ Layer 2: Hardware Ctrl   │ hdd_cpp                     │ hdd                           │
+│ Layer 3: Filesystems     │ ext4_cpp                    │ ext4                          │
+│                          │ exfat_cpp                   │ exfat                         │
+│                          │ ntfs_cpp                    │ ntfs                          │
+│                          │ fat32_cpp                   │ fat32                         │
+│ Forensic Verification    │ verification_cpp            │ verification                  │
+└──────────────────────────┴─────────────────────────────┴───────────────────────────────┘
+```
+
+---
+
+## 5.2 Supported Python Extension Modules
+
+1. **`osdevice` (`modules/bindings_os.cpp`)**:
+   - `WindowsStorageDevice`: Raw device handle lifecycle (`Open`, `Close`), exclusive volume locking (`LockVolume`), unmounting (`DismountVolume`), and disk geometry querying (`GetGeometry`).
+   - `LinuxStorageDevice`: POSIX block device direct I/O bindings (`O_RDWR | O_DIRECT | O_SYNC`).
+2. **`hdd` (`modules/bindings_hw.cpp`)**:
+   - `HDDController`: Magnetic and virtual disk physical overwrite engine implementing DoD 5220.22-M 3-pass sanitization.
+3. **`ntfs` (`modules/bindings_ntfs.cpp`)**:
+   - `NtfsDriver`: Core driver mounting, MFT traversal, file and recursive directory erasure (`EraseFile`, `EraseDirectory`), surgical volume wipe (`WipeVolume`), and drive re-formatting (`FormatDrive`).
+   - `TargetLocations` & `NtfsExtent`: Inspection structures detailing on-disk MFT record indices, cluster runlists, and physical sector offsets for forensic validation.
+4. **`fat32` (`modules/bindings_fat32.cpp`)**:
+   - `Fat32Driver`: Dual-FAT synchronization, 28-bit cluster chain traversal, SFN/LFN directory entry eradication, volume wiping, and pristine BPB/FSInfo formatting.
+5. **`ext4` (`modules/bindings_ext4.cpp`)**:
+   - `Ext4Driver`: Superblock inspection, inode extent tree parsing, block group bitmap sanitization, and secure file/volume erasure.
+6. **`exfat` (`modules/bindings_exfat.cpp`)**:
+   - `ExFatDriver`: VBR parsing, cluster allocation bitmap wiping, directory entry sanitization, and volume wiping.
+7. **`verification` (`modules/bindings_verification.cpp`)**:
+   - `VerificationEngine`: Multi-filesystem verification orchestrator performing pre-wipe cryptographic baselines, file audit verification, directory audit verification, and NIST SP 800-88 Rev. 1 Stratified Sampling volume audits.
+   - `StatisticalTests`: Python-callable endpoints for Shannon entropy calculation, Chi-Square goodness-of-fit, serial correlation, Monte Carlo $\pi$ estimation, SHA-256 computation, and ASCII terminal gauge renderers.
+   - `SignatureCarver`: Memory buffer scanner matching 120+ standard file signatures across documents, archives, multimedia, executables, and databases.
+   - `AuditReport`: Comprehensive structured audit report with JSON serialization (`ToJson()`) and terminal report generation (`PrintTerminalReport()`).
+
+---
+
+## 5.3 Automated Cross-Platform Toolchains & Testing
+
+The build process is managed via `modules/CMakeLists.txt`:
+- **Windows**: Compiles against MSVC 2022 and Python 3.14 (`find_package(Python3 COMPONENTS Interpreter Development REQUIRED)`), generating `.cp314-win_amd64.pyd` binary extensions.
+- **Linux**: Compiles against GCC 11+ and Python 3 (`python3 -m pybind11 --cmakedir`), generating `.so` shared libraries.
+
+An automated interactive test runner is provided in `modules/test.py`:
+- Detects administrative privileges on Windows and automatically prompts for UAC elevation via `ShellExecuteW("runas", ...)`.
+- Provides an interactive console menu to mount any detected partition (exFAT, ext4, NTFS, FAT32), execute surgical file or volume wipes, run filesystem consistency checks, and trigger post-erasure forensic verification.
+
