@@ -99,22 +99,22 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ artifacts, onPreview
                     </div>
                   </td>
                   <td className="px-2 py-3 text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="flex items-center justify-end gap-1.5">
                       <button
                         type="button"
                         onClick={() => onPreview?.(artifact)}
                         title={`Preview ${artifact.name}`}
-                        className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-ui-selection hover:text-text-pure"
+                        className="rounded-md border border-ui-outline bg-background-main p-1.5 text-text-muted transition-colors hover:border-status-valid/40 hover:bg-ui-selection hover:text-text-pure"
                       >
-                        <Eye className="h-3.5 w-3.5" />
+                        <Eye className="h-4 w-4 text-status-valid" />
                       </button>
                       <button
                         type="button"
                         onClick={() => onExport?.(artifact)}
-                        title={`Export ${artifact.name}`}
-                        className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-status-valid/15 hover:text-status-valid"
+                        title={`Save / Download ${artifact.name}`}
+                        className="rounded-md border border-status-valid/40 bg-status-valid/10 p-1.5 text-status-valid transition-colors hover:bg-status-valid/25"
                       >
-                        <Download className="h-3.5 w-3.5" />
+                        <Download className="h-4 w-4" />
                       </button>
                     </div>
                   </td>

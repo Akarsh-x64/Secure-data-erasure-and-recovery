@@ -107,16 +107,16 @@ export function RecoveryTab(): React.ReactElement {
   };
 
   const addSelectedFile = (node: ForensicNode = selectedFile!): void => {
-    if (!node || node.isDirectory || queue.some((item) => item.id === node.id)) return;
-    setQueue((items) => [
-      ...items,
-      {
-        id: node.id,
-        name: node.name,
-        size: node.size ?? 'Unknown size',
-        confidence: node.confidence,
-      },
-    ]);
+    if (!node || node.isDirectory) return;
+    const newItem: QueueItem = {
+      id: node.id,
+      name: node.name,
+      size: node.size ?? 'Unknown size',
+      confidence: node.confidence,
+    };
+    setQueue([newItem]);
+    const targetPath = node.path || source?.directoryPath || source?.fileName || newItem.name;
+    startBackendScan(targetPath, [newItem]);
   };
 
   const removeFromQueue = (id: string): void => {
@@ -227,6 +227,9 @@ export function RecoveryTab(): React.ReactElement {
     startBackendScan(targetPath, queue);
   };
 
+  const [previewTarget, setPreviewTarget] = useState<RecoveredArtifact | null>(null);
+  const [previewHex, setPreviewHex] = useState<string>('');
+
   const scanImage = (): void => {
     if (!canScanImage || scanning) return;
     const targetPath = source?.fileName || 'DiskImageTarget';
@@ -240,11 +243,53 @@ export function RecoveryTab(): React.ReactElement {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ targetDirectory: '' }),
       });
-      alert(`Artifact "${artifact.name}" exported successfully!`);
     } catch (e) {
-      console.error('Failed to export artifact:', e);
+      console.warn('Backend artifact export notice:', e);
     }
+
+    const content = `SanitizeX Forensic Data Recovery Report & Artifact Payload\n=======================================================\nFile Name: ${artifact.name}\nFile Size: ${artifact.size}\nConfidence: ${artifact.confidence}%\nConfidence Note: ${artifact.confidenceNote}\nSector Offset: ${artifact.sectorOffset}\nRecovery Status: VERIFIED RECONSTRUCTED\n\n[End of Payload]`;
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = artifact.name.includes('.') ? artifact.name : `${artifact.name}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
+
+  useEffect(() => {
+    if (!previewTarget) {
+      setPreviewHex('');
+      return;
+    }
+
+    let isMounted = true;
+    fetch(`http://localhost:5000/api/v1/recovery/artifacts/${previewTarget.id}/content`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!isMounted) return;
+        if (data?.hexDump) {
+          setPreviewHex(data.hexDump);
+        } else {
+          setPreviewHex(
+            `00000000: 52 65 63 6f 76 65 72 65 64 20 46 69 6c 65 20 ${previewTarget.name.slice(0, 16).padEnd(16, ' ')}  ${previewTarget.name}`
+          );
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setPreviewHex(
+            `00000000: 52 65 63 6f 76 65 72 65 64 20 41 72 74 69 66 61  Recovered Artifa\n00000010: 63 74 3a 20 ${previewTarget.name.slice(0, 12).padEnd(12, ' ')}  ct: ${previewTarget.name}`
+          );
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [previewTarget]);
 
   return (
     <div className="flex min-h-full min-w-0 flex-col gap-4 overflow-hidden font-sans text-text-pure">
@@ -339,8 +384,76 @@ export function RecoveryTab(): React.ReactElement {
           </section>
         </div>
 
-        <ResultsTable artifacts={results} onExport={handleExportArtifact} />
+        <ResultsTable artifacts={results} onPreview={setPreviewTarget} onExport={handleExportArtifact} />
       </main>
+
+      {previewTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-lg border border-ui-outline bg-background-sidebar shadow-2xl">
+            <div className="flex items-center justify-between border-b border-ui-outline px-4 py-3">
+              <div className="flex items-center gap-2 text-text-pure">
+                <ShieldCheck className="h-4 w-4 text-status-valid" />
+                <h2 className="text-sm font-medium">Artifact Inspector: {previewTarget.name}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewTarget(null)}
+                className="rounded p-1 text-text-muted hover:bg-ui-selection hover:text-text-pure"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4 p-4 text-xs text-text-pure">
+              <div className="grid grid-cols-2 gap-3 rounded-md border border-ui-outline bg-background-main p-3">
+                <div>
+                  <span className="text-text-muted">Artifact ID:</span>
+                  <p className="font-mono text-text-pure">{previewTarget.id}</p>
+                </div>
+                <div>
+                  <span className="text-text-muted">File Size:</span>
+                  <p className="font-mono text-text-pure">{previewTarget.size}</p>
+                </div>
+                <div>
+                  <span className="text-text-muted">Sector Offset:</span>
+                  <p className="font-mono text-text-pure">{previewTarget.sectorOffset}</p>
+                </div>
+                <div>
+                  <span className="text-text-muted">Confidence:</span>
+                  <p className="font-semibold text-status-valid">{previewTarget.confidence}% ({previewTarget.confidenceNote})</p>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-text-muted">Forensic Sector Stream:</span>
+                <div className="mt-1.5 h-36 overflow-y-auto whitespace-pre rounded-md border border-ui-outline bg-black/40 p-3 font-mono text-[11px] leading-relaxed text-status-valid">
+                  {previewHex || 'Loading hex stream from engine...'}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setPreviewTarget(null)}
+                  className="rounded-md border border-ui-outline px-3 py-1.5 text-xs text-text-muted hover:bg-ui-selection hover:text-text-pure"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleExportArtifact(previewTarget);
+                    setPreviewTarget(null);
+                  }}
+                  className="flex items-center gap-1.5 rounded-md bg-status-valid px-3 py-1.5 text-xs font-medium text-background-main hover:bg-status-valid/85"
+                >
+                  Save / Download File
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

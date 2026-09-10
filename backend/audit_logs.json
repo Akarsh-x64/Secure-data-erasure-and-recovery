@@ -1,5 +1,101 @@
 [
   {
+    "id": "log-83632383",
+    "timestamp": "2026-09-10T18:08:40Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-0d8bfe1a",
+    "timestamp": "2026-09-10T18:08:02Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-f022d7cb",
+    "timestamp": "2026-09-10T18:07:22Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-fbe63bfd",
+    "timestamp": "2026-09-10T18:01:57Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-4b09a60f",
+    "timestamp": "2026-09-10T18:01:46Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-ea4c42d3",
+    "timestamp": "2026-09-10T17:59:05Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
     "id": "log-4677fcbb",
     "timestamp": "2026-09-10T17:27:12Z",
     "operatorId": "operator.local",

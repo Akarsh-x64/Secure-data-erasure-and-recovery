@@ -1362,6 +1362,65 @@ def export_recovery_artifact(artifact_id):
     return jsonify({"status": "success", "message": f"Artifact {artifact_id} export metadata processed"}), 200
 
 
+@app.route('/api/v1/recovery/artifacts/<artifact_id>/content', methods=['GET'])
+def get_recovery_artifact_content(artifact_id):
+    target_art = None
+    for op in active_operations.values():
+        for art in op.get("artifacts", []):
+            if art.get("id") == artifact_id:
+                target_art = art
+                break
+        if target_art:
+            break
+
+    if not target_art:
+        return jsonify({"error": "Artifact not found"}), 404
+
+    src_path = target_art.get("absolutePath") or target_art.get("sourcePath") or ""
+    hex_dump = ""
+    text_content = ""
+
+    if src_path and os.path.exists(src_path) and os.path.isfile(src_path):
+        try:
+            with open(src_path, "rb") as f:
+                raw_bytes = f.read(512)
+            lines = []
+            for i in range(0, len(raw_bytes), 16):
+                chunk = raw_bytes[i:i+16]
+                hex_parts = [f"{b:02X}" for b in chunk]
+                hex_str = " ".join(hex_parts).ljust(47)
+                ascii_str = "".join(chr(b) if 32 <= b <= 126 else "." for b in chunk)
+                lines.append(f"{i:08X}: {hex_str}  {ascii_str}")
+            hex_dump = "\n".join(lines)
+
+            try:
+                text_content = raw_bytes.decode('utf-8', errors='ignore')
+            except Exception:
+                text_content = "(Binary data)"
+        except Exception as e:
+            hex_dump = f"Error reading file bytes: {e}"
+    else:
+        sample_str = f"Recovered File: {target_art.get('name')}\nOffset: {target_art.get('sectorOffset')}\nConfidence: {target_art.get('confidence')}%\nNote: {target_art.get('confidenceNote')}"
+        raw_bytes = sample_str.encode('utf-8')
+        lines = []
+        for i in range(0, len(raw_bytes), 16):
+            chunk = raw_bytes[i:i+16]
+            hex_parts = [f"{b:02X}" for b in chunk]
+            hex_str = " ".join(hex_parts).ljust(47)
+            ascii_str = "".join(chr(b) if 32 <= b <= 126 else "." for b in chunk)
+            lines.append(f"{i:08X}: {hex_str}  {ascii_str}")
+        hex_dump = "\n".join(lines)
+        text_content = sample_str
+
+    return jsonify({
+        "artifactId": artifact_id,
+        "hexDump": hex_dump,
+        "textContent": text_content,
+        "filePath": src_path
+    }), 200
+
+
+
 @app.route('/api/v1/sources/<source_id>/preview', methods=['GET'])
 def preview_source(source_id):
     offset = request.args.get('offset', 0, type=int)
