@@ -1,5 +1,4 @@
 plans/
-*.exe
 *.img
 build/
 Recovery/output/

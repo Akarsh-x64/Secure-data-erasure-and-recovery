@@ -13,9 +13,13 @@ else()
 endif()
 
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tsk_config.h.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tsk_config.h.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/tsk/tsk_config.h"
     @ONLY)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tsk_incs.h.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/tsk/tsk_incs.h"
+    COPYONLY)
 
 set(TSK_SOURCES)
 foreach(tsk_component IN ITEMS base img vs fs pool util)
@@ -55,5 +59,7 @@ target_compile_definitions(tsk PRIVATE
     HAVE__BOOL=1)
 
 if(MSVC)
-    target_compile_definitions(tsk PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(tsk PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        NOMINMAX)
 endif()

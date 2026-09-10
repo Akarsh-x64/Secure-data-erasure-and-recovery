@@ -401,7 +401,3 @@ int RunRecoveryCommand(int argc, char** argv) {
 }
 
 } // namespace Recovery
-
-int main(int argc, char** argv) {
-    return Recovery::RunRecoveryCommand(argc, argv);
-}

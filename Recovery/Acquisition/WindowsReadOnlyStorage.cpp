@@ -1,4 +1,5 @@
 #include "WindowsReadOnlyStorage.h"
+#include <winioctl.h>
 #include <iostream>
 #include <cstring>
 
