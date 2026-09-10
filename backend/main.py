@@ -18,6 +18,9 @@ try:
     import hdd
     import exfat
     import ext4
+    import fat32
+    import ntfs
+    import verification
 except ImportError as e:
     print(f"Warning: Failed to import erasure modules: {e}")
 
@@ -271,6 +274,10 @@ def get_fs_driver(fs_type: str, hdd_controller):
         return exfat.ExFatDriver(hdd_controller)
     elif fs_type == 'ext4':
         return ext4.Ext4Driver(hdd_controller)
+    elif fs_type == 'fat32' or fs_type == 'fat':
+        return fat32.Fat32Driver(hdd_controller)
+    elif fs_type == 'ntfs':
+        return ntfs.NtfsDriver(hdd_controller)
     else:
         raise NotImplementedError(f"Filesystem {fs_type} is not supported yet.")
 
@@ -425,6 +432,8 @@ def background_file_erase_worker(operation_id: str, targets: list, config: dict)
                 if not fs_driver.Mount():
                     raise Exception(f"Failed to mount {fs_type} on {device_path}")
                 
+                v_engine = verification.VerificationEngine(hdd_controller, device)
+
                 for rel_path in rel_paths:
                     active_operations[operation_id].update({
                         "phase": "erasing",
@@ -433,10 +442,24 @@ def background_file_erase_worker(operation_id: str, targets: list, config: dict)
                     })
                     socketio.emit('progress', active_operations[operation_id])
                     
+                    print(f"[INFO] Verification BEFORE file erase for {rel_path}:")
+                    try:
+                        pre_report = v_engine.AuditFileErasure(rel_path, fs_type, [0], 1024, 8, "")
+                        pre_report.PrintTerminalReport()
+                    except Exception as e:
+                        print(f"[WARNING] Pre-erase verification failed: {e}")
+
                     success = fs_driver.EraseFile(rel_path)
                     if not success:
                         raise Exception(f"Failed to erase file: {rel_path} on {device_path}")
                         
+                    print(f"[INFO] Verification AFTER file erase for {rel_path}:")
+                    try:
+                        post_report = v_engine.AuditFileErasure(rel_path, fs_type, [0], 1024, 8, "")
+                        post_report.PrintTerminalReport()
+                    except Exception as e:
+                        print(f"[WARNING] Post-erase verification failed: {e}")
+
                     completed_targets += 1
             finally:
                 device.Close()
@@ -550,6 +573,14 @@ def background_drive_erase_worker(operation_id: str, device_id: str, standard: s
             if not fs_driver.Mount():
                 raise Exception(f"Failed to mount {fs_type} on {device_path}")
 
+            v_engine = verification.VerificationEngine(hdd_controller, device)
+            print(f"[INFO] Verification BEFORE wipe for {device_path}:")
+            try:
+                pre_report = v_engine.AuditVolumeWipe(fs_type, 0, 1000000, 8)
+                pre_report.PrintTerminalReport()
+            except Exception as e:
+                print(f"[WARNING] Pre-wipe verification failed: {e}")
+
             active_operations[operation_id].update({
                 "phase": "erasing",
                 "percent": 50, # intermediate progress
@@ -560,6 +591,13 @@ def background_drive_erase_worker(operation_id: str, device_id: str, standard: s
             success = fs_driver.WipeVolume()
             if not success:
                 raise Exception(f"Failed to wipe volume on {device_path}")
+            
+            print(f"[INFO] Verification AFTER wipe for {device_path}:")
+            try:
+                post_report = v_engine.AuditVolumeWipe(fs_type, 0, 1000000, 8)
+                post_report.PrintTerminalReport()
+            except Exception as e:
+                print(f"[WARNING] Post-wipe verification failed: {e}")
         finally:    
             device.Close()
             repair_filesystem(device_path, fs_type, operation_id)
@@ -624,6 +662,82 @@ def execute_drive_erase():
         data.filesystem
     )
     return jsonify(response_payload), 202
+
+# --- Recovery API Boilerplate ---
+
+@app.route('/api/v1/recovery/sources', methods=['POST'])
+def register_recovery_source():
+    data = request.json or {}
+    return jsonify({
+        "sourceId": f"source-{uuid.uuid4().hex[:8]}",
+        "kind": data.get("kind"),
+        "path": data.get("path")
+    }), 201
+
+@app.route('/api/v1/recovery/scans', methods=['POST'])
+def start_recovery_scan():
+    data = request.json or {}
+    operation_id = f"op-scan-{uuid.uuid4().hex[:8]}"
+    return jsonify({
+        "operationId": operation_id,
+        "state": "queued"
+    }), 202
+
+@app.route('/api/v1/recovery/scans/<operation_id>/artifacts', methods=['GET'])
+def get_recovery_artifacts(operation_id):
+    return jsonify([
+        {
+            "id": f"art-{uuid.uuid4().hex[:8]}",
+            "name": "recovered_file.jpg",
+            "type": "image/jpeg",
+            "sizeBytes": 1024500,
+            "fragments": 1,
+            "confidence": 0.95,
+            "confidenceNote": "Header and footer match exactly",
+            "sectorOffset": 2048,
+            "previewAvailable": True
+        }
+    ]), 200
+
+@app.route('/api/v1/recovery/artifacts/<artifact_id>/export', methods=['POST'])
+def export_recovery_artifact(artifact_id):
+    return jsonify({"status": "success", "message": f"Artifact {artifact_id} exported successfully"}), 200
+
+@app.route('/api/v1/sources/<source_id>/preview', methods=['GET'])
+def preview_source(source_id):
+    offset = request.args.get('offset', 0, type=int)
+    length = request.args.get('length', 256, type=int)
+    return jsonify({
+        "sourceId": source_id,
+        "offset": offset,
+        "length": length,
+        "bytesBase64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+        "sha256": "dummy-hash-value"
+    }), 200
+
+@app.route('/api/v1/audit-logs', methods=['GET'])
+def query_audit_logs():
+    return jsonify([
+        {
+            "id": f"audit-{uuid.uuid4().hex[:8]}",
+            "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+            "operatorId": "sysadmin",
+            "action": request.args.get('action', 'unknown'),
+            "level": request.args.get('level', 'info'),
+            "verified": True,
+            "sha256": "dummy-hash-value",
+            "signature": "dummy-signature",
+            "payload": {"status": "Mocked audit log entry"}
+        }
+    ]), 200
+
+@app.route('/api/v1/reports', methods=['POST'])
+def generate_report():
+    return jsonify({"reportId": f"report-{uuid.uuid4().hex[:8]}"}), 201
+
+@app.route('/api/v1/reports/<report_id>/download', methods=['GET'])
+def download_report(report_id):
+    return jsonify({"status": "success", "message": f"Downloading report {report_id}"}), 200
 
 if __name__ == '__main__':
     socketio.run(app, port=5000, allow_unsafe_werkzeug=True)
