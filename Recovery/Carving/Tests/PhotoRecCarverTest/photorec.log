@@ -46,3 +46,127 @@ Total: 1 file found
 
 524160 sectors contain unknown data, 0 invalid files found and rejected.
 PhotoRec exited normally.
+Using locale 'en_US.UTF-8'.
+
+
+Wed Sep  9 15:27:40 2026
+Command line: PhotoRec /log /d /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/./real_photorec_output /cmd /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img partition_none,fileopt,everything,disable,fileopt,jpg,enable,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Linux, kernel 7.0.0-31-generic (#31~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Aug 10 09:38:02 UTC 2) x86_64
+Compiler: GCC 14.2
+ext2fs lib: 1.47.0, ntfs lib: libntfs-3g, ewf lib: 20120504, libjpeg: libjpeg-turbo-1.3.1, curses lib: ncurses 6.4
+User is not root!
+Hard disk list
+Disk /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img - 34 MB /, sector size=512
+
+Partition table type defaults to None
+Disk /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img - 34 MB /
+Partition table type: None
+   P Unknown                  0   0  1     4  52 48      67584
+
+Interface File Select
+
+Interface File Select
+1 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     4  52 48      67584
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=65536, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=65536) STATUS_EXT2_OFF
+Elapsed time 0h00m00s
+Pass 1 +0 file
+Total: 0 files found
+
+67584 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+Using locale 'en_US.UTF-8'.
+
+
+Wed Sep  9 15:50:28 2026
+Command line: PhotoRec /log /d /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/./real_photorec_output /cmd /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img partition_none,fileopt,everything,disable,fileopt,jpg,enable,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Linux, kernel 7.0.0-31-generic (#31~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Aug 10 09:38:02 UTC 2) x86_64
+Compiler: GCC 14.2
+ext2fs lib: 1.47.0, ntfs lib: libntfs-3g, ewf lib: 20120504, libjpeg: libjpeg-turbo-1.3.1, curses lib: ncurses 6.4
+User is not root!
+Hard disk list
+Disk /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img - 268 MB , sector size=512
+
+Partition table type (auto): None
+Disk /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img - 268 MB 
+Partition table type: None
+Filesystem created: Wed Sep  9 15:43:10 2026
+Last mount time:    Wed Sep  9 15:43:40 2026
+     Unknown                  0   0  1    32 162  2     524288 [Whole disk]
+   P ext4                     0   0  1    32 162  2     524288
+     ext4 blocksize=4096 Large_file Sparse_SB, 268 MB / 256 MiB
+
+Interface File Select
+
+Interface File Select
+1 first-level signatures enabled
+
+Analyse
+   P ext4                     0   0  1    32 162  2     524288
+     ext4 blocksize=4096 Large_file Sparse_SB, 268 MB / 256 MiB
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=65536, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=65536) STATUS_EXT2_OFF
+Elapsed time 0h00m01s
+Pass 1 +0 file
+Total: 0 files found
+
+524288 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+Using locale 'en_US.UTF-8'.
+
+
+Wed Sep  9 15:56:10 2026
+Command line: PhotoRec /log /d /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/./real_photorec_output /cmd /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img partition_none,fileopt,everything,disable,fileopt,jpg,enable,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Linux, kernel 7.0.0-31-generic (#31~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Aug 10 09:38:02 UTC 2) x86_64
+Compiler: GCC 14.2
+ext2fs lib: 1.47.0, ntfs lib: libntfs-3g, ewf lib: 20120504, libjpeg: libjpeg-turbo-1.3.1, curses lib: ncurses 6.4
+User is not root!
+Hard disk list
+Disk /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img - 268 MB , sector size=512
+
+Partition table type (auto): None
+Disk /home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img - 268 MB 
+Partition table type: None
+Filesystem created: Wed Sep  9 15:43:10 2026
+Last mount time:    Wed Sep  9 15:43:40 2026
+     Unknown                  0   0  1    32 162  2     524288 [Whole disk]
+   P ext4                     0   0  1    32 162  2     524288
+     ext4 blocksize=4096 Large_file Sparse_SB, 268 MB / 256 MiB
+
+Interface File Select
+
+Interface File Select
+1 first-level signatures enabled
+
+Analyse
+   P ext4                     0   0  1    32 162  2     524288
+     ext4 blocksize=4096 Large_file Sparse_SB, 268 MB / 256 MiB
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=65536, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=65536) STATUS_EXT2_OFF
+Elapsed time 0h00m00s
+Pass 1 +0 file
+Total: 0 files found
+
+524288 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.

@@ -10,41 +10,34 @@
     <package>PhotoRec</package>
     <version>7.3-WIP</version>
     <build_environment>
-      <compiler>GCC 13.4, Cygwin32 3003.3</compiler>
-      <library name='libext2fs' version='1.45.3'/>
-      <library name='libewf' version='20140608'/>
-      <library name='libjpeg' version='libjpeg-turbo-1.5.3'/>
-      <library name='libntfs' version='available'/>
-      <library name='zlib' version='1.2.11'/>
+      <compiler>GCC 14.2</compiler>
+      <library name='libext2fs' version='1.47.0'/>
+      <library name='libewf' version='20120504'/>
+      <library name='libjpeg' version='libjpeg-turbo-1.3.1'/>
+      <library name='libntfs' version='libntfs-3g'/>
+      <library name='zlib' version='1.3.1.zlib-ng'/>
     </build_environment>
     <execution_environment>
-      <os_sysname>Windows</os_sysname>
-      <os_release>Windows 8 (9200)</os_release>
-      <os_version>Windows 8 (9200)</os_version>
-      <host>SHABNAM</host>
-      <arch>i686</arch>
-      <uid>197609</uid>
-      <start_time>2026-09-07T21:46:58+0530</start_time>
+      <os_sysname>Linux</os_sysname>
+      <os_release>7.0.0-31-generic</os_release>
+      <os_version>#31~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Aug 10 09:38:02 UTC 2</os_version>
+      <host>Ishaankalaptop</host>
+      <arch>x86_64</arch>
+      <uid>1000</uid>
+      <start_time>2026-09-09T15:56:10+0530</start_time>
     </execution_environment>
   </creator>
   <source>
-    <image_filename>C:\Users\Amit\sih\Secure-data-erasure-and-recovery\Recovery\Carving\Tests\Scalpel3CarverTest\test.img</image_filename>
+    <image_filename>/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/Recovery/Carving/Tests/PhotoRecCarverTest/disk.img</image_filename>
     <sectorsize>512</sectorsize>
     <image_size>268435456</image_size>
     <volume>
       <byte_runs>
         <byte_run offset='0' img_offset='0' len='268435456'/>
       </byte_runs>
-      <block_size>512</block_size>
+      <block_size>4096</block_size>
     </volume>
   </source>
   <configuration>
   </configuration>
-  <fileobject>
-    <filename>f0008099.jpg</filename>
-    <filesize>47905</filesize>
-    <byte_runs>
-      <byte_run offset='0' img_offset='4146688' len='65536'/>
-    </byte_runs>
-  </fileobject>
 </dfxml>

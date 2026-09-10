@@ -1,5 +1,6 @@
 #include "../../Core/RecoveryOrchestrator.h"
 #include "../../Core/IMetadataRecoveryBackend.h"
+#include "../../../Audit/EvidenceManifest.h"
 #include "../../Verification/VerificationEngine.h"
 #include "../../../TSK/TskFeature.h"
 
@@ -135,6 +136,10 @@ void TestInvalidSourcePath() {
     const auto result = orchestrator.Recover(request);
     assert(!result.success);
     assert(!result.errorMessage.empty());
+    assert(result.auditLog.Events().front().type ==
+           Recovery::Audit::AuditEventType::RecoveryStarted);
+    assert(result.auditLog.Events().back().type ==
+           Recovery::Audit::AuditEventType::RecoveryFailed);
 }
 
 void TestPartitionPropagationAndCarving() {
@@ -237,6 +242,42 @@ void TestCombinedFailureIsolation() {
            Recovery::Carving::VerificationClassification::VALID);
     assert(result.carvingResult.candidates[0].recoveryBackend ==
            Recovery::Core::RecoveryBackend::PHOTOREC_CARVING);
+    assert(result.evidenceRecords.size() == 1);
+    assert(result.evidenceRecords[0].recoveryBackend ==
+           Recovery::Core::RecoveryBackend::PHOTOREC_CARVING);
+    assert(!result.evidenceRecords[0].sourceOffset.has_value());
+    assert(!result.evidenceManifest.empty());
+    assert(result.evidenceManifestHash ==
+           Recovery::Audit::EvidenceManifest::Hash(result.evidenceRecords));
+    assert(result.auditLog.Events().front().type ==
+           Recovery::Audit::AuditEventType::RecoveryStarted);
+    assert(result.auditLog.Events().back().type ==
+           Recovery::Audit::AuditEventType::RecoveryCompleted);
+    bool tskFailed = false;
+    bool photoRecStarted = false;
+    bool candidateRecovered = false;
+    bool verificationCompleted = false;
+    for (const auto& event : result.auditLog.Events()) {
+        tskFailed = tskFailed ||
+            event.type == Recovery::Audit::AuditEventType::BackendFailed &&
+            event.backend == Recovery::Core::RecoveryBackend::TSK_METADATA;
+        photoRecStarted = photoRecStarted ||
+            event.type == Recovery::Audit::AuditEventType::BackendStarted &&
+            event.backend == Recovery::Core::RecoveryBackend::PHOTOREC_CARVING;
+        candidateRecovered = candidateRecovered ||
+            event.type == Recovery::Audit::AuditEventType::CandidateRecovered;
+        verificationCompleted = verificationCompleted ||
+            event.type == Recovery::Audit::AuditEventType::VerificationCompleted;
+    }
+    assert(tskFailed);
+    assert(photoRecStarted);
+    assert(candidateRecovered);
+    assert(verificationCompleted);
+    for (const auto& event : result.auditLog.Events()) {
+        if (event.type == Recovery::Audit::AuditEventType::CandidateRecovered) {
+            assert(!event.sourceOffset.has_value());
+        }
+    }
 }
 
 void TestCombinedPreservesMetadataWhenCarvingFails() {
@@ -261,6 +302,9 @@ void TestCombinedPreservesMetadataWhenCarvingFails() {
            Recovery::Carving::VerificationClassification::VALID);
     assert(result.metadataRecords[0].recoveryBackend ==
            Recovery::Core::RecoveryBackend::TSK_METADATA);
+    assert(result.evidenceRecords.size() == 1);
+    assert(result.evidenceRecords[0].recoveryBackend ==
+           Recovery::Core::RecoveryBackend::TSK_METADATA);
 }
 
 void TestCombinedProvenance() {
@@ -282,6 +326,25 @@ void TestCombinedProvenance() {
     assert(result.carvingResult.candidates[0].sourcePath == request.sourcePath);
     assert(result.carvingResult.candidates[0].partitionIndex == 0);
     assert(!result.carvingResult.candidates[0].sourceOffsetKnown);
+}
+
+void TestAuditRespectsDisabledVerification() {
+    auto storage = std::make_shared<MemoryStorage>(BuildMBRImage());
+    auto carver = std::make_shared<FakeCarver>(true);
+    Recovery::Carving::RecoveryOrchestrator orchestrator(storage, carver);
+
+    Recovery::Carving::RecoveryRequest request;
+    request.sourcePath = "synthetic.img";
+    request.outputDir = "output";
+    request.recoveryMethod = Recovery::Core::RecoveryMethod::Carving;
+    request.verifyResults = false;
+
+    const auto result = orchestrator.Recover(request);
+    assert(result.success);
+    assert(result.evidenceRecords.size() == 1);
+    for (const auto& event : result.auditLog.Events()) {
+        assert(event.type != Recovery::Audit::AuditEventType::VerificationCompleted);
+    }
 }
 
 void TestVerificationClassificationsAndFailureRetention() {
@@ -314,6 +377,7 @@ int main() {
     TestCombinedFailureIsolation();
     TestCombinedPreservesMetadataWhenCarvingFails();
     TestCombinedProvenance();
+    TestAuditRespectsDisabledVerification();
     TestVerificationClassificationsAndFailureRetention();
     return 0;
 }

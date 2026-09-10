@@ -1,5 +1,8 @@
 #include "RecoveryOrchestrator.h"
 
+#include "../../Audit/AuditCollector.h"
+#include "../../Audit/EvidenceBuilder.h"
+#include "../../Audit/EvidenceManifest.h"
 #ifdef _WIN32
 #include "../../Acquisition/WindowsReadOnlyStorage.h"
 #else
@@ -134,20 +137,46 @@ namespace Carving {
         RecoveryResult result;
         result.sourcePath = request.sourcePath;
         result.recoveryMethod = request.recoveryMethod;
+        Audit::AuditLog auditLog;
+        Audit::AuditCollector auditCollector(auditLog);
+        const std::string sessionId =
+            request.sourcePath.empty() ? "recovery" : request.sourcePath;
+        auditCollector.RecordRecoveryStarted(
+            sessionId, "Recovery started for source: " + request.sourcePath);
+
+        const auto finalize = [&]() {
+            result.evidenceRecords = Audit::EvidenceBuilder().Build(result);
+            result.evidenceManifest =
+                Audit::EvidenceManifest::Canonicalize(result.evidenceRecords);
+            result.evidenceManifestHash =
+                Audit::EvidenceManifest::Hash(result.evidenceRecords);
+            if (result.success) {
+                auditCollector.RecordRecoveryCompleted(
+                    sessionId, "Recovery completed.");
+            } else {
+                auditCollector.RecordRecoveryFailed(
+                    sessionId,
+                    result.errorMessage.empty()
+                        ? "Recovery failed."
+                        : result.errorMessage);
+            }
+            result.auditLog = auditLog;
+            return result;
+        };
 
         if (request.sourcePath.empty()) {
             result.errorMessage = "Source path is empty.";
-            return result;
+            return finalize();
         }
         if (request.recoveryMethod == Core::RecoveryMethod::Carving &&
             request.outputDir.empty()) {
             result.errorMessage = "Output directory path is empty.";
-            return result;
+            return finalize();
         }
 
         if (!m_storage->Open(request.sourcePath)) {
             result.errorMessage = "Failed to open source storage.";
-            return result;
+            return finalize();
         }
 
         struct StorageCloser {
@@ -187,7 +216,7 @@ namespace Carving {
             const uint32_t requestedIndex = *request.selectedPartitionIndex;
             if (requestedIndex >= result.partitions.size()) {
                 result.errorMessage = "Selected partition index does not exist.";
-                return result;
+                return finalize();
             }
 
             const Core::PartitionInfo& partition = result.partitions[requestedIndex];
@@ -203,6 +232,9 @@ namespace Carving {
 
         if (runMetadata) {
             result.tskAttempted = true;
+            auditCollector.RecordBackendStarted(
+                sessionId, Core::RecoveryBackend::TSK_METADATA,
+                "TSK metadata recovery started.");
             if (!request.selectedPartitionIndex.has_value()) {
                 result.tskErrorMessage =
                     "TSK metadata recovery requires a selected partition.";
@@ -223,11 +255,24 @@ namespace Carving {
                             record.partitionIndex = request.selectedPartitionIndex;
                             record.partitionOffset = partition.startOffset;
                             record.partitionSize = partition.sizeBytes;
+                            auditCollector.RecordCandidateRecovered(
+                                sessionId, record, record.id);
                         }
                     }
                 } else {
                     result.tskErrorMessage = result.capabilityMessage;
                 }
+            }
+            if (result.tskSucceeded) {
+                auditCollector.RecordBackendCompleted(
+                    sessionId, Core::RecoveryBackend::TSK_METADATA, true,
+                    "TSK metadata recovery completed.");
+            } else {
+                auditCollector.RecordBackendFailed(
+                    sessionId, Core::RecoveryBackend::TSK_METADATA,
+                    result.tskErrorMessage.empty()
+                        ? "TSK metadata recovery failed."
+                        : result.tskErrorMessage);
             }
         }
 
@@ -248,18 +293,28 @@ namespace Carving {
 
         if (runCarving) {
             result.photoRecAttempted = true;
+            auditCollector.RecordBackendStarted(
+                sessionId, Core::RecoveryBackend::PHOTOREC_CARVING,
+                "PhotoRec carving started.");
             result.carvingResult = m_carver->Carve(carvingRequest);
             result.photoRecSucceeded = result.carvingResult.success;
-            for (auto& candidate : result.carvingResult.candidates) {
+            for (std::size_t index = 0;
+                 index < result.carvingResult.candidates.size(); ++index) {
+                auto& candidate = result.carvingResult.candidates[index];
                 candidate.recoveryBackend = Core::RecoveryBackend::PHOTOREC_CARVING;
                 candidate.sourcePath = request.sourcePath;
                 candidate.partitionIndex = request.selectedPartitionIndex;
                 candidate.partitionOffset = carvingRequest.sourceOffset;
                 candidate.partitionSize = carvingRequest.sourceLength;
                 candidate.sourceOffsetKnown = false;
+                auditCollector.RecordCandidateRecovered(
+                    sessionId, candidate, static_cast<uint64_t>(index));
                 if (request.verifyResults) {
                     Verification::VerificationEngine engine;
                     candidate.verification = engine.Verify(candidate);
+                    auditCollector.RecordVerificationCompleted(
+                        sessionId, candidate.verification,
+                        static_cast<uint64_t>(index));
                 }
             }
             if (!result.photoRecSucceeded) {
@@ -267,7 +322,13 @@ namespace Carving {
                 if (result.photoRecErrorMessage.empty()) {
                     result.photoRecErrorMessage = "Carving failed.";
                 }
-
+                auditCollector.RecordBackendFailed(
+                    sessionId, Core::RecoveryBackend::PHOTOREC_CARVING,
+                    result.photoRecErrorMessage);
+            } else {
+                auditCollector.RecordBackendCompleted(
+                    sessionId, Core::RecoveryBackend::PHOTOREC_CARVING, true,
+                    "PhotoRec carving completed.");
             }
         }
 
@@ -276,6 +337,21 @@ namespace Carving {
             for (const auto& record : result.metadataRecords) {
                 result.metadataVerificationResults.push_back(
                     VerifyMetadataRecord(*m_storage, record));
+            }
+            for (std::size_t index = 0;
+                 index < result.metadataVerificationResults.size(); ++index) {
+                const auto& verification =
+                    result.metadataVerificationResults[index];
+                const bool performed = std::any_of(
+                    verification.checks.begin(), verification.checks.end(),
+                    [](const VerificationCheck& check) {
+                        return check.status != CheckStatus::NOT_PERFORMED;
+                    });
+                if (performed) {
+                    auditCollector.RecordVerificationCompleted(
+                        sessionId, verification,
+                        result.metadataRecords[index].id);
+                }
             }
         }
 
@@ -288,7 +364,7 @@ namespace Carving {
                    (!result.tskSucceeded || !result.photoRecSucceeded)) {
             result.limitationMessage = "Recovery completed partially: one backend failed.";
         }
-        return result;
+        return finalize();
     }
 
 } // namespace Carving
