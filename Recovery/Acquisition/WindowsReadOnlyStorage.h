@@ -2,6 +2,7 @@
 
 #include "../Core/IReadOnlyStorage.h"
 #include <windows.h>
+#include <winioctl.h>
 #include <string>
 
 namespace Recovery {

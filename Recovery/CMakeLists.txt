@@ -61,9 +61,7 @@ target_include_directories(recovery PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(recovery PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if(MSVC)
-    target_compile_definitions(recovery PRIVATE
-        NOMINMAX
-        WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(recovery PRIVATE NOMINMAX)
 endif()
 
 add_executable(recover recover_main.cpp)
