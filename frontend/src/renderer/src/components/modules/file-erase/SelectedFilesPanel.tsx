@@ -1,7 +1,7 @@
 import { File, Folder, Trash2, Plus, FolderPlus } from 'lucide-react'
 import type { ReactElement } from 'react'
 
-export type FileSystemType = 'NTFS' | 'ext4' | 'FAT32'
+export type FileSystemType = 'NTFS' | 'ext4' | 'exFAT' | 'FAT32'
 
 export interface EraseTarget {
   id: string

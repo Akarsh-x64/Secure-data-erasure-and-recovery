@@ -25,6 +25,10 @@ function App(): ReactElement {
     setEraseQueueResetToken((token) => token + 1)
   }
 
+  const handleEraseNodesUpdated = (nodes: ForensicNode[]): void => {
+    setEraseTreeNodes(nodes)
+  }
+
   const clearEraseDirectory = (): void => {
     setEraseTreeNodes([])
     setEraseTreeTarget(null)
@@ -81,6 +85,7 @@ function App(): ReactElement {
               actionMode="erase"
               onAction={setEraseTreeTarget}
               onDirectorySelected={handleEraseDirectorySelected}
+              onUpdateNodes={handleEraseNodesUpdated}
               onDirectoryCleared={clearEraseDirectory}
               unmarkNode={eraseUnmarkRequest}
             />

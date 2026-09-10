@@ -38,6 +38,26 @@ const filterTreeNodes = (
   }, []);
 };
 
+// Recursive helper to update a single node in the tree immutably
+const updateNodeInTree = (
+  nodesList: ForensicNode[],
+  targetPath: string,
+  updater: (node: ForensicNode) => ForensicNode
+): ForensicNode[] => {
+  return nodesList.map((node) => {
+    if (node.path === targetPath || node.id === targetPath) {
+      return updater(node);
+    }
+    if (node.children && node.children.length > 0) {
+      return {
+        ...node,
+        children: updateNodeInTree(node.children, targetPath, updater),
+      };
+    }
+    return node;
+  });
+};
+
 interface FileSystemTreeProps {
   nodes?: ForensicNode[];
   panel?: boolean;
@@ -48,6 +68,7 @@ interface FileSystemTreeProps {
   scanned?: boolean;
   onAction?: (node: ForensicNode) => void;
   onDirectorySelected?: (nodes: ForensicNode[]) => void;
+  onUpdateNodes?: (nodes: ForensicNode[]) => void;
   onDirectoryCleared?: () => void;
   unmarkNode?: { id: string; request: number };
 }
@@ -112,6 +133,7 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
   scanned = false,
   onAction,
   onDirectorySelected,
+  onUpdateNodes,
   onDirectoryCleared,
   unmarkNode,
 }) => {
@@ -157,6 +179,51 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
       }
     }
     directoryInputRef.current?.click();
+  };
+
+  const handleExpandDirectory = async (targetNode: ForensicNode): Promise<void> => {
+    if (!targetNode.path || targetNode.isLoaded || targetNode.isLoading) return;
+    if (!window.api?.readDirectoryContents) return;
+
+    const targetPath = targetNode.path;
+
+    const loadingNodes = updateNodeInTree(nodes, targetPath, (n) => ({
+      ...n,
+      isLoading: true,
+    }));
+    if (onUpdateNodes) {
+      onUpdateNodes(loadingNodes);
+    } else {
+      onDirectorySelected?.(loadingNodes);
+    }
+
+    try {
+      const children = await window.api.readDirectoryContents(targetPath);
+      const updatedNodes = updateNodeInTree(nodes, targetPath, (n) => ({
+        ...n,
+        children: children || [],
+        isLoaded: true,
+        isLoading: false,
+      }));
+      if (onUpdateNodes) {
+        onUpdateNodes(updatedNodes);
+      } else {
+        onDirectorySelected?.(updatedNodes);
+      }
+    } catch (err) {
+      console.error('Failed to read directory contents:', err);
+      const errorNodes = updateNodeInTree(nodes, targetPath, (n) => ({
+        ...n,
+        children: [],
+        isLoaded: true,
+        isLoading: false,
+      }));
+      if (onUpdateNodes) {
+        onUpdateNodes(errorNodes);
+      } else {
+        onDirectorySelected?.(errorNodes);
+      }
+    }
   };
 
   const filteredData = useMemo(
@@ -281,6 +348,7 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
                 actionMode={actionMode}
                 onAction={handleAction}
                 markedNodeIds={markedNodeIds}
+                onExpandDirectory={handleExpandDirectory}
               />
             ))
           ) : (

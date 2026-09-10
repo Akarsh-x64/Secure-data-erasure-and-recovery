@@ -120,9 +120,27 @@ export const LogsTable: React.FC<LogsTableProps> = ({ entries }) => {
                           </div>
                           <div className="text-xs">
                             <div className="mb-2 text-text-muted">Signed payload</div>
-                            <pre className="max-h-48 overflow-auto rounded-md border border-ui-outline bg-background-icon px-2.5 py-2 text-text-pure">
-                              {JSON.stringify(entry.payload, null, 2)}
-                            </pre>
+                            <div className="max-h-48 overflow-auto rounded-md border border-ui-outline bg-background-icon p-2 text-text-pure">
+                              {Object.keys(entry.payload || {}).length > 0 ? (
+                                <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                                  {Object.entries(entry.payload || {}).map(([key, val]) => (
+                                    <div
+                                      key={key}
+                                      className="flex items-center justify-between rounded border border-ui-outline/40 bg-background-main/60 px-2 py-1"
+                                    >
+                                      <span className="text-[11px] text-text-muted capitalize">
+                                        {key.replace(/([A-Z])/g, ' $1')}
+                                      </span>
+                                      <span className="font-mono text-[11px] font-medium text-text-pure">
+                                        {Array.isArray(val) ? val.join(', ') : String(val)}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="italic text-text-muted">No payload parameters</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </td>

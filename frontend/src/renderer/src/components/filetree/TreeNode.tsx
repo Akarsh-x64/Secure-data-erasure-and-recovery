@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, Scissors, ScanSearch } from 'lucide-react';
+import { ChevronRight, ChevronDown, Scissors, ScanSearch, Loader2 } from 'lucide-react';
 import { FileIcon } from './FileIcon';
 
 export interface ForensicNode {
@@ -7,6 +7,8 @@ export interface ForensicNode {
   name: string;
   path?: string;
   isDirectory?: boolean;
+  isLoaded?: boolean;
+  isLoading?: boolean;
   isDrive?: boolean;
   isCorrupted?: boolean;
   isDeleted?: boolean;
@@ -26,6 +28,7 @@ interface TreeNodeProps {
   actionMode?: 'erase' | 'recovery';
   onAction?: (node: ForensicNode) => void;
   markedNodeIds?: ReadonlySet<string>;
+  onExpandDirectory?: (node: ForensicNode) => void;
 }
 
 export const TreeNode: React.FC<TreeNodeProps> = ({
@@ -36,6 +39,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
   actionMode,
   onAction,
   markedNodeIds,
+  onExpandDirectory,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(depth === 0);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -47,8 +51,12 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
   const handleToggleExpand = (e: React.MouseEvent): void => {
     e.stopPropagation();
-    if (hasChildren || node.isDirectory) {
-      setIsOpen(!isOpen);
+    if (node.isDirectory) {
+      const nextOpen = !isOpen;
+      setIsOpen(nextOpen);
+      if (nextOpen && !node.isLoaded && onExpandDirectory) {
+        onExpandDirectory(node);
+      }
     }
   };
 
@@ -73,14 +81,16 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
             : 'border-l-transparent text-text-muted hover:bg-ui-selection/60 hover:text-text-pure'
         }`}
       >
-        {/* Expand / collapse chevron */}
+        {/* Expand / collapse chevron or loading spinner */}
         <button
           onClick={handleToggleExpand}
           className={`mr-1 flex h-4 w-4 items-center justify-center rounded transition-opacity hover:bg-ui-outline ${
-            hasChildren || node.isDirectory ? 'opacity-100' : 'pointer-events-none opacity-0'
+            node.isDirectory ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
         >
-          {isOpen ? (
+          {node.isLoading ? (
+            <Loader2 className="h-3 w-3 animate-spin text-text-muted" />
+          ) : isOpen ? (
             <ChevronDown className="h-3 w-3 text-text-muted" />
           ) : (
             <ChevronRight className="h-3 w-3 text-text-muted" />
@@ -147,7 +157,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         {/* Context menu popup */}
         {showMenu && showAction && onAction && (
           <div
-            className="absolute right-2 top-8 z-50 w-48 rounded-md border border-ui-outline bg-background-sidebar py-1 text-sm shadow-xl"
+            className="absolute right-2 top-8 z-50 w-48 rounded-md border border-ui-outline bg-backgroundsidebar py-1 text-sm shadow-xl"
             onMouseLeave={() => setShowMenu(false)}
           >
             <button
@@ -169,21 +179,39 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         )}
       </div>
 
-      {/* Children nodes */}
-      {isOpen && hasChildren && (
+      {/* Children nodes / Empty state */}
+      {isOpen && node.isDirectory && (
         <div>
-          {node.children!.map((child) => (
-            <TreeNode
-              key={child.id}
-              node={child}
-              depth={depth + 1}
-              selectedId={selectedId}
-              onSelect={onSelect}
-              actionMode={actionMode}
-              onAction={onAction}
-              markedNodeIds={markedNodeIds}
-            />
-          ))}
+          {node.isLoading ? (
+            <div
+              style={{ paddingLeft: `${(depth + 1) * 14 + 8}px` }}
+              className="flex items-center gap-2 py-1 text-xs text-text-muted/80"
+            >
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Reading folder contents...</span>
+            </div>
+          ) : hasChildren ? (
+            node.children!.map((child) => (
+              <TreeNode
+                key={child.id}
+                node={child}
+                depth={depth + 1}
+                selectedId={selectedId}
+                onSelect={onSelect}
+                actionMode={actionMode}
+                onAction={onAction}
+                markedNodeIds={markedNodeIds}
+                onExpandDirectory={onExpandDirectory}
+              />
+            ))
+          ) : (
+            <div
+              style={{ paddingLeft: `${(depth + 1) * 14 + 8}px` }}
+              className="py-1 text-xs italic text-text-muted/50"
+            >
+              (Empty directory)
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -7,9 +7,15 @@ const api = {
   maximizeWindow: () => ipcRenderer.send('window-maximize'),
   closeWindow: () => ipcRenderer.send('window-close'),
   selectDirectory: () => ipcRenderer.invoke('select-directory'),
+  readDirectoryContents: (dirPath: string) => ipcRenderer.invoke('read-directory-contents', dirPath),
   selectFiles: () => ipcRenderer.invoke('select-files'),
   getPathForFile: (file: File) => webUtils.getPathForFile(file),
-  eraseFiles: (request: unknown) => ipcRenderer.invoke('erase-files', request)
+  eraseFiles: (request: unknown) => ipcRenderer.invoke('erase-files', request),
+  getDevices: () => ipcRenderer.invoke('get-devices'),
+  createTestVhd: () => ipcRenderer.invoke('create-test-vhd'),
+  eraseDrive: (request: unknown) => ipcRenderer.invoke('erase-drive', request),
+  getAuditLogs: () => ipcRenderer.invoke('get-audit-logs'),
+  saveAuditLog: (entry: unknown) => ipcRenderer.invoke('save-audit-log', entry)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

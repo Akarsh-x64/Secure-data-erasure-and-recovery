@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { FileOutput } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Eye } from 'lucide-react';
 import { LogFilter } from './LogFilter';
 import { LogsTable, type AuditLogEntry } from './LogsTable';
 import { ReportGeneratorModal } from '../../shared/ReportGeneratorModal';
@@ -106,13 +106,33 @@ function parseQuery(query: string): { text: string; filters: Record<string, stri
 }
 
 export function AuditLogsTab(): React.ReactElement {
+  const [logs, setLogs] = useState<AuditLogEntry[]>(SAMPLE_LOGS);
   const [query, setQuery] = useState('');
   const [reportOpen, setReportOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchLogs = async (): Promise<void> => {
+      try {
+        if (window.api?.getAuditLogs) {
+          const fetched = await window.api.getAuditLogs();
+          if (fetched && fetched.length > 0) {
+            setLogs(fetched);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch real audit logs:', err);
+      }
+    };
+
+    fetchLogs();
+    const interval = setInterval(fetchLogs, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredLogs = useMemo(() => {
     const { text, filters } = parseQuery(query);
 
-    return SAMPLE_LOGS.filter((log) => {
+    return logs.filter((log) => {
       if (filters.action && !log.action.toLowerCase().includes(filters.action)) return false;
       if (filters.level && log.level !== filters.level) return false;
       if (filters.operator && !log.operatorId.toLowerCase().includes(filters.operator)) return false;
@@ -121,12 +141,12 @@ export function AuditLogsTab(): React.ReactElement {
         if (log.verified !== wantsVerified) return false;
       }
       if (text) {
-        const haystack = `${log.action} ${log.operatorId} ${log.sha256}`.toLowerCase();
+        const haystack = `${log.action} ${log.operatorId} ${log.sha256} ${JSON.stringify(log.payload || {})}`.toLowerCase();
         if (!haystack.includes(text)) return false;
       }
       return true;
     });
-  }, [query]);
+  }, [logs, query]);
 
   return (
     <div className="flex min-h-full flex-col gap-4 font-sans text-text-pure">
@@ -143,8 +163,8 @@ export function AuditLogsTab(): React.ReactElement {
           onClick={() => setReportOpen(true)}
           className="flex items-center gap-2 rounded-md border border-button-primary bg-button-primary px-3 py-2 text-sm font-medium text-button-primary-text transition-colors hover:bg-button-primary/85"
         >
-          <FileOutput className="h-4 w-4" />
-          Generate report
+          <Eye className="h-4 w-4" />
+          View Audit Report
         </button>
       </header>
 
@@ -158,6 +178,7 @@ export function AuditLogsTab(): React.ReactElement {
         open={reportOpen}
         onClose={() => setReportOpen(false)}
         entryCount={filteredLogs.length}
+        logs={filteredLogs}
       />
     </div>
   );

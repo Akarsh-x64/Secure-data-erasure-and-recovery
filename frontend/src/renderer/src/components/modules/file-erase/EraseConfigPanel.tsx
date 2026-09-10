@@ -1,13 +1,11 @@
-import { Binary, Check, FileKey2, Gauge, ShieldCheck, Shuffle } from 'lucide-react'
+import { Binary, Check, FileCheck, ShieldCheck, Shuffle } from 'lucide-react'
 import type { ReactElement } from 'react'
 
 export type OverwriteMethod = 'zero' | 'random'
 
 export interface EraseConfig {
-  clearMetadata: boolean
-  wipeSlackSpace: boolean
   overwriteMethod: OverwriteMethod
-  passCount: number
+  verifyAfterErase: boolean
 }
 
 interface EraseConfigPanelProps {
@@ -23,7 +21,7 @@ export function EraseConfigPanel({
   targetCount,
   onRequestErase
 }: EraseConfigPanelProps): ReactElement {
-  const nistReady = targetCount > 0 && config.passCount > 0
+  const nistReady = targetCount > 0
   const update = (patch: Partial<EraseConfig>): void => onChange({ ...config, ...patch })
 
   return (
@@ -50,32 +48,6 @@ export function EraseConfigPanel({
         </div>
 
         <div className="space-y-2.5">
-          <p className="text-xs font-medium text-text-muted">Metadata handling</p>
-          <label className="flex cursor-pointer items-center justify-between rounded-md border border-ui-outline px-3 py-3 transition-colors hover:bg-ui-selection/40">
-            <span className="flex items-center gap-2.5 text-sm text-text-pure">
-              <FileKey2 className="h-4 w-4 text-text-muted" /> Clear MFT and inode records
-            </span>
-            <input
-              type="checkbox"
-              checked={config.clearMetadata}
-              onChange={(event) => update({ clearMetadata: event.target.checked })}
-              className="h-4 w-4 accent-status-valid"
-            />
-          </label>
-          <label className="flex cursor-pointer items-center justify-between rounded-md border border-ui-outline px-3 py-3 transition-colors hover:bg-ui-selection/40">
-            <span className="flex items-center gap-2.5 text-sm text-text-pure">
-              <Gauge className="h-4 w-4 text-text-muted" /> Wipe file slack space
-            </span>
-            <input
-              type="checkbox"
-              checked={config.wipeSlackSpace}
-              onChange={(event) => update({ wipeSlackSpace: event.target.checked })}
-              className="h-4 w-4 accent-status-valid"
-            />
-          </label>
-        </div>
-
-        <div className="space-y-2.5">
           <p className="text-xs font-medium text-text-muted">Overwrite pattern</p>
           <div className="grid grid-cols-2 gap-2">
             {(['zero', 'random'] as OverwriteMethod[]).map((method) => (
@@ -84,18 +56,18 @@ export function EraseConfigPanel({
                 type="button"
                 aria-pressed={config.overwriteMethod === method}
                 onClick={() => update({ overwriteMethod: method })}
-                  title={method === 'zero' ? 'Single pass with zero fill' : 'Overwrite with a random data pattern'}
-                  className={`flex min-h-14 items-center gap-2.5 rounded-md border px-3 py-2.5 text-left transition-colors ${
+                title={method === 'zero' ? 'Single pass with zero fill' : 'Overwrite with a random data pattern'}
+                className={`flex min-h-14 items-center gap-2.5 rounded-md border px-3 py-2.5 text-left transition-colors ${
                   config.overwriteMethod === method
-                      ? 'border-status-valid bg-status-valid/10 text-text-pure shadow-[inset_0_0_0_1px_rgba(16,185,129,0.18)]'
-                      : 'border-ui-outline text-text-muted hover:border-text-muted hover:bg-ui-selection/40'
+                    ? 'border-status-valid bg-status-valid/10 text-text-pure shadow-[inset_0_0_0_1px_rgba(16,185,129,0.18)]'
+                    : 'border-ui-outline text-text-muted hover:border-text-muted hover:bg-ui-selection/40'
                 }`}
               >
-                  {method === 'zero' ? (
+                {method === 'zero' ? (
                   <Binary className="h-4 w-4 shrink-0 text-status-valid" />
-                  ) : (
+                ) : (
                   <Shuffle className="h-4 w-4 shrink-0 text-text-muted" />
-                  )}
+                )}
                 <span className="min-w-0 flex-1 truncate text-sm font-medium">
                   {method === 'zero' ? 'Zero fill' : 'Random fill'}
                 </span>
@@ -105,22 +77,20 @@ export function EraseConfigPanel({
           </div>
         </div>
 
-        <label className="block text-xs font-medium text-text-muted">
-          Pass count
-          <div className="mt-2.5 flex items-center gap-3">
+        <div className="space-y-2.5">
+          <p className="text-xs font-medium text-text-muted">Verification & Audit</p>
+          <label className="flex cursor-pointer items-center justify-between rounded-md border border-ui-outline px-3 py-3 transition-colors hover:bg-ui-selection/40">
+            <span className="flex items-center gap-2.5 text-sm text-text-pure">
+              <FileCheck className="h-4 w-4 text-text-muted" /> Statistical Verification & Audit Certificate
+            </span>
             <input
-              type="range"
-              min={1}
-              max={7}
-              value={config.passCount}
-              onChange={(event) => update({ passCount: Number(event.target.value) })}
-              className="w-full accent-text-pure"
+              type="checkbox"
+              checked={config.verifyAfterErase}
+              onChange={(event) => update({ verifyAfterErase: event.target.checked })}
+              className="h-4 w-4 accent-status-valid"
             />
-            <output className="w-9 rounded-md border border-ui-outline bg-background-main py-1 text-center text-sm text-text-pure">
-              {config.passCount}
-            </output>
-          </div>
-        </label>
+          </label>
+        </div>
 
         <button
           type="button"

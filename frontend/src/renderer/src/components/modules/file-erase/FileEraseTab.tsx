@@ -8,14 +8,16 @@ import { SelectedFilesPanel, type EraseTarget, type FileSystemType } from './Sel
 import { VerificationCertificateModal, type VerificationReportData } from './VerificationCertificateModal'
 
 const INITIAL_CONFIG: EraseConfig = {
-  clearMetadata: true,
-  wipeSlackSpace: true,
   overwriteMethod: 'zero',
-  passCount: 1
+  verifyAfterErase: true
 }
 
 function guessFileSystem(path: string): FileSystemType {
-  return path.startsWith('/') ? 'ext4' : 'NTFS'
+  const norm = (path || '').toUpperCase()
+  if (norm.startsWith('/') || norm.startsWith('/DEV/')) return 'ext4'
+  if (norm.includes('EXFAT')) return 'exFAT'
+  if (norm.includes('FAT32') || norm.includes('FAT')) return 'FAT32'
+  return 'NTFS'
 }
 
 interface FileEraseTabProps {

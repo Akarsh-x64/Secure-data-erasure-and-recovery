@@ -57,17 +57,12 @@ export function EraseConfirmDialog({
           </div>
           <div className="grid grid-cols-2 gap-y-2 rounded-md border border-ui-outline bg-background-main p-3 text-sm">
             <span className="text-text-muted">Method</span>
-            <span className="text-right text-text-pure">
-              {config.overwriteMethod === 'zero' ? 'Zero fill' : 'Random'}, {config.passCount} pass
-              {config.passCount === 1 ? '' : 'es'}
+            <span className="text-right font-medium text-text-pure">
+              {config.overwriteMethod === 'zero' ? 'Zero fill' : 'Random fill'}
             </span>
-            <span className="text-text-muted">Metadata</span>
-            <span className="text-right text-text-pure">
-              {config.clearMetadata ? 'Clear' : 'Retain'}
-            </span>
-            <span className="text-text-muted">Slack space</span>
-            <span className="text-right text-text-pure">
-              {config.wipeSlackSpace ? 'Wipe' : 'Retain'}
+            <span className="text-text-muted">Audit Verification</span>
+            <span className="text-right font-medium text-text-pure">
+              {config.verifyAfterErase ? 'Enabled (NIST SP 800-88)' : 'Disabled'}
             </span>
           </div>
           <label className="block text-sm text-text-muted">

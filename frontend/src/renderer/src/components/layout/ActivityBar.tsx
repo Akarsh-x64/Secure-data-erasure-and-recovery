@@ -1,7 +1,7 @@
-import { FileText, HardDrive, RefreshCw, Settings, Trash2, type LucideIcon } from 'lucide-react';
+import { FileText, HardDrive, RefreshCw, Trash2, type LucideIcon } from 'lucide-react';
 import type { ReactElement } from 'react';
 
-export type NavItem = 'drive-erase' | 'file-erase' | 'recovery' | 'audit' | 'settings';
+export type NavItem = 'drive-erase' | 'file-erase' | 'recovery' | 'audit';
 
 interface ActivityBarProps {
   activeTab: NavItem;
@@ -59,24 +59,6 @@ export default function ActivityBar({ activeTab, onTabChange }: ActivityBarProps
             </button>
           );
         })}
-      </div>
-
-      {/* Bottom Settings Button */}
-      <div className="w-full flex justify-center">
-        <button
-          onClick={() => onTabChange('settings')}
-          title="Settings"
-          className={`relative w-10 h-10 flex items-center justify-center rounded-none transition-colors ${
-            activeTab === 'settings'
-              ? 'bg-ui-selection text-text-pure'
-              : 'text-text-muted hover:text-text-pure hover:bg-ui-selection/50'
-          }`}
-        >
-          {activeTab === 'settings' && (
-            <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-text-pure" />
-          )}
-          <Settings className="h-5 w-5" strokeWidth={1.5} />
-        </button>
       </div>
     </aside>
   );
