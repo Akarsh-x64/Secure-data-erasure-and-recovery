@@ -4,24 +4,21 @@ project(secure_erasure_core)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if(WIN32)
-    find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
 
-    execute_process(
-      COMMAND "${Python3_EXECUTABLE}" -m pybind11 --cmakedir
-      OUTPUT_VARIABLE pybind11_DIR
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    find_package(pybind11 REQUIRED)
-elseif(UNIX)
-    
-    execute_process(
-      COMMAND python3 -m pybind11 --cmakedir
-      OUTPUT_VARIABLE pybind11_DIR
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    find_package(pybind11 REQUIRED)
+execute_process(
+  COMMAND "${Python3_EXECUTABLE}" -m pybind11 --cmakedir
+  RESULT_VARIABLE PYBIND11_CMAKEDIR_RESULT
+  OUTPUT_VARIABLE pybind11_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_VARIABLE PYBIND11_CMAKEDIR_ERROR
+)
+if(NOT PYBIND11_CMAKEDIR_RESULT EQUAL 0 OR pybind11_DIR STREQUAL "")
+    message(FATAL_ERROR
+        "Could not locate pybind11 using ${Python3_EXECUTABLE}: "
+        "${PYBIND11_CMAKEDIR_ERROR}")
 endif()
+find_package(pybind11 CONFIG REQUIRED)
 
 # 1. Compile underlying C++ code into STATIC libraries
 if(WIN32)
