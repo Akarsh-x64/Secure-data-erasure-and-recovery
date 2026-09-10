@@ -39,6 +39,20 @@ target_link_libraries(exfat_cpp PRIVATE hdd_cpp osdevice_cpp)
 add_library(ext4_cpp STATIC "../Erasure/File Systems/ext4/ext4.cpp")
 target_link_libraries(ext4_cpp PRIVATE hdd_cpp osdevice_cpp)
 
+add_library(ntfs_cpp STATIC "../Erasure/File Systems/NTFS/NTFS.cpp")
+target_link_libraries(ntfs_cpp PRIVATE hdd_cpp osdevice_cpp)
+
+add_library(fat32_cpp STATIC "../Erasure/File Systems/FAT32/FAT32.cpp")
+target_link_libraries(fat32_cpp PRIVATE hdd_cpp osdevice_cpp)
+
+add_library(verification_cpp STATIC 
+    "../Erasure/Verification/VerificationEngine.cpp"
+    "../Erasure/Verification/StatisticalTests.cpp"
+    "../Erasure/Verification/SignatureCarver.cpp"
+    "../Erasure/Verification/VerificationReport.cpp"
+)
+target_link_libraries(verification_cpp PRIVATE hdd_cpp osdevice_cpp)
+
 # 2. Expose them to Python using pybind11 modules and link the static libraries
 pybind11_add_module(osdevice bindings_os.cpp)
 target_link_libraries(osdevice PRIVATE osdevice_cpp)
@@ -51,3 +65,12 @@ target_link_libraries(exfat PRIVATE exfat_cpp hdd_cpp osdevice_cpp)
 
 pybind11_add_module(ext4 bindings_ext4.cpp)
 target_link_libraries(ext4 PRIVATE ext4_cpp hdd_cpp osdevice_cpp)
+
+pybind11_add_module(ntfs bindings_ntfs.cpp)
+target_link_libraries(ntfs PRIVATE ntfs_cpp hdd_cpp osdevice_cpp)
+
+pybind11_add_module(fat32 bindings_fat32.cpp)
+target_link_libraries(fat32 PRIVATE fat32_cpp hdd_cpp osdevice_cpp)
+
+pybind11_add_module(verification bindings_verification.cpp)
+target_link_libraries(verification PRIVATE verification_cpp hdd_cpp osdevice_cpp)

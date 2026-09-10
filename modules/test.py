@@ -67,6 +67,18 @@ import osdevice
 import hdd
 import exfat
 import ext4
+try:
+    import ntfs
+except ImportError:
+    ntfs = None
+try:
+    import fat32
+except ImportError:
+    fat32 = None
+try:
+    import verification
+except ImportError:
+    verification = None
 import sys
 import ctypes
 
@@ -124,7 +136,7 @@ else:
 if device.DismountVolume():
     print("  -> Volume Dismounted!")
 
-choice = input("\nSelect Filesystem Driver:\n  [1] exFAT\n  [2] ext4\nEnter choice (default 1): ").strip()
+choice = input("\nSelect Filesystem Driver:\n  [1] exFAT\n  [2] ext4\n  [3] NTFS\n  [4] FAT32\nEnter choice (default 1): ").strip()
 
 if choice == "2":
     fs_driver = ext4.Ext4Driver(hdd_controller)
@@ -133,6 +145,26 @@ if choice == "2":
         print("[ERROR] Failed to mount ext4.")
         exit(1)
     fs_driver.PrintSuperblockInfo()
+elif choice == "3":
+    if ntfs is None:
+        print("[ERROR] NTFS module not found or failed to load.")
+        exit(1)
+    fs_driver = ntfs.NtfsDriver(hdd_controller)
+    print("\nAttempting to Mount NTFS...")
+    if not fs_driver.Mount():
+        print("[ERROR] Failed to mount NTFS.")
+        exit(1)
+    fs_driver.PrintBootInfo()
+elif choice == "4":
+    if fat32 is None:
+        print("[ERROR] FAT32 module not found or failed to load.")
+        exit(1)
+    fs_driver = fat32.Fat32Driver(hdd_controller)
+    print("\nAttempting to Mount FAT32...")
+    if not fs_driver.Mount():
+        print("[ERROR] Failed to mount FAT32.")
+        exit(1)
+    fs_driver.PrintBootInfo()
 else:
     fs_driver = exfat.ExFatDriver(hdd_controller)
     print("\nAttempting to Mount exFAT...")
