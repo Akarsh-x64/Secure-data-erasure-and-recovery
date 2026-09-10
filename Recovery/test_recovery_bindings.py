@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-EXTENSION_DIR = REPO_ROOT / "build" / "recovery-python" / "Recovery"
+EXTENSION_DIR = REPO_ROOT / "modules"
 
 
 def main() -> int:
