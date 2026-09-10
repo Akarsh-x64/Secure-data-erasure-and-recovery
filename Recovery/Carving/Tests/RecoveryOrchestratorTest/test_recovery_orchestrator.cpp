@@ -61,10 +61,11 @@ public:
             Recovery::Carving::CarvingCandidate candidate;
             candidate.recoveredPath =
                 (std::filesystem::temp_directory_path() / "recovered.jpg").string();
-            std::ofstream(candidate.recoveredPath, std::ios::binary)
-                << static_cast<char>(0xff) << static_cast<char>(0xd8)
-                << static_cast<char>(0xff) << static_cast<char>(0xd9);
-            candidate.recoveredSize = 4;
+            std::ofstream output(candidate.recoveredPath, std::ios::binary);
+            const unsigned char jpeg[] = {0xff, 0xd8, 0xff, 0xd9};
+            output.write(reinterpret_cast<const char*>(jpeg), sizeof(jpeg));
+            candidate.recoveredSize = sizeof(jpeg);
+            candidate.fileType = "jpg";
             result.candidates.push_back(candidate);
             result.candidatesFound = 1;
         }
@@ -246,6 +247,13 @@ void TestCombinedFailureIsolation() {
     assert(result.evidenceRecords[0].recoveryBackend ==
            Recovery::Core::RecoveryBackend::PHOTOREC_CARVING);
     assert(!result.evidenceRecords[0].sourceOffset.has_value());
+    assert(result.carvingResult.candidates[0].verification.classification ==
+           Recovery::Carving::VerificationClassification::VALID);
+    assert(!result.carvingResult.candidates[0].verification.sha256.empty());
+    assert(result.carvingResult.candidates[0].verification.fileSize ==
+           result.carvingResult.candidates[0].recoveredSize);
+    assert(!result.carvingResult.candidates[0].verification.detectedType.empty());
+    assert(!result.carvingResult.candidates[0].verification.checks.empty());
     assert(!result.evidenceManifest.empty());
     assert(result.evidenceManifestHash ==
            Recovery::Audit::EvidenceManifest::Hash(result.evidenceRecords));

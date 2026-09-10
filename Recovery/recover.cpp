@@ -290,10 +290,12 @@ bool RecoverCarvingInternal(const std::string& diskImage, RunState& state) {
     request.sourcePath = diskImage;
     request.outputDir = (state.outputRoot / "carved" / "recovered").string();
     Carving::PhotoRecCarver carver;
-    const Carving::CarvingResult result = carver.Carve(request);
+    Carving::CarvingResult result = carver.Carve(request);
     state.carvingError = result.errorMessage;
     for (size_t index = 0; index < result.candidates.size(); ++index) {
-        const auto& candidate = result.candidates[index];
+        auto& candidate = result.candidates[index];
+        Carving::Verification::VerificationEngine verifier;
+        candidate.verification = verifier.Verify(candidate);
         ManifestEntry entry;
         entry.id = "carving-" + std::to_string(index);
         entry.method = "PHOTOREC_CARVING";
