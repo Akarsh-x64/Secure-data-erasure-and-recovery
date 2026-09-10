@@ -59,37 +59,65 @@ void WindowsStorageDevice::Close() {
 }
 
 bool WindowsStorageDevice::UpdateGeometry() {
-  DISK_GEOMETRY_EX diskGeometry = {0}; // Struct to hold the hardware response
-  DWORD bytesReturned = 0; // How many bytes Windows actually gave back to us
+  DISK_GEOMETRY_EX diskGeometryEx = {0};
+  DWORD bytesReturned = 0;
 
-  // Send the IOCTL_DISK_GET_DRIVE_GEOMETRY_EX command to the hardware to ask
-  // for its sector size
   bool success = DeviceIoControl(
-      m_hDevice,                        // The handle to our drive
-      IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, // The specific Windows control code to
-                                        // ask for geometry
-      nullptr, 0, // Input buffer (we aren't sending any data, just asking a
-                  // question, so it's null)
-      &diskGeometry,
-      sizeof(
-          diskGeometry), // Output buffer (where Windows will write the answer)
-      &bytesReturned,    // Where Windows will write the size of the answer
-      nullptr // Overlapped struct for async I/O (we use sync, so null)
+      m_hDevice,
+      IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+      nullptr, 0,
+      &diskGeometryEx,
+      sizeof(diskGeometryEx),
+      &bytesReturned,
+      nullptr
   );
 
   if (success) {
-    // Successfully got the geometry! Now we translate it into our custom
-    // struct.
-    m_geometry.bytesPerSector = diskGeometry.Geometry.BytesPerSector;
-
-    // DiskSize is the total capacity in bytes.
-    // We divide by bytesPerSector to calculate exactly how many sectors exist
-    // on the drive.
-    m_geometry.totalSectors =
-        diskGeometry.DiskSize.QuadPart / diskGeometry.Geometry.BytesPerSector;
-
+    m_geometry.bytesPerSector = diskGeometryEx.Geometry.BytesPerSector;
+    m_geometry.totalSectors = diskGeometryEx.DiskSize.QuadPart / diskGeometryEx.Geometry.BytesPerSector;
     m_geometry.devicePath = m_devicePath;
     return true;
+  }
+
+  // Fallback for logical volumes (e.g. \\.\D:) where _EX often fails
+  DISK_GEOMETRY diskGeometry = {0};
+  success = DeviceIoControl(
+      m_hDevice,
+      IOCTL_DISK_GET_DRIVE_GEOMETRY,
+      nullptr, 0,
+      &diskGeometry,
+      sizeof(diskGeometry),
+      &bytesReturned,
+      nullptr
+  );
+
+  if (success) {
+    m_geometry.bytesPerSector = diskGeometry.BytesPerSector;
+    // For volumes, IOCTL_DISK_GET_DRIVE_GEOMETRY doesn't give us DiskSize directly, 
+    // but we can calculate it from Cylinders * TracksPerCylinder * SectorsPerTrack * BytesPerSector
+    uint64_t totalSectors = (uint64_t)diskGeometry.Cylinders.QuadPart * diskGeometry.TracksPerCylinder * diskGeometry.SectorsPerTrack;
+    m_geometry.totalSectors = totalSectors;
+    m_geometry.devicePath = m_devicePath;
+    return true;
+  }
+  
+  // If both disk IOCTLs fail, it might be a partition where we can only use IOCTL_DISK_GET_PARTITION_INFO_EX
+  PARTITION_INFORMATION_EX partInfo = {0};
+  success = DeviceIoControl(
+      m_hDevice,
+      IOCTL_DISK_GET_PARTITION_INFO_EX,
+      nullptr, 0,
+      &partInfo,
+      sizeof(partInfo),
+      &bytesReturned,
+      nullptr
+  );
+  if (success) {
+      // Just assume 512 bytes per sector if we can't get it, or default to standard
+      m_geometry.bytesPerSector = 512;
+      m_geometry.totalSectors = partInfo.PartitionLength.QuadPart / 512;
+      m_geometry.devicePath = m_devicePath;
+      return true;
   }
 
   return false;

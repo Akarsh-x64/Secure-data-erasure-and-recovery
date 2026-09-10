@@ -35,6 +35,7 @@ events:
     found: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCCompilerId.c.in"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -51,6 +52,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -74,6 +78,7 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
   -
     kind: "message-v1"
@@ -91,9 +96,9 @@ events:
       The output was:
       0
       MSBuild version 18.9.1+a81b43525 for .NET Framework
-      Build started 09-09-2026 12:39:49.
+      Build started 10-09-2026 16:28:18.
       
-      Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
+      Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
       PrepareForBuild:
         Creating directory "Debug\\".
         Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
@@ -106,7 +111,7 @@ events:
         CMakeCCompilerId.c
       Link:
         C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdC.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdC.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdC.lib" /MACHINE:X64 Debug\\CMakeCCompilerId.obj
-        CompilerIdC.vcxproj -> C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdC\\CompilerIdC.exe
+        CompilerIdC.vcxproj -> C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdC\\CompilerIdC.exe
       PostBuildEvent:
         for %%i in (cl.exe) do @echo CMAKE_C_COMPILER=%%~$PATH:i
         :VCEnd
@@ -114,13 +119,13 @@ events:
       FinalizeBuildStatus:
         Deleting file "Debug\\CompilerIdC.tlog\\unsuccessfulbuild".
         Touching "Debug\\CompilerIdC.tlog\\CompilerIdC.lastbuildstate".
-      Done Building Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdC\\CompilerIdC.vcxproj" (default targets).
+      Done Building Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdC\\CompilerIdC.vcxproj" (default targets).
       
       Build succeeded.
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:01.00
+      Time Elapsed 00:00:01.45
       
       
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -128,7 +133,7 @@ events:
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
       
       The C compiler identification is MSVC, found in:
-        C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/4.4.3/CompilerIdC/CompilerIdC.exe
+        C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/4.4.3/CompilerIdC/CompilerIdC.exe
       
   -
     kind: "find-v1"
@@ -153,6 +158,7 @@ events:
       - "link"
     candidate_directories:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
@@ -169,6 +175,9 @@ events:
       - "C:/Program Files (x86)/Eclipse/Sumo/bin/"
       - "C:/Program Files (x86)/Eclipse/Sumo/tools/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/usbipd-win/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/devan/AppData/Local/agy/bin/"
       - "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/"
@@ -190,6 +199,7 @@ events:
     found: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/link.exe"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -206,6 +216,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -229,6 +242,7 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
   -
     kind: "find-v1"
@@ -253,6 +267,7 @@ events:
       - "lld-link"
     candidate_directories:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
@@ -269,6 +284,9 @@ events:
       - "C:/Program Files (x86)/Eclipse/Sumo/bin/"
       - "C:/Program Files (x86)/Eclipse/Sumo/tools/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/usbipd-win/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/devan/AppData/Local/agy/bin/"
       - "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/"
@@ -289,6 +307,9 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/lld-link.com"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/lld-link.exe"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/lld-link"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/lld-link.com"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/lld-link.exe"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/lld-link"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/lld-link.com"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/lld-link.exe"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/lld-link"
@@ -337,6 +358,15 @@ events:
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.com"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.exe"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link"
+      - "C:/Program Files/usbipd-win/lld-link.com"
+      - "C:/Program Files/usbipd-win/lld-link.exe"
+      - "C:/Program Files/usbipd-win/lld-link"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/lld-link.com"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/lld-link.exe"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/lld-link"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/lld-link.com"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/lld-link.exe"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/lld-link"
       - "C:/Users/devan/AppData/Local/agy/bin/lld-link.com"
       - "C:/Users/devan/AppData/Local/agy/bin/lld-link.exe"
       - "C:/Users/devan/AppData/Local/agy/bin/lld-link"
@@ -388,6 +418,7 @@ events:
     found: false
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -404,6 +435,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -427,6 +461,7 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
   -
     kind: "find-v1"
@@ -449,6 +484,7 @@ events:
       - "link"
     candidate_directories:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
@@ -465,6 +501,9 @@ events:
       - "C:/Program Files (x86)/Eclipse/Sumo/bin/"
       - "C:/Program Files (x86)/Eclipse/Sumo/tools/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/usbipd-win/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/devan/AppData/Local/agy/bin/"
       - "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/"
@@ -486,6 +525,7 @@ events:
     found: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/link.exe"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -502,6 +542,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -525,6 +568,7 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
   -
     kind: "find-v1"
@@ -547,6 +591,7 @@ events:
       - "mt"
     candidate_directories:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
@@ -563,6 +608,9 @@ events:
       - "C:/Program Files (x86)/Eclipse/Sumo/bin/"
       - "C:/Program Files (x86)/Eclipse/Sumo/tools/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/usbipd-win/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/devan/AppData/Local/agy/bin/"
       - "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/"
@@ -583,6 +631,9 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/mt.com"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/mt.exe"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/mt"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/mt.com"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/mt.exe"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/mt"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/mt.com"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/mt.exe"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/mt"
@@ -631,6 +682,15 @@ events:
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt.com"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt.exe"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt"
+      - "C:/Program Files/usbipd-win/mt.com"
+      - "C:/Program Files/usbipd-win/mt.exe"
+      - "C:/Program Files/usbipd-win/mt"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/mt.com"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/mt.exe"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/mt"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/mt.com"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/mt.exe"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/mt"
       - "C:/Users/devan/AppData/Local/agy/bin/mt.com"
       - "C:/Users/devan/AppData/Local/agy/bin/mt.exe"
       - "C:/Users/devan/AppData/Local/agy/bin/mt"
@@ -682,6 +742,7 @@ events:
     found: false
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -698,6 +759,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -721,6 +785,7 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
   -
     kind: "find-v1"
@@ -743,6 +808,7 @@ events:
       - "lib"
     candidate_directories:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
@@ -759,6 +825,9 @@ events:
       - "C:/Program Files (x86)/Eclipse/Sumo/bin/"
       - "C:/Program Files (x86)/Eclipse/Sumo/tools/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/usbipd-win/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/devan/AppData/Local/agy/bin/"
       - "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/"
@@ -780,6 +849,7 @@ events:
     found: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/lib.exe"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -796,6 +866,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -819,6 +892,7 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
   -
     kind: "find-v1"
@@ -847,6 +921,7 @@ events:
     found: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXCompilerId.cpp.in"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -863,6 +938,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -886,6 +964,7 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
   -
     kind: "message-v1"
@@ -903,9 +982,9 @@ events:
       The output was:
       0
       MSBuild version 18.9.1+a81b43525 for .NET Framework
-      Build started 09-09-2026 12:39:50.
+      Build started 10-09-2026 16:28:20.
       
-      Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
+      Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
         Creating directory "Debug\\".
         Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
@@ -918,7 +997,7 @@ events:
         CMakeCXXCompilerId.cpp
       Link:
         C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
-        CompilerIdCXX.vcxproj -> C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdCXX\\CompilerIdCXX.exe
+        CompilerIdCXX.vcxproj -> C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdCXX\\CompilerIdCXX.exe
       PostBuildEvent:
         for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
         :VCEnd
@@ -926,13 +1005,13 @@ events:
       FinalizeBuildStatus:
         Deleting file "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
         Touching "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.lastbuildstate".
-      Done Building Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
+      Done Building Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\4.4.3\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
       
       Build succeeded.
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:00.58
+      Time Elapsed 00:00:00.90
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -940,7 +1019,7 @@ events:
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
       
       The CXX compiler identification is MSVC, found in:
-        C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/4.4.3/CompilerIdCXX/CompilerIdCXX.exe
+        C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/4.4.3/CompilerIdCXX/CompilerIdCXX.exe
       
   -
     kind: "find-v1"
@@ -965,6 +1044,7 @@ events:
       - "lld-link"
     candidate_directories:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
@@ -981,6 +1061,9 @@ events:
       - "C:/Program Files (x86)/Eclipse/Sumo/bin/"
       - "C:/Program Files (x86)/Eclipse/Sumo/tools/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/usbipd-win/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/devan/AppData/Local/agy/bin/"
       - "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/"
@@ -1001,6 +1084,9 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/lld-link.com"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/lld-link.exe"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/lld-link"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/lld-link.com"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/lld-link.exe"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/lld-link"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/lld-link.com"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/lld-link.exe"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/lld-link"
@@ -1049,6 +1135,15 @@ events:
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.com"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.exe"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link"
+      - "C:/Program Files/usbipd-win/lld-link.com"
+      - "C:/Program Files/usbipd-win/lld-link.exe"
+      - "C:/Program Files/usbipd-win/lld-link"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/lld-link.com"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/lld-link.exe"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/lld-link"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/lld-link.com"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/lld-link.exe"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/lld-link"
       - "C:/Users/devan/AppData/Local/agy/bin/lld-link.com"
       - "C:/Users/devan/AppData/Local/agy/bin/lld-link.exe"
       - "C:/Users/devan/AppData/Local/agy/bin/lld-link"
@@ -1100,6 +1195,7 @@ events:
     found: false
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -1116,6 +1212,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -1139,6 +1238,7 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
   -
     kind: "find-v1"
@@ -1163,6 +1263,7 @@ events:
     names:
       - "rc"
     candidate_directories:
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
@@ -1179,6 +1280,9 @@ events:
       - "C:/Program Files (x86)/Eclipse/Sumo/bin/"
       - "C:/Program Files (x86)/Eclipse/Sumo/tools/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/usbipd-win/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/devan/AppData/Local/agy/bin/"
       - "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/"
@@ -1204,10 +1308,13 @@ events:
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/bin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/sbin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/"
-      - "C:/Program Files/secure_erasure_core/bin/"
-      - "C:/Program Files/secure_erasure_core/sbin/"
-      - "C:/Program Files/secure_erasure_core/"
+      - "C:/Program Files (x86)/secure_erasure_core/bin/"
+      - "C:/Program Files (x86)/secure_erasure_core/sbin/"
+      - "C:/Program Files (x86)/secure_erasure_core/"
     searched_directories:
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/rc.com"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/rc.exe"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/rc"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/rc.com"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/rc.exe"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/rc"
@@ -1256,6 +1363,15 @@ events:
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc.com"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc.exe"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc"
+      - "C:/Program Files/usbipd-win/rc.com"
+      - "C:/Program Files/usbipd-win/rc.exe"
+      - "C:/Program Files/usbipd-win/rc"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/rc.com"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/rc.exe"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/rc"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/rc.com"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/rc.exe"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/rc"
       - "C:/Users/devan/AppData/Local/agy/bin/rc.com"
       - "C:/Users/devan/AppData/Local/agy/bin/rc.exe"
       - "C:/Users/devan/AppData/Local/agy/bin/rc"
@@ -1331,18 +1447,19 @@ events:
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/rc.com"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/rc.exe"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/rc"
-      - "C:/Program Files/secure_erasure_core/bin/rc.com"
-      - "C:/Program Files/secure_erasure_core/bin/rc.exe"
-      - "C:/Program Files/secure_erasure_core/bin/rc"
-      - "C:/Program Files/secure_erasure_core/sbin/rc.com"
-      - "C:/Program Files/secure_erasure_core/sbin/rc.exe"
-      - "C:/Program Files/secure_erasure_core/sbin/rc"
-      - "C:/Program Files/secure_erasure_core/rc.com"
-      - "C:/Program Files/secure_erasure_core/rc.exe"
-      - "C:/Program Files/secure_erasure_core/rc"
+      - "C:/Program Files (x86)/secure_erasure_core/bin/rc.com"
+      - "C:/Program Files (x86)/secure_erasure_core/bin/rc.exe"
+      - "C:/Program Files (x86)/secure_erasure_core/bin/rc"
+      - "C:/Program Files (x86)/secure_erasure_core/sbin/rc.com"
+      - "C:/Program Files (x86)/secure_erasure_core/sbin/rc.exe"
+      - "C:/Program Files (x86)/secure_erasure_core/sbin/rc"
+      - "C:/Program Files (x86)/secure_erasure_core/rc.com"
+      - "C:/Program Files (x86)/secure_erasure_core/rc.exe"
+      - "C:/Program Files (x86)/secure_erasure_core/rc"
     found: false
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -1359,6 +1476,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -1382,13 +1502,14 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files/secure_erasure_core"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
         - "C:/Program Files (x86)"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data"
-        - "C:/Program Files/secure_erasure_core"
+        - "C:/Program Files (x86)/secure_erasure_core"
   -
     kind: "try_compile-v1"
     backtrace:
@@ -1398,8 +1519,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-nf313r"
-      binary: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-nf313r"
+      source: "C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-rxi27r"
+      binary: "C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-rxi27r"
     cmakeVariables:
       CMAKE_CXX_STDLIB_MODULES_JSON: ""
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
@@ -1409,39 +1530,39 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: false
       stdout: |
-        Change Dir: 'C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-nf313r'
+        Change Dir: 'C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-rxi27r'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_895a7.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_39401.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.9.1+a81b43525 for .NET Framework
-        Build started 09-09-2026 12:39:51.
+        Build started 10-09-2026 16:28:21.
         
-        Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-nf313r\\cmTC_895a7.vcxproj" on node 1 (default targets).
+        Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rxi27r\\cmTC_39401.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-nf313r\\Debug\\".
-          Creating directory "cmTC_895a7.dir\\Debug\\cmTC_895a7.tlog\\".
+          Creating directory "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rxi27r\\Debug\\".
+          Creating directory "cmTC_39401.dir\\Debug\\cmTC_39401.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_895a7.dir\\Debug\\cmTC_895a7.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_895a7.dir\\Debug\\cmTC_895a7.tlog\\unsuccessfulbuild".
+          Creating "cmTC_39401.dir\\Debug\\cmTC_39401.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_39401.dir\\Debug\\cmTC_39401.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_895a7.dir\\Debug\\\\" /Fd"cmTC_895a7.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.4\\Modules\\CMakeCCompilerABI.c"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_39401.dir\\Debug\\\\" /Fd"cmTC_39401.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.4\\Modules\\CMakeCCompilerABI.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.51.36256 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_895a7.dir\\Debug\\\\" /Fd"cmTC_895a7.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.4\\Modules\\CMakeCCompilerABI.c"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_39401.dir\\Debug\\\\" /Fd"cmTC_39401.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.4\\Modules\\CMakeCCompilerABI.c"
           CMakeCCompilerABI.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-nf313r\\Debug\\cmTC_895a7.exe" /INCREMENTAL /ILK:"cmTC_895a7.dir\\Debug\\cmTC_895a7.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-nf313r/Debug/cmTC_895a7.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-nf313r/Debug/cmTC_895a7.lib" /MACHINE:X64  /machine:x64 cmTC_895a7.dir\\Debug\\CMakeCCompilerABI.obj
-          cmTC_895a7.vcxproj -> C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-nf313r\\Debug\\cmTC_895a7.exe
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rxi27r\\Debug\\cmTC_39401.exe" /INCREMENTAL /ILK:"cmTC_39401.dir\\Debug\\cmTC_39401.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-rxi27r/Debug/cmTC_39401.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-rxi27r/Debug/cmTC_39401.lib" /MACHINE:X64  /machine:x64 cmTC_39401.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_39401.vcxproj -> C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rxi27r\\Debug\\cmTC_39401.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_895a7.dir\\Debug\\cmTC_895a7.tlog\\unsuccessfulbuild".
-          Touching "cmTC_895a7.dir\\Debug\\cmTC_895a7.tlog\\cmTC_895a7.lastbuildstate".
-        Done Building Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-nf313r\\cmTC_895a7.vcxproj" (default targets).
+          Deleting file "cmTC_39401.dir\\Debug\\cmTC_39401.tlog\\unsuccessfulbuild".
+          Touching "cmTC_39401.dir\\Debug\\cmTC_39401.tlog\\cmTC_39401.lastbuildstate".
+        Done Building Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rxi27r\\cmTC_39401.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.59
+        Time Elapsed 00:00:00.78
         
       exitCode: 0
   -
@@ -1454,7 +1575,7 @@ events:
       Parsed C implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
-        link line: [  C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-nf313r\\Debug\\cmTC_895a7.exe" /INCREMENTAL /ILK:"cmTC_895a7.dir\\Debug\\cmTC_895a7.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-nf313r/Debug/cmTC_895a7.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-nf313r/Debug/cmTC_895a7.lib" /MACHINE:X64  /machine:x64 cmTC_895a7.dir\\Debug\\CMakeCCompilerABI.obj] ==> linker [C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe]
+        link line: [  C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rxi27r\\Debug\\cmTC_39401.exe" /INCREMENTAL /ILK:"cmTC_39401.dir\\Debug\\cmTC_39401.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-rxi27r/Debug/cmTC_39401.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-rxi27r/Debug/cmTC_39401.lib" /MACHINE:X64  /machine:x64 cmTC_39401.dir\\Debug\\CMakeCCompilerABI.obj] ==> linker [C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe]
         linker tool for 'C': C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/HostX64/x64/link.exe 
         implicit libs: []
         implicit objs: []
@@ -1482,8 +1603,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-r1gifk"
-      binary: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-r1gifk"
+      source: "C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-g9xsnv"
+      binary: "C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-g9xsnv"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1494,39 +1615,39 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: false
       stdout: |
-        Change Dir: 'C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-r1gifk'
+        Change Dir: 'C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-g9xsnv'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_8b6ba.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_e3c71.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.9.1+a81b43525 for .NET Framework
-        Build started 09-09-2026 12:39:52.
+        Build started 10-09-2026 16:28:23.
         
-        Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-r1gifk\\cmTC_8b6ba.vcxproj" on node 1 (default targets).
+        Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-g9xsnv\\cmTC_e3c71.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-r1gifk\\Debug\\".
-          Creating directory "cmTC_8b6ba.dir\\Debug\\cmTC_8b6ba.tlog\\".
+          Creating directory "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-g9xsnv\\Debug\\".
+          Creating directory "cmTC_e3c71.dir\\Debug\\cmTC_e3c71.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_8b6ba.dir\\Debug\\cmTC_8b6ba.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_8b6ba.dir\\Debug\\cmTC_8b6ba.tlog\\unsuccessfulbuild".
+          Creating "cmTC_e3c71.dir\\Debug\\cmTC_e3c71.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_e3c71.dir\\Debug\\cmTC_e3c71.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /Fo"cmTC_8b6ba.dir\\Debug\\\\" /Fd"cmTC_8b6ba.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.4\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /Fo"cmTC_e3c71.dir\\Debug\\\\" /Fd"cmTC_e3c71.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.4\\Modules\\CMakeCXXCompilerABI.cpp"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.51.36256 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /Fo"cmTC_8b6ba.dir\\Debug\\\\" /Fd"cmTC_8b6ba.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.4\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /Fo"cmTC_e3c71.dir\\Debug\\\\" /Fd"cmTC_e3c71.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.4\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-r1gifk\\Debug\\cmTC_8b6ba.exe" /INCREMENTAL /ILK:"cmTC_8b6ba.dir\\Debug\\cmTC_8b6ba.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-r1gifk/Debug/cmTC_8b6ba.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-r1gifk/Debug/cmTC_8b6ba.lib" /MACHINE:X64  /machine:x64 cmTC_8b6ba.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_8b6ba.vcxproj -> C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-r1gifk\\Debug\\cmTC_8b6ba.exe
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-g9xsnv\\Debug\\cmTC_e3c71.exe" /INCREMENTAL /ILK:"cmTC_e3c71.dir\\Debug\\cmTC_e3c71.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-g9xsnv/Debug/cmTC_e3c71.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-g9xsnv/Debug/cmTC_e3c71.lib" /MACHINE:X64  /machine:x64 cmTC_e3c71.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_e3c71.vcxproj -> C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-g9xsnv\\Debug\\cmTC_e3c71.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_8b6ba.dir\\Debug\\cmTC_8b6ba.tlog\\unsuccessfulbuild".
-          Touching "cmTC_8b6ba.dir\\Debug\\cmTC_8b6ba.tlog\\cmTC_8b6ba.lastbuildstate".
-        Done Building Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-r1gifk\\cmTC_8b6ba.vcxproj" (default targets).
+          Deleting file "cmTC_e3c71.dir\\Debug\\cmTC_e3c71.tlog\\unsuccessfulbuild".
+          Touching "cmTC_e3c71.dir\\Debug\\cmTC_e3c71.tlog\\cmTC_e3c71.lastbuildstate".
+        Done Building Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-g9xsnv\\cmTC_e3c71.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.59
+        Time Elapsed 00:00:00.73
         
       exitCode: 0
   -
@@ -1539,7 +1660,7 @@ events:
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
-        link line: [  C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-r1gifk\\Debug\\cmTC_8b6ba.exe" /INCREMENTAL /ILK:"cmTC_8b6ba.dir\\Debug\\cmTC_8b6ba.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-r1gifk/Debug/cmTC_8b6ba.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-r1gifk/Debug/cmTC_8b6ba.lib" /MACHINE:X64  /machine:x64 cmTC_8b6ba.dir\\Debug\\CMakeCXXCompilerABI.obj] ==> linker [C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe]
+        link line: [  C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-g9xsnv\\Debug\\cmTC_e3c71.exe" /INCREMENTAL /ILK:"cmTC_e3c71.dir\\Debug\\cmTC_e3c71.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-g9xsnv/Debug/cmTC_e3c71.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-g9xsnv/Debug/cmTC_e3c71.lib" /MACHINE:X64  /machine:x64 cmTC_e3c71.dir\\Debug\\CMakeCXXCompilerABI.obj] ==> linker [C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe]
         linker tool for 'CXX': C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/HostX64/x64/link.exe 
         implicit libs: []
         implicit objs: []
@@ -6491,6 +6612,7 @@ events:
     found: "C:/Users/devan/AppData/Local/Programs/Python/Python314/python.exe"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -6507,6 +6629,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -6530,13 +6655,14 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files/secure_erasure_core"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
         - "C:/Program Files (x86)"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data"
-        - "C:/Program Files/secure_erasure_core"
+        - "C:/Program Files (x86)/secure_erasure_core"
   -
     kind: "find-v1"
     backtrace:
@@ -6573,6 +6699,7 @@ events:
     found: false
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -6589,6 +6716,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -6612,13 +6742,14 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files/secure_erasure_core"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
         - "C:/Program Files (x86)"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data"
-        - "C:/Program Files/secure_erasure_core"
+        - "C:/Program Files (x86)/secure_erasure_core"
   -
     kind: "find-v1"
     backtrace:
@@ -6650,6 +6781,7 @@ events:
     found: "C:/Users/devan/AppData/Local/Programs/Python/Python314/libs/python314.lib"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -6666,6 +6798,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -6689,15 +6824,16 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files/secure_erasure_core"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
         - "C:/Program Files (x86)"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data"
-        - "C:/Program Files/secure_erasure_core"
+        - "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_LIBRARY_PATH:
-        - "C:/Program Files/secure_erasure_core/bin"
+        - "C:/Program Files (x86)/secure_erasure_core/bin"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/bin"
         - "/bin"
   -
@@ -6726,6 +6862,7 @@ events:
     found: false
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -6742,6 +6879,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -6765,15 +6905,16 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files/secure_erasure_core"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
         - "C:/Program Files (x86)"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data"
-        - "C:/Program Files/secure_erasure_core"
+        - "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_LIBRARY_PATH:
-        - "C:/Program Files/secure_erasure_core/bin"
+        - "C:/Program Files (x86)/secure_erasure_core/bin"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/bin"
         - "/bin"
   -
@@ -6802,6 +6943,8 @@ events:
       - "C:/Users/devan/AppData/Local/Programs/Python/Python314/libs/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python314/bin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python314/"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/bin/"
+      - "C:/Users/devan/.gemini/antigravity-cli/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/bin/"
       - "C:/Program Files/Common Files/Oracle/Java/javapath/"
       - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/bin/"
@@ -6834,6 +6977,10 @@ events:
       - "C:/Program Files (x86)/Eclipse/Sumo/tools/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/bin/"
       - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/usbipd-win/bin/"
+      - "C:/Program Files/usbipd-win/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/bin/"
+      - "C:/Users/devan/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/devan/AppData/Local/agy/bin/bin/"
       - "C:/Users/devan/AppData/Local/agy/bin/"
       - "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/bin/"
@@ -6878,12 +7025,12 @@ events:
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/lib/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/bin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/"
-      - "C:/Program Files/secure_erasure_core/lib/bin/"
-      - "C:/Program Files/secure_erasure_core/lib/"
-      - "C:/Program Files/secure_erasure_core/bin/"
-      - "C:/Program Files/secure_erasure_core/"
-      - "C:/Program Files/secure_erasure_core/bin/bin/"
-      - "C:/Program Files/secure_erasure_core/bin/"
+      - "C:/Program Files (x86)/secure_erasure_core/lib/bin/"
+      - "C:/Program Files (x86)/secure_erasure_core/lib/"
+      - "C:/Program Files (x86)/secure_erasure_core/bin/"
+      - "C:/Program Files (x86)/secure_erasure_core/"
+      - "C:/Program Files (x86)/secure_erasure_core/bin/bin/"
+      - "C:/Program Files (x86)/secure_erasure_core/bin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/bin/bin/"
       - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/bin/"
       - "/bin/bin/"
@@ -6898,6 +7045,7 @@ events:
     found: "C:/Users/devan/AppData/Local/Programs/Python/Python314/python314.dll"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -6914,6 +7062,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -6937,15 +7088,16 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files/secure_erasure_core"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
         - "C:/Program Files (x86)"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data"
-        - "C:/Program Files/secure_erasure_core"
+        - "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_LIBRARY_PATH:
-        - "C:/Program Files/secure_erasure_core/bin"
+        - "C:/Program Files (x86)/secure_erasure_core/bin"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/bin"
         - "/bin"
   -
@@ -6972,6 +7124,7 @@ events:
     found: "C:/Users/devan/AppData/Local/Programs/Python/Python314/Include/"
     search_context:
       ENV{PATH}:
+        - "C:/Users/devan/.gemini/antigravity-cli/bin"
         - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
         - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
@@ -6988,6 +7141,9 @@ events:
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
         - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
         - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\usbipd-win\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
         - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
@@ -7011,664 +7167,14 @@ events:
         - "C:\\msys64\\ucrt64\\bin"
         - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
         - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
+        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python314\\Scripts"
         - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files/secure_erasure_core"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/secure_erasure_core"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"
         - "C:/Program Files (x86)"
         - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data"
-        - "C:/Program Files/secure_erasure_core"
-  -
-    kind: "find_package-v1"
-    backtrace:
-      - "CMakeLists.txt:15 (find_package)"
-    name: "pybind11"
-    configs:
-      -
-        filename: "pybind11.cps"
-        kind: "cps"
-      -
-        filename: "pybind11Config.cmake"
-        kind: "cmake"
-      -
-        filename: "pybind11-config.cmake"
-        kind: "cmake"
-    version_request:
-      exact: false
-    settings:
-      required: "required_explicit"
-      quiet: false
-      global: false
-      policy_scope: true
-      bypass_provider: false
-      names:
-        - "pybind11"
-      path_suffixes:
-        - ""
-      paths:
-        CMAKE_FIND_USE_CMAKE_PATH: true
-        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
-        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
-        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
-        CMAKE_FIND_USE_INSTALL_PREFIX: true
-        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
-        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
-        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
-        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
-    candidates:
-      -
-        path: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/pkgRedirects/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/pkgRedirects/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/pkgRedirects/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/pkgRedirects/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Common Files/Oracle/Java/javapath/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Common Files/Oracle/Java/javapath/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Common Files/Oracle/Java/javapath/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Common Files/Oracle/Java/javapath/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/wbem/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/wbem/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/wbem/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/wbem/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/WindowsPowerShell/v1.0/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/WindowsPowerShell/v1.0/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/WindowsPowerShell/v1.0/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/WindowsPowerShell/v1.0/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/OpenSSH/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/OpenSSH/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/OpenSSH/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Windows/System32/OpenSSH/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Git/cmd/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Git/cmd/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Git/cmd/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Git/cmd/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/dotnet/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/dotnet/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/dotnet/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/dotnet/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Graphviz/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Graphviz/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Graphviz/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Graphviz/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Docker/Docker/resources/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Docker/Docker/resources/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Docker/Docker/resources/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/Docker/Docker/resources/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Downloads/platform-tools-latest-windows/platform-tools/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Downloads/platform-tools-latest-windows/platform-tools/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Downloads/platform-tools-latest-windows/platform-tools/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Downloads/platform-tools-latest-windows/platform-tools/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Eclipse/Sumo/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Eclipse/Sumo/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Eclipse/Sumo/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Eclipse/Sumo/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Eclipse/Sumo/tools/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Eclipse/Sumo/tools/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Eclipse/Sumo/tools/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Eclipse/Sumo/tools/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/agy/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/agy/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/agy/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/agy/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/codeBin/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Scripts/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Pub/Cache/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Pub/Cache/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Pub/Cache/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Pub/Cache/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Documents/Project/flutter/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Documents/Project/flutter/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Documents/Project/flutter/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Documents/Project/flutter/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Documents/Project/flutter/bin/cache/dart-sdk/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Documents/Project/flutter/bin/cache/dart-sdk/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Documents/Project/flutter/bin/cache/dart-sdk/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/Documents/Project/flutter/bin/cache/dart-sdk/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/nodejs/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/nodejs/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/nodejs/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/nodejs/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Roaming/npm/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Roaming/npm/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Roaming/npm/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Roaming/npm/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Microsoft VS Code/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Microsoft VS Code/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Microsoft VS Code/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Microsoft VS Code/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Microsoft/WindowsApps/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Microsoft/WindowsApps/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Microsoft/WindowsApps/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Microsoft/WindowsApps/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/cursor/resources/app/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/msys64/ucrt64/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/msys64/ucrt64/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/msys64/ucrt64/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/msys64/ucrt64/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Microsoft/WinGet/Links/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Microsoft/WinGet/Links/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Microsoft/WinGet/Links/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Microsoft/WinGet/Links/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/swytchcode/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/swytchcode/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/swytchcode/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/swytchcode/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/.vscode/extensions/ms-python.debugpy-2026.6.0-win32-x64/bundled/scripts/noConfigScripts/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/.vscode/extensions/ms-python.debugpy-2026.6.0-win32-x64/bundled/scripts/noConfigScripts/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/.vscode/extensions/ms-python.debugpy-2026.6.0-win32-x64/bundled/scripts/noConfigScripts/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/.vscode/extensions/ms-python.debugpy-2026.6.0-win32-x64/bundled/scripts/noConfigScripts/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Program Files (x86)/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/pybind11Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/pybind11-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/lib/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data/share/cps/pybind11.cps"
-        mode: "cps"
-        reason: "no_exist"
-    found: null
-    search_context:
-      ENV{PATH}:
-        - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
-        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
-        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
-        - "C:\\Program Files\\dotnet\\"
-        - "C:\\Program Files\\Graphviz\\bin"
-        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
-        - "C:\\Users\\devan\\Downloads\\platform-tools-latest-windows\\platform-tools"
-        - "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\"
-        - "C:\\Program Files (x86)\\Eclipse\\Sumo\\tools\\"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\devan\\AppData\\Local\\agy\\bin"
-        - "c:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\codeBin"
-        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
-        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Python\\Python313\\"
-        - "C:\\Program Files\\Common Files\\Oracle\\Java\\javapath"
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
-        - "C:\\Users\\devan\\AppData\\Local\\Pub\\Cache\\bin"
-        - "C:\\Users\\devan\\Documents\\Project\\flutter\\bin"
-        - "C:\\Users\\devan\\Documents\\Project\\flutter\\bin\\cache\\dart-sdk\\bin"
-        - "C:\\Program Files\\nodejs"
-        - "C:\\Users\\devan\\AppData\\Roaming\\npm"
-        - "C:\\Users\\devan\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Program Files\\Graphviz\\bin"
-        - "C:\\Users\\devan\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
-        - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Users\\devan\\AppData\\Local\\Microsoft\\WinGet\\Links"
-        - "C:\\Users\\devan\\AppData\\Local\\Programs\\swytchcode\\bin"
-        - "c:\\Users\\devan\\.vscode\\extensions\\ms-python.debugpy-2026.6.0-win32-x64\\bundled\\scripts\\noConfigScripts"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files/secure_erasure_core"
-      CMAKE_SYSTEM_PREFIX_PATH:
-        - "C:/Program Files"
-        - "C:/Program Files (x86)"
-        - "C:/Users/devan/AppData/Local/Programs/Python/Python313/Lib/site-packages/cmake/data"
-        - "C:/Program Files/secure_erasure_core"
-...
-
----
-events:
+        - "C:/Program Files (x86)/secure_erasure_core"
   -
     kind: "try_compile-v1"
     backtrace:
@@ -7683,8 +7189,8 @@ events:
     checks:
       - "Performing Test HAS_MSVC_GL_LTCG"
     directories:
-      source: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-0sx3l2"
-      binary: "C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-0sx3l2"
+      source: "C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-yfa1io"
+      binary: "C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-yfa1io"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -7695,47 +7201,47 @@ events:
       variable: "HAS_MSVC_GL_LTCG"
       cached: true
       stdout: |
-        Change Dir: 'C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-0sx3l2'
+        Change Dir: 'C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-yfa1io'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_d3532.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_26ef3.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.9.1+a81b43525 for .NET Framework
-        Build started 09-09-2026 12:41:08.
+        Build started 10-09-2026 16:28:26.
         
-        Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\cmTC_d3532.vcxproj" on node 1 (default targets).
+        Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\cmTC_26ef3.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\Debug\\".
-          Creating directory "cmTC_d3532.dir\\Debug\\cmTC_d3532.tlog\\".
+          Creating directory "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\Debug\\".
+          Creating directory "cmTC_26ef3.dir\\Debug\\cmTC_26ef3.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_d3532.dir\\Debug\\cmTC_d3532.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_d3532.dir\\Debug\\cmTC_d3532.tlog\\unsuccessfulbuild".
+          Creating "cmTC_26ef3.dir\\Debug\\cmTC_26ef3.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_26ef3.dir\\Debug\\cmTC_26ef3.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /GL /D _MBCS /D WIN32 /D _WINDOWS /D HAS_MSVC_GL_LTCG /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /std:c++17 /Fo"cmTC_d3532.dir\\Debug\\\\" /Fd"cmTC_d3532.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\src.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /GL /D _MBCS /D WIN32 /D _WINDOWS /D HAS_MSVC_GL_LTCG /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /std:c++17 /Fo"cmTC_26ef3.dir\\Debug\\\\" /Fd"cmTC_26ef3.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\src.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.51.36256 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /GL /D _MBCS /D WIN32 /D _WINDOWS /D HAS_MSVC_GL_LTCG /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /std:c++17 /Fo"cmTC_d3532.dir\\Debug\\\\" /Fd"cmTC_d3532.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\src.cxx"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /GL /D _MBCS /D WIN32 /D _WINDOWS /D HAS_MSVC_GL_LTCG /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GR /std:c++17 /Fo"cmTC_26ef3.dir\\Debug\\\\" /Fd"cmTC_26ef3.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\src.cxx"
           src.cxx
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\Debug\\cmTC_d3532.exe" /INCREMENTAL /ILK:"cmTC_d3532.dir\\Debug\\cmTC_d3532.ilk" /NOLOGO "-LTCG" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-0sx3l2/Debug/cmTC_d3532.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-0sx3l2/Debug/cmTC_d3532.lib" /MACHINE:X64  /machine:x64 cmTC_d3532.dir\\Debug\\src.obj
-        LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification [C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\cmTC_d3532.vcxproj]
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\Debug\\cmTC_26ef3.exe" /INCREMENTAL /ILK:"cmTC_26ef3.dir\\Debug\\cmTC_26ef3.ilk" /NOLOGO "-LTCG" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-yfa1io/Debug/cmTC_26ef3.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/CMakeFiles/CMakeScratch/TryCompile-yfa1io/Debug/cmTC_26ef3.lib" /MACHINE:X64  /machine:x64 cmTC_26ef3.dir\\Debug\\src.obj
+        LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification [C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\cmTC_26ef3.vcxproj]
           Generating code
           Finished generating code
-          cmTC_d3532.vcxproj -> C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\Debug\\cmTC_d3532.exe
+          cmTC_26ef3.vcxproj -> C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\Debug\\cmTC_26ef3.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_d3532.dir\\Debug\\cmTC_d3532.tlog\\unsuccessfulbuild".
-          Touching "cmTC_d3532.dir\\Debug\\cmTC_d3532.tlog\\cmTC_d3532.lastbuildstate".
-        Done Building Project "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\cmTC_d3532.vcxproj" (default targets).
+          Deleting file "cmTC_26ef3.dir\\Debug\\cmTC_26ef3.tlog\\unsuccessfulbuild".
+          Touching "cmTC_26ef3.dir\\Debug\\cmTC_26ef3.tlog\\cmTC_26ef3.lastbuildstate".
+        Done Building Project "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\cmTC_26ef3.vcxproj" (default targets).
         
         Build succeeded.
         
-        "C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\cmTC_d3532.vcxproj" (default target) (1) ->
+        "C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\cmTC_26ef3.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification [C:\\CS\\Projects\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-0sx3l2\\cmTC_d3532.vcxproj]
+          LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification [C:\\CS\\Projects\\Secure Erasure and Recovery\\Secure-data-erasure-and-recovery\\modules\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yfa1io\\cmTC_26ef3.vcxproj]
         
             1 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.73
+        Time Elapsed 00:00:02.69
         
       exitCode: 0
 ...

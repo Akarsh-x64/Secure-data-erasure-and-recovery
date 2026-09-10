@@ -1,6 +1,6 @@
-^C:\CS\PROJECTS\SECURE-DATA-ERASURE-AND-RECOVERY\MODULES\BUILD\CMAKEFILES\C9DACB6847C27B9537217766CABE391B\GENERATE.STAMP.RULE
+^C:\CS\PROJECTS\SECURE ERASURE AND RECOVERY\SECURE-DATA-ERASURE-AND-RECOVERY\MODULES\BUILD\CMAKEFILES\9FCCFA3B3F980257C40167FD3AAC83F4\GENERATE.STAMP.RULE
 setlocal
-C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\bin\cmake.exe -SC:/CS/Projects/Secure-data-erasure-and-recovery/modules -BC:/CS/Projects/Secure-data-erasure-and-recovery/modules/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/CS/Projects/Secure-data-erasure-and-recovery/modules/build/secure_erasure_core.slnx
+C:\Users\devan\AppData\Local\Programs\Python\Python313\Lib\site-packages\cmake\data\bin\cmake.exe "-SC:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules" "-BC:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules/build/secure_erasure_core.slnx"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

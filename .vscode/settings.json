@@ -4,5 +4,6 @@
     ],
     "python.autoComplete.extraPaths": [
         "./modules"
-    ]
+    ],
+    "cmake.sourceDirectory": "C:/CS/Projects/Secure Erasure and Recovery/Secure-data-erasure-and-recovery/modules"
 }

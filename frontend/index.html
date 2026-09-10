@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Erasure Test</title>
+    <!-- Include Socket.IO client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+        input {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #005A9E;
+        }
+        #log {
+            margin-top: 30px;
+            padding: 15px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            height: 400px;
+            overflow-y: auto;
+            border-radius: 4px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #F44336; }
+        .info { color: #2196F3; }
+        .warning { color: #FF9800; }
+    </style>
+</head>
+<body>
+    <h2>Test File Erasure API</h2>
+    <p>This frontend submits a file deletion request to the local Flask server and streams progress updates.</p>
+    
+    <div class="form-group">
+        <label for="driveName">Drive Name:</label>
+        <input type="text" id="driveName" placeholder="e.g. C: or X:" value="X:">
+    </div>
+    
+    <div class="form-group">
+        <label for="fileSystem">Drive Filesystem:</label>
+        <input type="text" id="fileSystem" placeholder="e.g. exfat or ext4" value="exfat">
+    </div>
+    
+    <div class="form-group">
+        <label for="filePath">File to Delete:</label>
+        <input type="text" id="filePath" placeholder="e.g. path/to/file.txt" value="test.txt">
+    </div>
+
+    <button onclick="submitErasure()">Erase File</button>
+
+    <div id="log"><span class="info">Logs:</span>\n</div>
+
+    <script>
+        // Connect to SocketIO on the Flask server
+        const socket = io('http://127.0.0.1:5000');
+        const logDiv = document.getElementById('log');
+
+        function log(message, type = '') {
+            let colorClass = '';
+            if (type === 'success') colorClass = 'success';
+            if (type === 'error') colorClass = 'error';
+            if (type === 'info') colorClass = 'info';
+            if (type === 'warning') colorClass = 'warning';
+            
+            const span = document.createElement('span');
+            span.className = colorClass;
+            span.textContent = message + '\n';
+            logDiv.appendChild(span);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        socket.on('connect', () => {
+            log('🟢 Connected to SocketIO server (http://127.0.0.1:5000)', 'success');
+        });
+
+        socket.on('disconnect', () => {
+            log('🔴 Disconnected from server', 'error');
+        });
+
+        socket.on('progress', (data) => {
+            let displayData = { ...data };
+            if (displayData.repair_logs) {
+                delete displayData.repair_logs; // Remove it from the JSON dump to avoid double-printing
+            }
+            log('🔄 Progress Update:\n' + JSON.stringify(displayData, null, 2), 'info');
+            
+            if (data.repair_logs) {
+                log('🛠️ Repair Command Output:\n' + data.repair_logs, 'warning');
+            }
+        });
+
+        async function submitErasure() {
+            const driveName = document.getElementById('driveName').value.trim();
+            const fileSystem = document.getElementById('fileSystem').value.trim();
+            let filePath = document.getElementById('filePath').value.trim();
+            
+            if(!driveName || !fileSystem || !filePath) {
+                log('❌ Please fill in all fields.', 'error');
+                return;
+            }
+
+            // Remove leading slashes if the user provided them
+            if(filePath.startsWith('/') || filePath.startsWith('\\')) {
+                filePath = filePath.substring(1);
+            }
+            
+            // Format to what backend expects: DriveName\FilePath (e.g., X:\test.txt)
+            // Note: The backend uses canonicalPath[:2] as the drive letter and replaces '\\' with '/'
+            const canonicalPath = `${driveName}\\${filePath}`;
+            
+            const payload = {
+                targets: [
+                    {
+                        nodeId: "test-node-123",
+                        canonicalPath: canonicalPath,
+                        kind: "file",
+                        filesystem: fileSystem
+                    }
+                ],
+                config: {
+                    clearMetadata: true,
+                    wipeSlackSpace: false,
+                    overwriteMethod: "zero",
+                    passCount: 1
+                },
+                confirmation: "CONFIRM_ERASE"
+            };
+
+            log(`\n🚀 Sending Erase Request for [${canonicalPath}] on [${fileSystem}]...`, 'warning');
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/v1/erase/files', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Idempotency-Key': 'test-key-' + Date.now() // Unique key for each request
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                let result;
+                try {
+                    result = await response.json();
+                } catch(e) {
+                    const text = await response.text();
+                    log(`❌ Server returned non-JSON response (${response.status}):\n${text.substring(0, 200)}...`, 'error');
+                    return;
+                }
+
+                if (response.ok) {
+                    log(`✅ Request Accepted (202): ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    log(`❌ Error ${response.status}: ${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (err) {
+                log(`❌ Fetch completely failed: ${err.message}.\nUsually this means the backend is unreachable or a CORS error occurred. Check the terminal running the backend.`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

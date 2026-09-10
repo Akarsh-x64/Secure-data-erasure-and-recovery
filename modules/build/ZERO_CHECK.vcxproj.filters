@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\CS\Projects\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\c9dacb6847c27b9537217766cabe391b\generate.stamp.rule">
+    <CustomBuild Include="C:\CS\Projects\Secure Erasure and Recovery\Secure-data-erasure-and-recovery\modules\build\CMakeFiles\9fccfa3b3f980257c40167fd3aac83f4\generate.stamp.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{575EDDAA-1D8D-3207-9525-5F6D0367852D}</UniqueIdentifier>
+      <UniqueIdentifier>{34A124ED-66A5-3987-83D4-A5FFBB2752D0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
