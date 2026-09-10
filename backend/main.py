@@ -618,10 +618,10 @@ def background_drive_erase_worker(operation_id: str, device_id: str, standard: s
         })
         socketio.emit('progress', active_operations[operation_id])
         
-@app.route('/api/v1/erase/drives/validate')
+@app.route('/api/v1/erase/drives/validate', methods=['POST'])
 def drive_erase_validate() :
     try:
-        validated_data = DriveEraseRequest(**request.json)
+        validated_data = DriveEraseValidateRequest(**request.json)
         
         return jsonify({"message": "Valid request"}), 200
         

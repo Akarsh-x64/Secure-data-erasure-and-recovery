@@ -3,18 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Erasure Test</title>
+    <title>Secure Erasure & Verification Test</title>
     <!-- Include Socket.IO client -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
+        .section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         label {
             display: inline-block;
@@ -28,19 +35,27 @@
             border-radius: 4px;
         }
         button {
-            padding: 10px 20px;
+            padding: 8px 16px;
             cursor: pointer;
             background-color: #0078D7;
             color: white;
             border: none;
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 14px;
+            margin-right: 5px;
+            margin-top: 10px;
         }
         button:hover {
             background-color: #005A9E;
         }
+        button.secondary {
+            background-color: #555;
+        }
+        button.secondary:hover {
+            background-color: #333;
+        }
         #log {
-            margin-top: 30px;
+            margin-top: 20px;
             padding: 15px;
             background: #1e1e1e;
             color: #d4d4d4;
@@ -54,33 +69,62 @@
         .error { color: #F44336; }
         .info { color: #2196F3; }
         .warning { color: #FF9800; }
+        h2, h3 { margin-top: 0; }
     </style>
 </head>
 <body>
-    <h2>Test File Erasure API</h2>
-    <p>This frontend submits a file deletion request to the local Flask server and streams progress updates.</p>
+    <h2>Secure Data Erasure & Verification Test</h2>
+    <p>This frontend submits requests to the local Flask server and streams progress updates.</p>
     
-    <div class="form-group">
-        <label for="driveName">Drive Name:</label>
-        <input type="text" id="driveName" placeholder="e.g. C: or X:" value="X:">
-    </div>
-    
-    <div class="form-group">
-        <label for="fileSystem">Drive Filesystem:</label>
-        <input type="text" id="fileSystem" placeholder="e.g. exfat or ext4" value="exfat">
-    </div>
-    
-    <div class="form-group">
-        <label for="filePath">File to Delete:</label>
-        <input type="text" id="filePath" placeholder="e.g. path/to/file.txt" value="test.txt">
+    <div class="section">
+        <h3>File Erasure</h3>
+        <div class="form-group">
+            <label for="driveName">Drive Name:</label>
+            <input type="text" id="driveName" placeholder="e.g. C: or X:" value="X:">
+        </div>
+        <div class="form-group">
+            <label for="fileSystem">Filesystem:</label>
+            <input type="text" id="fileSystem" placeholder="e.g. exfat or ext4" value="exfat">
+        </div>
+        <div class="form-group">
+            <label for="filePath">File to Delete:</label>
+            <input type="text" id="filePath" placeholder="e.g. path/to/file.txt" value="test.txt">
+        </div>
+        <button onclick="submitFileErasure()">Erase File</button>
     </div>
 
-    <button onclick="submitErasure()">Erase File</button>
+    <div class="section">
+        <h3>Drive Erasure</h3>
+        <div class="form-group">
+            <label for="deviceId">Device ID:</label>
+            <input type="text" id="deviceId" placeholder="e.g. dev-123" value="dev-123">
+        </div>
+        <div class="form-group">
+            <label for="driveFileSystem">Filesystem:</label>
+            <input type="text" id="driveFileSystem" placeholder="e.g. exfat or ext4" value="exfat">
+        </div>
+        <div class="form-group">
+            <label for="identityToken">Identity Token:</label>
+            <input type="text" id="identityToken" placeholder="Auth Token" value="token-abc-123">
+        </div>
+        <div class="form-group">
+            <label for="standard">Standard:</label>
+            <input type="text" id="standard" placeholder="e.g. DoD 5220.22-M" value="DoD 5220.22-M">
+        </div>
+        <button onclick="validateDriveErasure()" class="secondary">Validate Request</button>
+        <button onclick="submitDriveErasure()">Erase Entire Drive</button>
+    </div>
+
+    <div class="section">
+        <h3>Verification / Audit Module</h3>
+        <p>Fetch verification logs and audit reports.</p>
+        <button onclick="fetchAuditLogs()" class="secondary">Get Audit Logs</button>
+        <button onclick="generateReport()" class="secondary">Generate Report</button>
+    </div>
 
     <div id="log"><span class="info">Logs:</span>\n</div>
 
     <script>
-        // Connect to SocketIO on the Flask server
         const socket = io('http://127.0.0.1:5000');
         const logDiv = document.getElementById('log');
 
@@ -99,7 +143,7 @@
         }
 
         socket.on('connect', () => {
-            log('🟢 Connected to SocketIO server (http://127.0.0.1:5000)', 'success');
+            log('🟢 Connected to SocketIO server', 'success');
         });
 
         socket.on('disconnect', () => {
@@ -108,62 +152,98 @@
 
         socket.on('progress', (data) => {
             let displayData = { ...data };
-            if (displayData.repair_logs) {
-                delete displayData.repair_logs; // Remove it from the JSON dump to avoid double-printing
-            }
+            if (displayData.repair_logs) delete displayData.repair_logs;
             log('🔄 Progress Update:\n' + JSON.stringify(displayData, null, 2), 'info');
-            
-            if (data.repair_logs) {
-                log('🛠️ Repair Command Output:\n' + data.repair_logs, 'warning');
-            }
+            if (data.repair_logs) log('🛠️ Repair Command Output:\n' + data.repair_logs, 'warning');
         });
 
-        async function submitErasure() {
+        async function submitFileErasure() {
             const driveName = document.getElementById('driveName').value.trim();
             const fileSystem = document.getElementById('fileSystem').value.trim();
             let filePath = document.getElementById('filePath').value.trim();
             
             if(!driveName || !fileSystem || !filePath) {
-                log('❌ Please fill in all fields.', 'error');
-                return;
+                log('❌ Please fill in all fields for File Erasure.', 'error'); return;
             }
-
-            // Remove leading slashes if the user provided them
-            if(filePath.startsWith('/') || filePath.startsWith('\\')) {
-                filePath = filePath.substring(1);
-            }
+            if(filePath.startsWith('/') || filePath.startsWith('\\')) filePath = filePath.substring(1);
             
-            // Format to what backend expects: DriveName\FilePath (e.g., X:\test.txt)
-            // Note: The backend uses canonicalPath[:2] as the drive letter and replaces '\\' with '/'
             const canonicalPath = `${driveName}\\${filePath}`;
-            
             const payload = {
                 targets: [
-                    {
-                        nodeId: "test-node-123",
-                        canonicalPath: canonicalPath,
-                        kind: "file",
-                        filesystem: fileSystem
-                    }
+                    { nodeId: "test-node-123", canonicalPath: canonicalPath, kind: "file", filesystem: fileSystem }
                 ],
-                config: {
-                    clearMetadata: true,
-                    wipeSlackSpace: false,
-                    overwriteMethod: "zero",
-                    passCount: 1
-                },
+                config: { clearMetadata: true, wipeSlackSpace: false, overwriteMethod: "zero", passCount: 1 },
                 confirmation: "CONFIRM_ERASE"
             };
 
-            log(`\n🚀 Sending Erase Request for [${canonicalPath}] on [${fileSystem}]...`, 'warning');
-            
+            log(`\n🚀 Sending File Erase Request for [${canonicalPath}]...`, 'warning');
+            await makeApiRequest('http://127.0.0.1:5000/api/v1/erase/files', 'POST', payload, true);
+        }
+
+        async function validateDriveErasure() {
+            const deviceId = document.getElementById('deviceId').value.trim();
+            const filesystem = document.getElementById('driveFileSystem').value.trim();
+            const identityToken = document.getElementById('identityToken').value.trim();
+            const standard = document.getElementById('standard').value.trim();
+
+            if(!deviceId || !filesystem || !identityToken || !standard) {
+                log('❌ Please fill in all fields for Drive Erasure.', 'error'); return;
+            }
+
+            const payload = { deviceId, identityToken, standard, filesystem };
+            log(`\n🔍 Validating Drive Erase Request for [${deviceId}]...`, 'info');
+            await makeApiRequest('http://127.0.0.1:5000/api/v1/erase/drives/validate', 'POST', payload);
+        }
+
+        async function submitDriveErasure() {
+            const deviceId = document.getElementById('deviceId').value.trim();
+            const filesystem = document.getElementById('driveFileSystem').value.trim();
+            const identityToken = document.getElementById('identityToken').value.trim();
+            const standard = document.getElementById('standard').value.trim();
+
+            if(!deviceId || !filesystem || !identityToken || !standard) {
+                log('❌ Please fill in all fields for Drive Erasure.', 'error'); return;
+            }
+
+            const payload = {
+                deviceId, identityToken, standard, filesystem,
+                confirmation: "CONFIRM_WIPE"
+            };
+
+            log(`\n🚀 Sending Drive Erase Request for [${deviceId}]...`, 'warning');
+            await makeApiRequest('http://127.0.0.1:5000/api/v1/erase/drives', 'POST', payload, true);
+        }
+
+        async function fetchAuditLogs() {
+            log(`\n📄 Fetching Audit Logs...`, 'info');
             try {
-                const response = await fetch('http://127.0.0.1:5000/api/v1/erase/files', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Idempotency-Key': 'test-key-' + Date.now() // Unique key for each request
-                    },
+                const response = await fetch('http://127.0.0.1:5000/api/v1/audit-logs');
+                const result = await response.json();
+                if (response.ok) {
+                    log(`✅ Audit Logs:\n${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    log(`❌ Error ${response.status}: ${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (err) {
+                log(`❌ Fetch failed: ${err.message}`, 'error');
+            }
+        }
+
+        async function generateReport() {
+            log(`\n📊 Generating Verification Report...`, 'info');
+            await makeApiRequest('http://127.0.0.1:5000/api/v1/reports', 'POST', {});
+        }
+
+        async function makeApiRequest(url, method, payload, includeIdempotency = false) {
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (includeIdempotency) {
+                    headers['Idempotency-Key'] = 'test-key-' + Date.now();
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: headers,
                     body: JSON.stringify(payload)
                 });
                 
@@ -177,12 +257,12 @@
                 }
 
                 if (response.ok) {
-                    log(`✅ Request Accepted (202): ${JSON.stringify(result, null, 2)}`, 'success');
+                    log(`✅ Response (${response.status}): ${JSON.stringify(result, null, 2)}`, 'success');
                 } else {
                     log(`❌ Error ${response.status}: ${JSON.stringify(result, null, 2)}`, 'error');
                 }
             } catch (err) {
-                log(`❌ Fetch completely failed: ${err.message}.\nUsually this means the backend is unreachable or a CORS error occurred. Check the terminal running the backend.`, 'error');
+                log(`❌ API Request failed: ${err.message}. Backend might be down.`, 'error');
             }
         }
     </script>
