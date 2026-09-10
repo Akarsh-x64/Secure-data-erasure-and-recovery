@@ -1,0 +1,2 @@
+{"type":1,"sessionId":"recovery","message":"Starting filesystem metadata recovery."}
+{"type":3,"sessionId":"recovery","message":"Failed to open source image read-only."}
