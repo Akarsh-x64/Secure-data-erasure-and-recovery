@@ -59,5 +59,7 @@ target_compile_definitions(tsk PRIVATE
     HAVE__BOOL=1)
 
 if(MSVC)
-    target_compile_definitions(tsk PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(tsk PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        NOMINMAX)
 endif()
