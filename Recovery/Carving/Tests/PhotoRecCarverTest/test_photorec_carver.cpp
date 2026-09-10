@@ -152,7 +152,7 @@ fs::path LocateRealTestImage(const fs::path& executablePath) {
     if (configuredImage != nullptr && *configuredImage != '\0') {
         return configuredImage;
     }
-    return executablePath.parent_path() / ".." / "Scalpel3CarverTest" / "test.img";
+    return executablePath.parent_path() / "test.img";
 }
 
 std::string QuoteCommandArgument(const std::string& value) {
@@ -160,9 +160,10 @@ std::string QuoteCommandArgument(const std::string& value) {
 }
 
 void TestRealPhotoRec(const fs::path& executablePath) {
-    const char* configuredExecutable = std::getenv("PHOTOREC_EXE");
-    if (configuredExecutable == nullptr || *configuredExecutable == '\0') {
-        std::cout << "Real PhotoRec test skipped: PHOTOREC_EXE not configured\n";
+    const fs::path configuredExecutable = kPhotoRecExecutablePath;
+    if (!fs::is_regular_file(configuredExecutable)) {
+        std::cout << "Real PhotoRec test skipped: executable not found: "
+                  << configuredExecutable.string() << "\n";
         return;
     }
 
@@ -189,15 +190,15 @@ void TestRealPhotoRec(const fs::path& executablePath) {
     request.sourcePath = imagePath.string();
     request.outputDir = outputPath.string();
     request.requestedFileTypes = {"jpg"};
-    const std::string command = QuoteCommandArgument(configuredExecutable) +
+    const std::string command = QuoteCommandArgument(configuredExecutable.string()) +
         " /log /d " + QuoteCommandArgument(request.outputDir) +
         " /cmd " + QuoteCommandArgument(request.sourcePath) +
         " partition_none,fileopt,everything,disable,fileopt,jpg,enable,search";
     std::cout << "Base output path: " << request.outputDir << "\n"
-              << "PhotoRec executable: " << configuredExecutable << "\n"
+              << "PhotoRec executable: " << configuredExecutable.string() << "\n"
               << "Source image: " << request.sourcePath << "\n"
               << "Exact PhotoRec command: " << command << "\n";
-    PhotoRecCarver carver(nullptr, configuredExecutable);
+    PhotoRecCarver carver(nullptr, configuredExecutable.string());
     const CarvingResult result = carver.Carve(request);
 
     std::cout << "Post-PhotoRec diagnostics:\n"

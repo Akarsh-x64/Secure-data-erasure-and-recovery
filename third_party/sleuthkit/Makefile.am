@@ -1,0 +1,63 @@
+# File that we want to include in the dist
+EXTRA_DIST = README_win32.txt README.md INSTALL.txt ChangeLog.txt NEWS.txt API-CHANGES.txt \
+    licenses/README.md licenses/GNUv2-COPYING licenses/GNUv3-COPYING licenses/IBM-LICENSE \
+    licenses/Apache-LICENSE-2.0.txt licenses/cpl1.0.txt licenses/bsd.txt licenses/mit.txt \
+    docs/README.txt \
+    packages/sleuthkit.spec \
+    win32 \
+    bindings/java \
+    case-uco/java
+
+ACLOCAL_AMFLAGS = -I m4
+
+# Skip Java submodules during distcheck: they require ivy (network) and a
+# pre-built bindings jar, neither of which is in the distribution tarball.
+AM_DISTCHECK_CONFIGURE_FLAGS = --disable-java
+
+# directories to compile
+if CPPUNIT
+  UNIT_TESTS=unit_tests
+endif
+
+# Compile java bindings if all of the dependencies existed
+if X_JNI
+  JAVA_BINDINGS=bindings/java
+  JAVA_CASEUCO=case-uco/java
+else   
+  JAVA_BINDINGS=
+  JAVA_CASEUCO=
+endif
+
+SUBDIRS = tsk tools tests samples man $(UNIT_TESTS) $(JAVA_BINDINGS) $(JAVA_CASEUCO)
+
+nobase_include_HEADERS = tsk/libtsk.h tsk/tsk_incs.h \
+    tsk/base/tsk_base.h tsk/base/tsk_os.h \
+    tsk/img/tsk_img.h tsk/vs/tsk_vs.h tsk/img/pool.hpp tsk/img/logical_img.h \
+    tsk/vs/tsk_bsd.h tsk/vs/tsk_dos.h tsk/vs/tsk_gpt.h \
+    tsk/vs/tsk_mac.h tsk/vs/tsk_sun.h \
+    tsk/fs/tsk_fs.h tsk/fs/tsk_ffs.h tsk/fs/tsk_ext2fs.h tsk/fs/tsk_fatfs.h \
+    tsk/fs/tsk_ntfs.h tsk/fs/tsk_iso9660.h tsk/fs/tsk_hfs.h tsk/fs/tsk_yaffs.h tsk/fs/tsk_logical_fs.h \
+    tsk/fs/tsk_apfs.h tsk/fs/tsk_apfs.hpp tsk/fs/apfs_fs.h tsk/fs/apfs_fs.hpp tsk/fs/apfs_compat.hpp tsk/fs/encryptionHelper.h \
+    tsk/fs/decmpfs.h tsk/fs/tsk_exfatfs.h tsk/fs/tsk_fatxxfs.h \
+    tsk/hashdb/tsk_hashdb.h tsk/auto/tsk_auto.h \
+    tsk/auto/tsk_is_image_supported.h tsk/auto/guid.h \
+    tsk/pool/tsk_pool.h tsk/pool/tsk_pool.hpp tsk/pool/tsk_apfs.h tsk/pool/tsk_apfs.hpp \
+	tsk/pool/pool_compat.hpp tsk/pool/apfs_pool_compat.hpp \
+    tsk/pool/lvm_pool_compat.hpp \
+    tsk/util/crypto.hpp tsk/util/lw_shared_ptr.hpp tsk/util/span.hpp \
+    tsk/util/detect_encryption.h tsk/util/file_system_utils.h \
+    tsk/util/Bitlocker/BitlockerParser.h tsk/util/Bitlocker/DataTypes.h tsk/util/Bitlocker/MetadataEntry.h \
+    tsk/util/Bitlocker/MetadataUtils.h tsk/util/Bitlocker/MetadataValue.h tsk/util/Bitlocker/MetadataValueAesCcmEncryptedKey.h \
+    tsk/util/Bitlocker/MetadataValueKey.h tsk/util/Bitlocker/MetadataValueOffsetAndSize.h tsk/util/Bitlocker/MetadataValueUnicode.h \
+    tsk/util/Bitlocker/MetadataValueStretchKey.h tsk/util/Bitlocker/MetadataValueVolumeMasterKey.h tsk/util/Bitlocker/BitlockerUtils.h
+
+nobase_dist_data_DATA = tsk/sorter/default.sort tsk/sorter/freebsd.sort \
+    tsk/sorter/images.sort tsk/sorter/linux.sort tsk/sorter/openbsd.sort \
+    tsk/sorter/solaris.sort tsk/sorter/windows.sort 
+
+api-docs:
+	doxygen tsk/docs/Doxyfile
+	cd bindings/java/doxygen; doxygen Doxyfile
+
+man-html:
+	cd man;build-html

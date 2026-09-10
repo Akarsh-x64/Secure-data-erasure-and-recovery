@@ -67,6 +67,31 @@ import osdevice
 import hdd
 import exfat
 import ext4
+import sys
+import ctypes
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def ensure_admin():
+    if os.name == 'nt':
+        try:
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+        except:
+            is_admin = False
+        
+        if not is_admin:
+            print("[INFO] Requesting Windows Administrator privileges...")
+            # Relaunch the script and prompt for UAC elevation
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+            )
+            sys.exit(0) # Exit the non-admin instance
+    else:
+        # Optional: Linux admin check
+        if os.geteuid() != 0:
+            print("[ERROR] Please run this script with sudo.")
+            sys.exit(1)
+ensure_admin()
 
 print("==========================================")
 print("    Secure Erasure Engine - Python      ")
@@ -126,9 +151,36 @@ elif filename:
 
 if success:
     device.Close()
-    repair_cmd = ["sudo", "../_externals/e2fsck", "-f", "-y", path] if choice == "2" else ["sudo", "../_externals/fsck.exfat", "-y", path]
-    result = subprocess.run(repair_cmd)
-    if result.returncode == 0:
-        print("[SUCCESS] Filesystem check completed cleanly.")
+    
+    # Ensure path points to a partition if on Windows, or use WSL block devices
+    if os.name == 'nt':
+        e2fsck_bin = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "_externals", "e2fsck.exe"))
+        exfat_bin = os.path.abspath(os.path.join(SCRIPT_DIR, "_externals", "fsck.exfat.exe"))
+        
+        target_bin = e2fsck_bin if choice == "2" else exfat_bin
+
+        if not os.path.exists(target_bin):
+            print(f"[ERROR] Executable not found at resolved path: {target_bin}")
+            while(input()):
+                pass
+            sys.exit(1)
+
+        # Note: e2fsck requires a partition path (e.g., \\.\PhysicalDrive1p1) 
+        # or you should run the check via WSL where ext4 tools natively map partitions.
+        repair_cmd = [target_bin, "-f", "-y", path]
     else:
-        print(f"[WARNING] Filesystem check exited with code {result.returncode}")
+        e2fsck_bin = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "_externals", "e2fsck"))
+        exfat_bin = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "_externals", "fsck.exfat"))
+        target_bin = e2fsck_bin if choice == "2" else exfat_bin
+        repair_cmd = ["sudo", target_bin, "-f", "-y", path]
+
+    try:
+        result = subprocess.run(repair_cmd)
+        if result.returncode == 0:
+            print("[SUCCESS] Filesystem check completed cleanly.")
+        else:
+            print(f"[WARNING] Filesystem check exited with code {result.returncode}")
+    except Exception as e:
+        print(f"[ERROR] Failed to run repair tool: {e}")
+    while(input()):
+        pass

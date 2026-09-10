@@ -1,0 +1,10 @@
+# Normalize text files in the repository
+* text=auto
+
+# C/C++ source files
+*.h text eol=crlf
+*.cpp text eol=crlf
+
+# CMake
+CMakeLists.txt text eol=crlf
+*.cmake text eol=crlf
