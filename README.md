@@ -81,7 +81,3 @@ cmake --build build --config Release
 # Deep signature carving across raw sectors
 .\build\recover --carve image.dd --out ./recovered_files/
 ```
-
-## Documentation
-For a deep dive into each subsystem, refer to the exhaustive documentation suite inside the `.context/` folder. 
-It provides code-level references covering OS I/O pipes, filesystem execution intensive details, the forensic recovery engine, statistical verification methodology, and distribution formats.
