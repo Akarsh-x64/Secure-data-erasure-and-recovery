@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/ar qc libfat32_cpp.a CMakeFiles/fat32_cpp.dir/workspace/Erasure/File_Systems/FAT32/FAT32.cpp.o
+/opt/rh/gcc-toolset-14/root/usr/bin/ranlib libfat32_cpp.a

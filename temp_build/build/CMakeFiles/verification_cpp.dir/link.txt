@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/ar qc libverification_cpp.a CMakeFiles/verification_cpp.dir/workspace/Erasure/Verification/VerificationEngine.cpp.o CMakeFiles/verification_cpp.dir/workspace/Erasure/Verification/StatisticalTests.cpp.o CMakeFiles/verification_cpp.dir/workspace/Erasure/Verification/SignatureCarver.cpp.o CMakeFiles/verification_cpp.dir/workspace/Erasure/Verification/VerificationReport.cpp.o
+/opt/rh/gcc-toolset-14/root/usr/bin/ranlib libverification_cpp.a

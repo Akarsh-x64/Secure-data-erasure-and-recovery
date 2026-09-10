@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -flto=auto -shared  -o recovery.cpython-314-x86_64-linux-gnu.so CMakeFiles/recovery_python.dir/bindings_recovery.cpp.o  librecovery.a sleuthkit/libtsk.a 

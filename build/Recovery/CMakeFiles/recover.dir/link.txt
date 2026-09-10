@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/recover.dir/recover_main.cpp.o -o recover  librecovery.a sleuthkit/libtsk.a 

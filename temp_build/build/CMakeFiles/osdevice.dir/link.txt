@@ -1,0 +1,1 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/c++ -fPIC -flto=auto -shared  -o osdevice.cpython-314-x86_64-linux-gnu.so CMakeFiles/osdevice.dir/bindings_os.cpp.o  libosdevice_cpp.a 

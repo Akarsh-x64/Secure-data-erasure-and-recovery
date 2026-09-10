@@ -1,0 +1,1 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/c++ -fPIC -flto=auto -shared  -o fat32.cpython-314-x86_64-linux-gnu.so CMakeFiles/fat32.dir/bindings_fat32.cpp.o  libfat32_cpp.a libhdd_cpp.a libosdevice_cpp.a 

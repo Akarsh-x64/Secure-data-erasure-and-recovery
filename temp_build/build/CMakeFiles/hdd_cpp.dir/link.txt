@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/ar qc libhdd_cpp.a CMakeFiles/hdd_cpp.dir/workspace/Erasure/Hardware/Magnetic/HDDController.cpp.o
+/opt/rh/gcc-toolset-14/root/usr/bin/ranlib libhdd_cpp.a

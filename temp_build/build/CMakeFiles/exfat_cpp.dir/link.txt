@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/ar qc libexfat_cpp.a CMakeFiles/exfat_cpp.dir/workspace/Erasure/File_Systems/exFAT/exFAT.cpp.o
+/opt/rh/gcc-toolset-14/root/usr/bin/ranlib libexfat_cpp.a

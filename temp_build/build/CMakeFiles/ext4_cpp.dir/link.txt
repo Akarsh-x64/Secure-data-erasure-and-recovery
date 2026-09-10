@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/ar qc libext4_cpp.a CMakeFiles/ext4_cpp.dir/workspace/Erasure/File_Systems/ext4/ext4.cpp.o
+/opt/rh/gcc-toolset-14/root/usr/bin/ranlib libext4_cpp.a

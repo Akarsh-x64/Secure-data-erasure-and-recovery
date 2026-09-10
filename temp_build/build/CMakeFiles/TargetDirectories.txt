@@ -1,0 +1,16 @@
+/workspace/modules/build/CMakeFiles/osdevice_cpp.dir
+/workspace/modules/build/CMakeFiles/hdd_cpp.dir
+/workspace/modules/build/CMakeFiles/exfat_cpp.dir
+/workspace/modules/build/CMakeFiles/ext4_cpp.dir
+/workspace/modules/build/CMakeFiles/ntfs_cpp.dir
+/workspace/modules/build/CMakeFiles/fat32_cpp.dir
+/workspace/modules/build/CMakeFiles/verification_cpp.dir
+/workspace/modules/build/CMakeFiles/osdevice.dir
+/workspace/modules/build/CMakeFiles/hdd.dir
+/workspace/modules/build/CMakeFiles/exfat.dir
+/workspace/modules/build/CMakeFiles/ext4.dir
+/workspace/modules/build/CMakeFiles/ntfs.dir
+/workspace/modules/build/CMakeFiles/fat32.dir
+/workspace/modules/build/CMakeFiles/verification.dir
+/workspace/modules/build/CMakeFiles/edit_cache.dir
+/workspace/modules/build/CMakeFiles/rebuild_cache.dir

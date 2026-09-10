@@ -1,0 +1,1 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/c++ -fPIC -flto=auto -shared  -o ntfs.cpython-314-x86_64-linux-gnu.so CMakeFiles/ntfs.dir/bindings_ntfs.cpp.o  libntfs_cpp.a libhdd_cpp.a libosdevice_cpp.a 

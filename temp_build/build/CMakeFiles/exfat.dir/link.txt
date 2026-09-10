@@ -1,0 +1,1 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/c++ -fPIC -flto=auto -shared  -o exfat.cpython-314-x86_64-linux-gnu.so CMakeFiles/exfat.dir/bindings_exfat.cpp.o  libexfat_cpp.a libhdd_cpp.a libosdevice_cpp.a 

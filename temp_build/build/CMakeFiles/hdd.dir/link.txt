@@ -1,0 +1,1 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/c++ -fPIC -flto=auto -shared  -o hdd.cpython-314-x86_64-linux-gnu.so CMakeFiles/hdd.dir/bindings_hw.cpp.o  libhdd_cpp.a libosdevice_cpp.a 

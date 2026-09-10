@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/ar qc libntfs_cpp.a CMakeFiles/ntfs_cpp.dir/workspace/Erasure/File_Systems/NTFS/NTFS.cpp.o
+/opt/rh/gcc-toolset-14/root/usr/bin/ranlib libntfs_cpp.a

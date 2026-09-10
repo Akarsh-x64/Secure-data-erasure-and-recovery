@@ -1,0 +1,1 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/c++ -fPIC -flto=auto -shared  -o ext4.cpython-314-x86_64-linux-gnu.so CMakeFiles/ext4.dir/bindings_ext4.cpp.o  libext4_cpp.a libhdd_cpp.a libosdevice_cpp.a 

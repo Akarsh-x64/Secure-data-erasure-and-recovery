@@ -1,0 +1,2 @@
+/opt/rh/gcc-toolset-14/root/usr/bin/ar qc libosdevice_cpp.a CMakeFiles/osdevice_cpp.dir/workspace/Erasure/OS/Linux/LinuxStorageDevice.cpp.o
+/opt/rh/gcc-toolset-14/root/usr/bin/ranlib libosdevice_cpp.a

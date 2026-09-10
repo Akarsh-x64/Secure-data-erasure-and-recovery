@@ -1,0 +1,10 @@
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/CMakeFiles/edit_cache.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/CMakeFiles/rebuild_cache.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/Recovery/CMakeFiles/recovery.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/Recovery/CMakeFiles/recover.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/Recovery/CMakeFiles/recovery_python.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/Recovery/CMakeFiles/edit_cache.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/Recovery/CMakeFiles/rebuild_cache.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/Recovery/sleuthkit/CMakeFiles/tsk.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/Recovery/sleuthkit/CMakeFiles/edit_cache.dir
+/home/ishaan/dev/sihv3/clone/Secure-data-erasure-and-recovery/build/Recovery/sleuthkit/CMakeFiles/rebuild_cache.dir
