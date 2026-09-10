@@ -10,7 +10,7 @@ namespace Recovery {
 namespace Carving {
 
     inline constexpr const char* kPhotoRecExecutablePath =
-        R"(..\..\third-party\PhotoRec\testdisk-7.3-WIP\photorec_win.exe)";
+        R"(Recovery\third-party\PhotoRec\testdisk-7.3-WIP\photorec_win.exe)";
 
     class PhotoRecCarver : public ICarver {
     public:
