@@ -1,0 +1,59 @@
+                Last Updated: 18 October 2016
+
+This file describes how to build TSK using Visual Studio 2019 (see
+README_win32.txt for instructions on building the win32 libraries and
+executables from Linux). 
+
+
+Installing Visual Studio
+
+If you do not have a copy of Visual Studio, you can use the free
+Community Edition which can be downloaded after creating an 
+account with Microsoft:
+
+    https://my.visualstudio.com/Downloads?q=visual%20studio%202019%20community&wt.mc_id=o~msft~vscom~older-downloads
+
+When installing, 
+- In the "Workloads" tab, select "Desktop development with C++".  
+- In the "Installation Details" panel on the right, additionally select:
+    - "C++/CLI support for 142 build tools"
+    - "MSVC 141 - VS 2017 C++ x64/x86 build tools"
+- Under the "Individual components" tab in the "Compilers, build tools 
+  and runtimes" section, select "C++ Windows XP Support for VS 2017 
+  (v141) tools [Deprecated]"
+  
+
+Building
+
+There are four build targets: 
+    - Debug_NoLibs and Release_NoLibs do not depend on any third-party libraries. 
+    - Debug and Release depend on libewf, libvmdk, libvhdi, and zlib NuGet packages so that E01 images as well as VMDK and VHD virtual machine formats are supported. 
+
+
+Note: The following instructions are for 64 bit versions to TSK only.
+
+------------------------------------------------------------------------
+Debug and Release Targets
+
+
+The steps below outline the process required to compile the Debug and
+Release targets.
+
+1) If you want to build libtsk_jni for the Java JNI bindings, then set the JDK_HOME environment variable to point to the top directory of your Java SDK.
+
+2) Open the TSK Visual Studio Solution file, tsk-win.sln, in the win32 directory.
+
+3) Compile a Debug, Debug_NoLibs, or Release version of the libraries and executables. The resulting libraries and executables on a 32-bit build will be put in win32/Debug, win32/Debug_NoLibs, or win32/Release as appropriate. A 64-bit build will put them into the win32/x64 folders. You can change the type of build using the pulldown in Visual Studio and switching between Win32 and x64.
+
+4) Note that the libraries and executables will depend on the libewf, libvmdk, libvhdi, and zlib DLL files (which are copied to the TSK build directories).
+
+
+-------------------------------------------------------------------
+Environment Variables
+
+If you want to compile Autopsy or use the win32\updateAndBuildAll.py script, then you must set TSK_HOME to the root of The Sleuth Kit source code. 
+
+-------------------------------------------------------------------
+carrier <at> sleuthkit <dot> org 
+Brian Carrier
+
