@@ -1,2 +1,0 @@
-{"type":1,"sessionId":"recovery","message":"Starting file carving."}
-{"type":2,"sessionId":"recovery","message":"PhotoRec failed with exit code 32512. Output: sh: 1: Recovery\\third-party\\PhotoRec\\testdisk-7.3-WIP\\photorec_win.exe: not found\n (failed)."}

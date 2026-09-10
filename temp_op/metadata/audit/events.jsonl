@@ -1,5 +1,0 @@
-{"type":1,"sessionId":"recovery","message":"Starting filesystem metadata recovery."}
-{"type":5,"sessionId":"recovery","message":"Verification completed: UNKNOWN","candidateId":1}
-{"type":5,"sessionId":"recovery","message":"Verification completed: UNKNOWN","candidateId":3}
-{"type":5,"sessionId":"recovery","message":"Verification completed: UNKNOWN","candidateId":5}
-{"type":2,"sessionId":"recovery","message":"Metadata recovery completed. (succeeded)."}

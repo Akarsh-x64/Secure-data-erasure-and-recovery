@@ -1,0 +1,170 @@
+[
+  {
+    "id": "log-83632383",
+    "timestamp": "2026-09-10T18:08:40Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-0d8bfe1a",
+    "timestamp": "2026-09-10T18:08:02Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-f022d7cb",
+    "timestamp": "2026-09-10T18:07:22Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-fbe63bfd",
+    "timestamp": "2026-09-10T18:01:57Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-4b09a60f",
+    "timestamp": "2026-09-10T18:01:46Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-ea4c42d3",
+    "timestamp": "2026-09-10T17:59:05Z",
+    "operatorId": "operator.local",
+    "action": "file-recovery",
+    "level": "info",
+    "verified": true,
+    "sha256": "N/A (Recovery)",
+    "signature": "RECOVERY_SCAN_COMPLETE",
+    "payload": {
+      "sourcePath": "D:",
+      "outputRoot": "C:\\Users\\Sudhit\\Documents\\Study Material\\Projects\\SIH v2\\Recovery\\output",
+      "recoveredCount": 0,
+      "mode": "both"
+    }
+  },
+  {
+    "id": "log-4677fcbb",
+    "timestamp": "2026-09-10T17:27:12Z",
+    "operatorId": "operator.local",
+    "action": "drive-erase",
+    "level": "info",
+    "verified": true,
+    "sha256": "",
+    "signature": "43ce1807c8ab1bb4ccd16a2d37b95e6df805dd5aa0eb1b281a0487ed686490c9",
+    "payload": {
+      "targetPath": "\\\\.\\D:",
+      "fileName": "MiniVHD (D:)",
+      "fileSize": 523169792,
+      "erasureStandard": "Surgical Volume Wipe (nist-purge)",
+      "timestamp": "2026-09-10T17:27:12Z",
+      "preWipeSha256": "",
+      "postWipeSha256": "43ce1807c8ab1bb4ccd16a2d37b95e6df805dd5aa0eb1b281a0487ed686490c9",
+      "rawByteMatchRate": 100.0,
+      "shannonEntropy": 5.0893499918002565,
+      "chiSquareValue": 253037697.0576172,
+      "chiSquarePValue": 0.0,
+      "monteCarloPi": 3.555816650390625,
+      "monteCarloPiErrorPercent": 13.185159327626767,
+      "signaturesChecked": 120,
+      "signaturesDetected": 1,
+      "passed": false,
+      "verdict": "PASSED - VOLUME WIPE VERIFIED CLEAN"
+    }
+  },
+  {
+    "id": "log-3369d7e7",
+    "timestamp": "2026-09-10T17:14:02Z",
+    "operatorId": "operator.local",
+    "action": "drive-erase",
+    "level": "info",
+    "verified": true,
+    "sha256": "",
+    "signature": "e5e5b4bb08b67ddc0a5d44786e803605451fb179c3aee2c59f058dd3bfd2ac82",
+    "payload": {
+      "targetPath": "\\\\.\\D:",
+      "fileName": "MiniVHD (D:)",
+      "fileSize": 523169792,
+      "erasureStandard": "Surgical Volume Wipe (nist-purge)",
+      "timestamp": "2026-09-10T17:14:02Z",
+      "preWipeSha256": "",
+      "postWipeSha256": "e5e5b4bb08b67ddc0a5d44786e803605451fb179c3aee2c59f058dd3bfd2ac82",
+      "rawByteMatchRate": 100.0,
+      "shannonEntropy": 3.7244639666601187,
+      "chiSquareValue": 451147320.8343506,
+      "chiSquarePValue": 0.0,
+      "monteCarloPi": 3.69580078125,
+      "monteCarloPiErrorPercent": 17.64099260376522,
+      "signaturesChecked": 120,
+      "signaturesDetected": 1,
+      "passed": false,
+      "verdict": "PASSED - VOLUME WIPE VERIFIED CLEAN"
+    }
+  },
+  {
+    "id": "log-init-001",
+    "timestamp": "2026-09-10T17:13:13Z",
+    "operatorId": "operator.system",
+    "action": "system-init",
+    "level": "info",
+    "verified": true,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "signature": "30440220a1b2c3d4e5f67890a1b2c3d4e5f67890",
+    "payload": {
+      "engine": "SanitizeX C++17 Core Engine initialized",
+      "status": "Ready"
+    }
+  }
+]
