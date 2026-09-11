@@ -4,6 +4,7 @@ import {
   FileArchive,
   FolderSearch,
   Loader2,
+  PlusCircle,
   Scissors,
   Search,
   ShieldCheck,
@@ -14,6 +15,7 @@ import type { ForensicNode } from '../../filetree/TreeNode';
 import { DiskImageSelector, type ImageSource } from './DiskImageSelector';
 import { RecoveryOptions, DEFAULT_SIGNATURES, type FileSignatureDef } from './RecoveryOptions';
 import { ResultsTable, type RecoveredArtifact } from './ResultsTable';
+import { CreateTestImageModal, type FilesystemChoice } from './CreateTestImageModal';
 
 interface QueueItem {
   id: string;
@@ -79,7 +81,19 @@ export function RecoveryTab(): React.ReactElement {
   const [scanning, setScanning] = useState(false);
   const [scanPercent, setScanPercent] = useState(0);
   const [results, setResults] = useState<RecoveredArtifact[]>([]);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const handleImageCreated = (imagePath: string, filesystem: FilesystemChoice): void => {
+    setSource({
+      mode: 'file',
+      fileName: imagePath,
+      fileSize: `Test ${filesystem}`
+    });
+    setSelectedNode(null);
+    setQueue([]);
+    setResults([]);
+  };
 
   const enabledCount = signatures.filter((signature) => signature.enabled).length;
   const isDirectory = source?.mode === 'directory';
@@ -162,19 +176,6 @@ export function RecoveryTab(): React.ReactElement {
                   confidence: art.confidence ?? 85,
                   confidenceNote: art.confidenceNote ?? 'Forensic match',
                   sectorOffset: art.sectorOffset ?? '0x00000000',
-                }));
-              }
-
-              if (fetchedArtifacts.length === 0 && queuedItems.length > 0) {
-                fetchedArtifacts = queuedItems.map((item, index) => ({
-                  id: `recovered-${item.id}`,
-                  name: item.name,
-                  type: item.name.split('.').pop() ?? 'file',
-                  size: item.size,
-                  fragments: 1,
-                  confidence: item.confidence ?? 86,
-                  confidenceNote: item.confidence ? 'forensic match' : 'recovered from selected file',
-                  sectorOffset: `0x${(0x0a3f1000 + index * 0x120400).toString(16).toUpperCase()}`,
                 }));
               }
 
@@ -301,6 +302,17 @@ export function RecoveryTab(): React.ReactElement {
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-text-muted">
+          <button
+            type="button"
+            disabled={scanning}
+            onClick={() => setCreateModalOpen(true)}
+            className="flex items-center gap-1.5 rounded-md border border-button-primary bg-button-primary/10 px-3 py-2 text-xs font-medium text-button-primary transition-colors hover:bg-button-primary/20 disabled:opacity-50"
+            title="Create a test disk image with a filesystem of your choice to test file deletion & recovery"
+          >
+            <PlusCircle className="h-4 w-4" />
+            Create Test Image
+          </button>
+
           {scanning ? (
             <span className="flex items-center gap-1.5 text-status-warning">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -454,6 +466,12 @@ export function RecoveryTab(): React.ReactElement {
           </div>
         </div>
       )}
+
+      <CreateTestImageModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onImageCreated={handleImageCreated}
+      />
     </div>
   );
 }

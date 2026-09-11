@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: package
+appId: com.sanitizex.app
+productName: SanitizeX
 directories:
   buildResources: build
 files:
@@ -11,13 +11,20 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+extraResources:
+  - from: "../dist/backend_engine"
+    to: "backend_engine"
 win:
-  executableName: package
+  executableName: SanitizeX
+  target:
+    - nsis
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: SanitizeX-Setup-${version}.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:

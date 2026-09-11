@@ -8,30 +8,44 @@ import threading
 import time
 import subprocess
 import json
+import getpass
+
+def get_operator_id() -> str:
+    try:
+        user = getpass.getuser().strip()
+        if user:
+            return f"operator.{user.lower()}"
+    except Exception:
+        pass
+    return "operator.admin"
 
 import sys
 import os
 import tempfile
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'modules'))
+mod_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'modules')
+sys.path.append(mod_dir)
 
-if os.name == 'nt' and os.path.exists(r'C:\msys64\ucrt64\bin'):
+if os.name == 'nt':
+    if os.path.exists(r'C:\msys64\ucrt64\bin'):
+        try:
+            os.add_dll_directory(r'C:\msys64\ucrt64\bin')
+        except Exception:
+            pass
+    if os.path.exists(mod_dir):
+        try:
+            os.add_dll_directory(mod_dir)
+        except Exception:
+            pass
+
+osdevice = hdd = exfat = ext4 = fat32 = ntfs = verification = recovery = None
+
+for mod_name in ['osdevice', 'hdd', 'exfat', 'ext4', 'fat32', 'ntfs', 'verification', 'recovery']:
     try:
-        os.add_dll_directory(r'C:\msys64\ucrt64\bin')
-    except Exception:
-        pass
-
-try:
-    import osdevice
-    import hdd
-    import exfat
-    import ext4
-    import fat32
-    import ntfs
-    import verification
-    import recovery
-except ImportError as e:
-    print(f"Warning: Failed to import erasure/recovery modules: {e}")
+        globals()[mod_name] = __import__(mod_name)
+        print(f"[ENGINE] Successfully loaded native C++ module: {mod_name}")
+    except Exception as e:
+        print(f"[ENGINE] Warning: Could not load native C++ module '{mod_name}': {e}")
 
 
 
@@ -62,9 +76,19 @@ CORS(app)
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+@app.route('/api/v1/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "ok", "engine": "SanitizeX C++17 Core Engine", "os": os.name})
+
 active_operations = {}
 
-AUDIT_LOGS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'audit_logs.json')
+if os.name == 'nt':
+    app_data_dir = os.path.join(os.environ.get('APPDATA', os.path.expanduser('~')), 'SanitizeX')
+else:
+    app_data_dir = os.path.join(os.path.expanduser('~'), '.sanitize-x')
+
+os.makedirs(app_data_dir, exist_ok=True)
+AUDIT_LOGS_FILE = os.path.join(app_data_dir, 'audit_logs.json')
 AUDIT_LOGS_LOCK = threading.Lock()
 
 def load_audit_logs():
@@ -230,20 +254,69 @@ def format_storage_size(bytes_val: int) -> str:
         idx += 1
     return f"{val:.1f} {units[idx]}" if idx > 0 else f"{int(val)} B"
 
+def get_win32_drives_fast():
+    drives = []
+    if os.name != 'nt':
+        return drives
+    try:
+        import ctypes
+        bitmask = ctypes.windll.kernel32.GetLogicalDrives()
+        for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+            if bitmask & 1:
+                root_path = f"{letter}:\\"
+                free_bytes = ctypes.c_ulonglong()
+                total_bytes = ctypes.c_ulonglong()
+                ret = ctypes.windll.kernel32.GetDiskFreeSpaceExW(
+                    ctypes.c_wchar_p(root_path),
+                    None,
+                    ctypes.byref(total_bytes),
+                    ctypes.byref(free_bytes)
+                )
+
+                vol_name_buf = ctypes.create_unicode_buffer(261)
+                fs_name_buf = ctypes.create_unicode_buffer(261)
+                ctypes.windll.kernel32.GetVolumeInformationW(
+                    ctypes.c_wchar_p(root_path),
+                    vol_name_buf,
+                    261,
+                    None, None, None,
+                    fs_name_buf,
+                    261
+                )
+
+                fs_type = fs_name_buf.value or "NTFS"
+                vol_label = vol_name_buf.value or f"Volume {letter}"
+                size = total_bytes.value if ret else 0
+
+                drives.append({
+                    "DriveLetter": letter,
+                    "FileSystemLabel": vol_label,
+                    "FileSystem": fs_type,
+                    "Size": size
+                })
+            bitmask >>= 1
+    except Exception as e:
+        print(f"[Win32FastStorage] Error: {e}")
+    return drives
+
 def enumerate_system_storage():
+    devices = []
     global DEVICES_MAP
     DEVICES_MAP.clear()
-    devices = []
 
     if os.name == 'nt':
-        # 1. Query logical volumes
+        # 1. Query logical volume drives via PowerShell (with fast Win32 fallback)
         try:
             ps_vol_cmd = "Get-Volume | Select-Object DriveLetter, FileSystemLabel, FileSystem, DriveType, Size, SizeRemaining | ConvertTo-Json"
-            vol_out = subprocess.check_output(["powershell", "-NoProfile", "-Command", ps_vol_cmd], text=True, timeout=6)
+            vol_out = subprocess.check_output(["powershell", "-NoProfile", "-Command", ps_vol_cmd], text=True, timeout=12)
             vol_data = json.loads(vol_out.strip())
             if isinstance(vol_data, dict):
                 vol_data = [vol_data]
+        except Exception as e:
+            print(f"[StorageDiscovery] PowerShell Get-Volume timed out/failed ({e}), using fast Win32 fallback...")
+            vol_data = get_win32_drives_fast()
 
+        try:
             for v in vol_data:
                 dl = v.get("DriveLetter")
                 if not dl:
@@ -297,7 +370,7 @@ def enumerate_system_storage():
         # 2. Query physical disk drives
         try:
             ps_disk_cmd = "Get-CimInstance Win32_DiskDrive | Select-Object DeviceID, Index, Model, SerialNumber, InterfaceType, Size, BytesPerSector | ConvertTo-Json"
-            disk_out = subprocess.check_output(["powershell", "-NoProfile", "-Command", ps_disk_cmd], text=True, timeout=6)
+            disk_out = subprocess.check_output(["powershell", "-NoProfile", "-Command", ps_disk_cmd], text=True, timeout=12)
             disk_data = json.loads(disk_out.strip())
             if isinstance(disk_data, dict):
                 disk_data = [disk_data]
@@ -357,37 +430,10 @@ def enumerate_system_storage():
             print(f"[StorageDiscovery] Warning querying disks: {e}")
 
     if not devices:
-        # Fallback device if discovery yields empty
-        fallback = StorageDevice(
-            id="vol-D",
-            path="\\\\.\\D:",
-            model="MiniVHD (Volume D:)",
-            serial="VOL-NTFS-D",
-            busType="Virtual",
-            capacityBytes=523169792,
-            capacity="500 MB",
-            sectorSizeBytes=512,
-            sectorSize="512 B",
-            health="healthy",
-            mounted=True,
-            readOnly=False,
-            writeProtected=False,
-            identityToken="token-vol-D",
-            filesystem="NTFS",
-            isSystem=False,
-            volumeLabel="MiniVHD"
-        )
-        devices.append(fallback)
-        DEVICES_MAP["vol-D"] = {
-            "id": "vol-D",
-            "path": "\\\\.\\D:",
-            "fs_type": "ntfs",
-            "model": fallback.model,
-            "size": 523169792,
-            "isSystem": False
-        }
+        print("[StorageDiscovery] Warning: No system storage devices could be enumerated. Please ensure backend is running with Administrator privileges.")
 
     return devices
+
 
 @app.route('/api/v1/devices', methods=['GET'])
 def get_storage_device():
@@ -395,12 +441,21 @@ def get_storage_device():
     return jsonify([device.model_dump() for device in devices_list])
 
 
-@app.route('/api/v1/create-test-vhd', methods=['POST'])
-def create_test_vhd():
+@app.route('/api/v1/create-test-image', methods=['POST', 'OPTIONS'])
+def create_test_image():
+    if request.method == 'OPTIONS':
+        return jsonify({'status': 'ok'}), 200
+
     try:
+        data = request.get_json(silent=True) or {}
+        filesystem = (data.get('filesystem') or 'NTFS').lower()
+        size_mb = int(data.get('sizeMb') or 500)
+        label = (data.get('label') or f"Test_{filesystem.upper()}").replace(" ", "_")
+
         temp_dir = tempfile.gettempdir()
-        vhd_path = os.path.join(temp_dir, 'SanitizeX_TestDrive.vhd')
-        script_path = os.path.join(temp_dir, 'create_vhd_script.txt')
+        vhd_name = f"SanitizeX_Test_{filesystem.upper()}.vhd"
+        vhd_path = os.path.join(temp_dir, vhd_name)
+        script_path = os.path.join(temp_dir, f'create_{filesystem}_script.txt')
 
         try:
             with open(script_path, 'w', encoding='ascii') as f:
@@ -415,88 +470,40 @@ def create_test_vhd():
             except Exception:
                 pass
 
+        fs_cmd = 'format fs=ntfs' if filesystem == 'ntfs' else ('format fs=fat32' if filesystem == 'fat32' else 'format fs=exfat')
+
         commands = [
-            f'create vdisk file="{vhd_path}" maximum=500 type=fixed',
+            f'create vdisk file="{vhd_path}" maximum={size_mb} type=fixed',
             f'select vdisk file="{vhd_path}"',
             'attach vdisk',
             'convert mbr',
             'create partition primary',
-            'format fs=ntfs label="SanitizeX_Test" quick',
+            f'{fs_cmd} label="{label}" quick',
             'assign'
         ]
         with open(script_path, 'w', encoding='ascii') as f:
             f.write('\n'.join(commands) + '\n')
 
-        res = subprocess.run(['diskpart', '/s', script_path], capture_output=True, text=True, timeout=30)
-        print("[VHD] Diskpart stdout:", res.stdout)
+        res = subprocess.run(['diskpart', '/s', script_path], capture_output=True, text=True, timeout=35)
+        print(f"[TEST IMAGE] Diskpart stdout for {filesystem}:", res.stdout)
 
         return jsonify({
             'success': True,
-            'message': 'Virtual drive SanitizeX_TestDrive.vhd (500 MB NTFS) created and mounted successfully!',
+            'message': f'Test Disk Image ({vhd_name}, {size_mb} MB {filesystem.upper()}) created and mounted successfully!',
             'vhdPath': vhd_path,
+            'filesystem': filesystem.upper(),
             'output': res.stdout
         })
     except Exception as e:
-        print("[VHD] Error creating virtual drive:", e)
+        print("[TEST IMAGE] Error creating test image:", e)
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/v1/file-node',methods=['GET'])
-def get_file_node() :
-    
-    audit_log = FileNode(
-        id="node-f001",
-        parentId="node-d001",
-        name="audit.log",
-        canonicalPath="C:\\evidence\\audit.log",
-        kind="file",
-        sizeBytes=1048576,  
-        modifiedAt="2026-09-08T10:00:00Z",
-        inode=15032,
-        startSector=2048,
-        sectorCount=2048,
-        deleted=False,
-        corrupted=False,
-        confidence=1.0
-    )
-
-    deleted_image = FileNode(
-        id="node-f002",
-        parentId="node-d001",
-        name="recovered_image.jpg",
-        canonicalPath="C:\\evidence\\recovered_image.jpg",
-        kind="file",
-        sizeBytes=345000,
-        modifiedAt="2025-12-01T14:30:00Z",
-        inode=15033,
-        startSector=4096,
-        sectorCount=674,
-        deleted=True,       
-        corrupted=True,     
-        confidence=0.85     
-    )
-
-    evidence_folder = FileNode(
-        id="node-d001",
-        parentId="node-r001",
-        name="evidence",
-        canonicalPath="C:\\evidence",
-        kind="directory",
-        modifiedAt="2026-09-08T09:00:00Z",
-        filesystem="NTFS",
-        children=[audit_log, deleted_image] 
-    )
-    root_drive = FileNode(
-        id="node-r001",
-        name="C:",
-        canonicalPath="C:\\",
-        kind="drive",
-        sizeBytes=500107862016,
-        filesystem="NTFS",
-        clusterSizeBytes=4096,
-        children=[evidence_folder] 
-    )
-    return jsonify(root_drive.model_dump())
+@app.route('/api/v1/create-test-vhd', methods=['POST', 'OPTIONS'])
+def create_test_vhd():
+    if request.method == 'OPTIONS':
+        return jsonify({'status': 'ok'}), 200
+    return create_test_image()
 
 MOCK_DEVICES = {
     "dev-123": {
@@ -818,7 +825,7 @@ def background_file_erase_worker(operation_id: str, targets: list, config: dict)
                     add_audit_log({
                         "id": f"log-{uuid.uuid4().hex[:8]}",
                         "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-                        "operatorId": "operator.local",
+                        "operatorId": get_operator_id(),
                         "action": "file-erase",
                         "level": "info" if report.get("passed", True) else "error",
                         "verified": report.get("passed", True),
@@ -886,7 +893,7 @@ def background_file_erase_worker(operation_id: str, targets: list, config: dict)
                     add_audit_log({
                         "id": f"log-{uuid.uuid4().hex[:8]}",
                         "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-                        "operatorId": "operator.local",
+                        "operatorId": get_operator_id(),
                         "action": "file-erase",
                         "level": "info",
                         "verified": True,
@@ -1063,7 +1070,13 @@ def background_drive_erase_worker(operation_id: str, device_id: str, standard: s
             repair_filesystem(device_path, fs_type, operation_id)
 
         import hashlib
-        calc_pre_sha = hashlib.sha256(f"{device_path}:{device_info.get('size', 0)}".encode('utf-8')).hexdigest()
+        calc_pre_sha = hashlib.sha256(f"{device_path}:{device_info.get('size', 0)}:{time.time()}".encode('utf-8')).hexdigest()
+        pre_sha = (getattr(post_report_obj, 'preWipeSha256', '') if post_report_obj else '') or calc_pre_sha
+        post_sha = (getattr(post_report_obj, 'postWipeSha256', '') if post_report_obj else '') or "0000000000000000000000000000000000000000000000000000000000000000"
+
+        sig_detected = int(getattr(post_report_obj, 'signaturesDetected', 0)) if post_report_obj else 0
+        raw_match = float(getattr(post_report_obj, 'rawByteMatchRate', 100.0)) if post_report_obj else 100.0
+        is_passed = (sig_detected <= 1) and (raw_match >= 99.0)
 
         # Build verification report payload
         rep = {
@@ -1072,29 +1085,29 @@ def background_drive_erase_worker(operation_id: str, device_id: str, standard: s
             "fileSize": device_info.get("size", 0),
             "erasureStandard": f"Surgical Volume Wipe ({standard})",
             "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-            "preWipeSha256": getattr(post_report_obj, 'preWipeSha256', calc_pre_sha) if post_report_obj else calc_pre_sha,
-            "postWipeSha256": getattr(post_report_obj, 'postWipeSha256', "0000000000000000000000000000000000000000000000000000000000000000") if post_report_obj else "0000000000000000000000000000000000000000000000000000000000000000",
-            "rawByteMatchRate": float(getattr(post_report_obj, 'rawByteMatchRate', 100.0)) if post_report_obj else 100.0,
+            "preWipeSha256": pre_sha,
+            "postWipeSha256": post_sha,
+            "rawByteMatchRate": raw_match,
             "shannonEntropy": float(getattr(post_report_obj, 'shannonEntropy', 0.0)) if post_report_obj else 0.0,
             "chiSquareValue": float(getattr(post_report_obj, 'chiSquareValue', 0.0)) if post_report_obj else 0.0,
             "chiSquarePValue": float(getattr(post_report_obj, 'chiSquarePValue', 1.0)) if post_report_obj else 1.0,
             "monteCarloPi": float(getattr(post_report_obj, 'monteCarloPi', 3.14159)) if post_report_obj else 3.14159,
             "monteCarloPiErrorPercent": float(getattr(post_report_obj, 'monteCarloPiError', 0.0)) if post_report_obj else 0.0,
             "signaturesChecked": int(getattr(post_report_obj, 'signaturesChecked', 120)) if post_report_obj else 120,
-            "signaturesDetected": int(getattr(post_report_obj, 'signaturesDetected', 0)) if post_report_obj else 0,
-            "passed": bool(getattr(post_report_obj, 'passed', True)) if post_report_obj else True,
-            "verdict": "PASSED - VOLUME WIPE VERIFIED CLEAN"
+            "signaturesDetected": sig_detected,
+            "passed": is_passed,
+            "verdict": "PASSED - VOLUME WIPE VERIFIED CLEAN" if is_passed else "WARNING - RESIDUAL SIGNATURE DETECTED"
         }
 
         add_audit_log({
             "id": f"log-{uuid.uuid4().hex[:8]}",
             "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-            "operatorId": "operator.local",
+            "operatorId": get_operator_id(),
             "action": "drive-erase",
-            "level": "info",
-            "verified": True,
-            "sha256": rep.get("preWipeSha256", "N/A"),
-            "signature": rep.get("postWipeSha256", "0000000000000000000000000000000000000000000000000000000000000000"),
+            "level": "info" if is_passed else "warning",
+            "verified": is_passed,
+            "sha256": pre_sha,
+            "signature": post_sha,
             "payload": rep
         })
 
@@ -1178,9 +1191,17 @@ def background_recovery_scan_worker(operation_id: str, disk_image: str, output_r
         abs_output_root = os.path.abspath(output_root or os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Recovery', 'output'))
         os.makedirs(abs_output_root, exist_ok=True)
         
-        meta_ok = False
-        carve_ok = False
-        
+        # Format target path for raw volume device access on Windows if needed
+        raw_target = disk_image
+        if os.name == 'nt':
+            clean_path = disk_image.strip()
+            if len(clean_path) == 2 and clean_path[1] == ':':
+                raw_target = f"\\\\.\\{clean_path[0].upper()}:"
+            elif len(clean_path) == 3 and clean_path[1:] == ':\\':
+                raw_target = f"\\\\.\\{clean_path[0].upper()}:"
+            elif clean_path.startswith("vol-"):
+                raw_target = f"\\\\.\\{clean_path[4:].upper()}:"
+
         if mode in ['metadata', 'both']:
             active_operations[operation_id].update({
                 "phase": "metadata_recovery",
@@ -1188,9 +1209,9 @@ def background_recovery_scan_worker(operation_id: str, disk_image: str, output_r
                 "message": f"Scanning filesystem metadata on {os.path.basename(disk_image) or disk_image}..."
             })
             socketio.emit('progress', active_operations[operation_id])
-            if 'recovery' in sys.modules and recovery:
+            if recovery:
                 try:
-                    meta_ok = recovery.recover_metadata(disk_image, abs_output_root)
+                    meta_ok = recovery.recover_metadata(raw_target, abs_output_root)
                 except Exception as me:
                     print(f"[RECOVERY] C++ recover_metadata error: {me}")
             else:
@@ -1203,9 +1224,9 @@ def background_recovery_scan_worker(operation_id: str, disk_image: str, output_r
                 "message": f"Carving file signatures on {os.path.basename(disk_image) or disk_image}..."
             })
             socketio.emit('progress', active_operations[operation_id])
-            if 'recovery' in sys.modules and recovery:
+            if recovery:
                 try:
-                    carve_ok = recovery.recover_carving(disk_image, abs_output_root)
+                    carve_ok = recovery.recover_carving(raw_target, abs_output_root)
                 except Exception as ce:
                     print(f"[RECOVERY] C++ recover_carving error: {ce}")
             else:
@@ -1244,7 +1265,7 @@ def background_recovery_scan_worker(operation_id: str, disk_image: str, output_r
         add_audit_log({
             "id": f"log-{uuid.uuid4().hex[:8]}",
             "timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-            "operatorId": "operator.local",
+            "operatorId": get_operator_id(),
             "action": "file-recovery",
             "level": "info",
             "verified": True,
@@ -1420,23 +1441,6 @@ def get_recovery_artifact_content(artifact_id):
     }), 200
 
 
-
-@app.route('/api/v1/sources/<source_id>/preview', methods=['GET'])
-def preview_source(source_id):
-    offset = request.args.get('offset', 0, type=int)
-    length = request.args.get('length', 256, type=int)
-    sample_bytes = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-    import base64, hashlib
-    b64_str = base64.b64encode(sample_bytes).decode('ascii')
-    sha256_hash = hashlib.sha256(sample_bytes).hexdigest()
-    return jsonify({
-        "sourceId": source_id,
-        "offset": offset,
-        "length": length,
-        "bytesBase64": b64_str,
-        "sha256": sha256_hash
-    }), 200
-
 @app.route('/api/v1/audit-logs', methods=['GET', 'POST'])
 def query_audit_logs():
     if request.method == 'POST':
@@ -1470,13 +1474,6 @@ def query_audit_logs():
 
     return jsonify(logs), 200
 
-@app.route('/api/v1/reports', methods=['POST'])
-def generate_report():
-    return jsonify({"reportId": f"report-{uuid.uuid4().hex[:8]}"}), 201
-
-@app.route('/api/v1/reports/<report_id>/download', methods=['GET'])
-def download_report(report_id):
-    return jsonify({"status": "success", "message": f"Downloading report {report_id}"}), 200
 
 if __name__ == '__main__':
     socketio.run(app, port=5000, allow_unsafe_werkzeug=True)

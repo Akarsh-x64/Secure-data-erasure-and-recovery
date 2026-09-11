@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, KeyRound, ShieldCheck, ShieldX } from 'lucide-react';
+import { ChevronDown, ChevronRight, FileText, KeyRound, ShieldCheck, ShieldX } from 'lucide-react';
 
 export type LogLevel = 'info' | 'warning' | 'error';
 
@@ -17,6 +17,7 @@ export interface AuditLogEntry {
 
 interface LogsTableProps {
   entries: AuditLogEntry[];
+  onViewReport?: (entry: AuditLogEntry) => void;
 }
 
 const levelConfig: Record<LogLevel, { label: string; color: string; dot: string }> = {
@@ -37,7 +38,7 @@ function formatTimestamp(iso: string): string {
   });
 }
 
-export const LogsTable: React.FC<LogsTableProps> = ({ entries }) => {
+export const LogsTable: React.FC<LogsTableProps> = ({ entries, onViewReport }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
@@ -52,6 +53,7 @@ export const LogsTable: React.FC<LogsTableProps> = ({ entries }) => {
               <th className="border-b border-ui-outline px-2 py-2 font-normal">Action</th>
               <th className="border-b border-ui-outline px-2 py-2 font-normal">Level</th>
               <th className="border-b border-ui-outline px-4 py-2 font-normal">Verification</th>
+              <th className="border-b border-ui-outline px-2 py-2 font-normal text-right">Audit Report</th>
             </tr>
           </thead>
           <tbody>
@@ -97,10 +99,23 @@ export const LogsTable: React.FC<LogsTableProps> = ({ entries }) => {
                         </span>
                       )}
                     </td>
+                    <td className="px-2 py-2.5 text-right">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onViewReport?.(entry);
+                        }}
+                        className="inline-flex items-center gap-1 rounded border border-status-valid/40 bg-status-valid/10 px-2 py-1 text-xs text-status-valid transition-colors hover:bg-status-valid/25"
+                      >
+                        <FileText className="h-3 w-3" />
+                        Action Audit
+                      </button>
+                    </td>
                   </tr>
                   {isExpanded && (
                     <tr className="border-b border-ui-outline/60 bg-background-main">
-                      <td colSpan={6} className="px-4 py-3">
+                      <td colSpan={7} className="px-4 py-3">
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                           <div className="space-y-2 text-xs">
                             <div className="flex items-center gap-1.5 text-text-muted">

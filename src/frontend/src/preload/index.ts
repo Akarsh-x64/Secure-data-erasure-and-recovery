@@ -13,6 +13,7 @@ const api = {
   eraseFiles: (request: unknown) => ipcRenderer.invoke('erase-files', request),
   getDevices: () => ipcRenderer.invoke('get-devices'),
   createTestVhd: () => ipcRenderer.invoke('create-test-vhd'),
+  createTestImage: (options?: unknown) => ipcRenderer.invoke('create-test-image', options),
   eraseDrive: (request: unknown) => ipcRenderer.invoke('erase-drive', request),
   getAuditLogs: () => ipcRenderer.invoke('get-audit-logs'),
   saveAuditLog: (entry: unknown) => ipcRenderer.invoke('save-audit-log', entry)

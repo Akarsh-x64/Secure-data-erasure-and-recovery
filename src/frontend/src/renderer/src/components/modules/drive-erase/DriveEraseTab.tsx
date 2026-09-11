@@ -112,7 +112,27 @@ export function DriveEraseTab(): React.ReactElement {
 
   useEffect(() => {
     loadDevices();
-  }, []);
+
+    // Auto-refresh connected devices/volumes every 5 seconds in background
+    const interval = setInterval(() => {
+      if (wipeState !== 'running' && !isCreatingVhd && window.api?.getDevices) {
+        window.api
+          .getDevices()
+          .then((result) => {
+            if (Array.isArray(result) && result.length > 0) {
+              setDevices((current) => {
+                const currSignature = current.map((d) => `${d.id}:${d.path}`).sort().join(';');
+                const newSignature = result.map((d) => `${d.id}:${d.path}`).sort().join(';');
+                return currSignature === newSignature ? current : result;
+              });
+            }
+          })
+          .catch(() => {});
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [wipeState, isCreatingVhd]);
 
   const selectedDevice = devices.find((d) => d.id === selectedId) ?? null;
   const isRunning = wipeState === 'running';

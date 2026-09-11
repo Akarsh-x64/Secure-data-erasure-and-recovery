@@ -143,6 +143,51 @@ export const FileSystemTree: React.FC<FileSystemTreeProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [flagFilter] = useState<'all'>('all');
 
+  const latestNodesRef = useRef(nodes);
+  latestNodesRef.current = nodes;
+  const latestOnUpdateNodesRef = useRef(onUpdateNodes);
+  latestOnUpdateNodesRef.current = onUpdateNodes;
+  const latestOnDirectorySelectedRef = useRef(onDirectorySelected);
+  latestOnDirectorySelectedRef.current = onDirectorySelected;
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.api?.readDirectoryContents) return;
+
+    const interval = setInterval(async () => {
+      const currentNodes = latestNodesRef.current;
+      if (!currentNodes || currentNodes.length === 0) return;
+      const rootNode = currentNodes[0];
+      if (!rootNode || !rootNode.path || !rootNode.isDirectory) return;
+
+      try {
+        const readDir = window.api?.readDirectoryContents;
+        if (!readDir) return;
+        const freshChildren = await readDir(rootNode.path);
+        if (freshChildren && Array.isArray(freshChildren)) {
+          const currentChildNames = (rootNode.children || []).map((c) => c.name).sort().join(',');
+          const freshChildNames = freshChildren.map((c) => c.name).sort().join(',');
+          if (currentChildNames !== freshChildNames) {
+            const updatedNodes = updateNodeInTree(currentNodes, rootNode.path, (n) => ({
+              ...n,
+              children: freshChildren,
+              isLoaded: true,
+              isLoading: false,
+            }));
+            if (latestOnUpdateNodesRef.current) {
+              latestOnUpdateNodesRef.current(updatedNodes);
+            } else if (latestOnDirectorySelectedRef.current) {
+              latestOnDirectorySelectedRef.current(updatedNodes);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Failed periodic directory refresh:', err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     setSelectedNode(null);
     setMarkedNodeIds(new Set());

@@ -8,6 +8,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Akarsh-x64/Secure-data-erasure-and-recovery/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/Release-v1.0.0%20(.exe)-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Release v1.0.0 (.exe)" /></a>
   <a href="#compliance-and-standards"><img src="https://img.shields.io/badge/Compliance-NIST%20SP%20800--88%20Rev.1-007acc?style=for-the-badge&logo=security" alt="NIST SP 800-88" /></a>
   <a href="#compliance-and-standards"><img src="https://img.shields.io/badge/Standard-DoD%205220.22--M-critical?style=for-the-badge&logo=lock" alt="DoD 5220.22-M" /></a>
   <a href="#architecture"><img src="https://img.shields.io/badge/Architecture-3--Layer%20Decoupled-success?style=for-the-badge" alt="3-Tier Architecture" /></a>
@@ -181,6 +182,7 @@ Secure-data-erasure-and-recovery/
 | **Project screenshots / visual assets** | `assets/screenshots/` |
 | **Final presentation** | `submission/` |
 | **Demo video** | `submission/` |
+| **Windows Executable (`.exe`)** | [GitHub Releases (v1.0.0)](https://github.com/Akarsh-x64/Secure-data-erasure-and-recovery/releases/tag/v1.0.0) |
 | **Project overview & guide** | `README.md` |
 
 ---
@@ -196,6 +198,18 @@ Secure-data-erasure-and-recovery/
 
 - The video demonstration is located in the `submission/` directory:
   - `submission/PaperRex_SIH2026 - Video Demo.mp4`
+
+---
+
+## Release & Pre-Built Executable
+
+For evaluators and users on Windows looking to run **SanitizeX** out of the box without compiling the native C++ drivers or configuring Python / Node.js development environments:
+
+- **Official Release**: [GitHub Releases - v1.0.0](https://github.com/Akarsh-x64/Secure-data-erasure-and-recovery/releases/tag/v1.0.0)
+- **Windows Executable / Installer**: [`SanitizeX-Setup-1.0.0.exe`](https://github.com/Akarsh-x64/Secure-data-erasure-and-recovery/releases/download/v1.0.0/SanitizeX-Setup-1.0.0.exe) (or portable `SanitizeX.exe`)
+
+> [!IMPORTANT]
+> **Run as Administrator**: Low-level storage sanitization and forensic disk reconstruction require raw block device handles (`\\.\PhysicalDriveX`). Right-click `SanitizeX` and choose **Run as administrator** (or accept the Windows UAC elevation prompt).
 
 ---
 
@@ -258,6 +272,9 @@ Visual overview of the SanitizeX mission-control desktop interface and core oper
 ---
 
 ## Installation
+
+> [!TIP]
+> **Prefer not to build from source?** Download the pre-compiled Windows executable directly from the [v1.0.0 Release](https://github.com/Akarsh-x64/Secure-data-erasure-and-recovery/releases/tag/v1.0.0) (`SanitizeX-Setup-1.0.0.exe`). If you want to develop or compile from source, follow the instructions below.
 
 ### Prerequisites
 
@@ -340,7 +357,7 @@ npm run dev
 ```bash
 cd src/frontend
 npm run build:linux   # Linux AppImage / deb
-npm run build:win     # Windows NSIS Installer / portable .exe
+npm run build:win     # Windows NSIS Installer (`dist/SanitizeX-Setup-1.0.0.exe`)
 ```
 
 ---
