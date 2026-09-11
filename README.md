@@ -15,16 +15,17 @@
 
 ## Project Information
 
-- **Project Title**: 
-- **PS ID**: 
-- **PS Title**: 
-- **Category**: 
-- **Theme**: 
+- **Project Title**: SanitizeX
+- **PS ID**: 26149
+- **PS Title**: Design and Development of an Integrated Secure Data Erasure and Advanced File Recovery Tool for Digital Forensics and Data Sanitization
+- **Category**: Software
+- **Theme**: Blockchain & Cybersecurity
 
 ---
 
 ## Problem Statement
 
+The project aims to develop an integrated **Secure Data Erasure and Advanced File Recovery Tool** for digital forensics and data sanitization. Existing solutions typically focus on either securely destroying data or recovering deleted files, requiring multiple tools and workflows. Our system combines three core capabilities: **secure drive erasure, secure file/folder erasure, and advanced file carving and recovery**. It will support secure and verifiable data sanitization with audit logging, while the recovery module will recover deleted, formatted, fragmented, or corrupted files using filesystem metadata, file signatures, structural analysis, and carving techniques. The system will prioritize read-only forensic analysis, file validation, fragmented-file reconstruction, confidence scoring, and comprehensive reporting to preserve evidential integrity.
 
 
 ---
