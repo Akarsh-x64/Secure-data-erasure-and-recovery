@@ -1,4 +1,4 @@
-# <p align="center">SanitizeX</p>
+# <p align="center">Paper Rex - SanitizeX</p>
 
 <p align="center">
   <strong>Enterprise- and Defense-Grade Multi-Filesystem Data Sanitization, Forensic Recovery, and Cryptographic Verification Platform</strong>
