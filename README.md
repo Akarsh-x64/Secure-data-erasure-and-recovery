@@ -215,7 +215,7 @@ Secure-data-erasure-and-recovery/
 ### Step 1: Clone Repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
+git clone https://github.com/Akarsh-x64/Secure-data-erasure-and-recovery.git
 cd Secure-data-erasure-and-recovery
 ```
 
