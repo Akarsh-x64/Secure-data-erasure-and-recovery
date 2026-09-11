@@ -173,7 +173,7 @@ Install Python dependencies:
 python -m venv venv
 source venv/bin/activate       # On Windows: .\venv\Scripts\activate
 
-pip install flask flask-cors flask-socketio pydantic pybind11
+pip install -r requirements.txt
 ```
 
 Run the backend server (requires elevated administrator or root rights for low-level storage device access):
