@@ -4,90 +4,6 @@ import { LogFilter } from './LogFilter';
 import { LogsTable, type AuditLogEntry } from './LogsTable';
 import { ReportGeneratorModal } from '../../shared/ReportGeneratorModal';
 
-const SAMPLE_LOGS: AuditLogEntry[] = [
-  {
-    id: 'log-1',
-    timestamp: '2026-09-07T09:12:44Z',
-    operatorId: 'operator.rhodes',
-    action: 'drive-erase',
-    level: 'info',
-    verified: true,
-    sha256: '3b1c9e0f7a2d5e8c1f4a6b9d0e3c7f2a5b8d1e4c7f0a3b6d9e2c5f8a1b4d7e0c',
-    signature: '30450221009f2c...b1e4022100c7a3d0f6',
-    payload: {
-      device: '/dev/nvme0n1',
-      standard: 'NIST SP 800-88 Rev. 1, Purge',
-      passes: 1,
-      durationSeconds: 812,
-      result: 'success',
-    },
-  },
-  {
-    id: 'log-2',
-    timestamp: '2026-09-07T08:47:02Z',
-    operatorId: 'operator.chen',
-    action: 'file-erase',
-    level: 'info',
-    verified: true,
-    sha256: '9e4a2c7f1b8d5e0a3c6f9b2d5e8a1c4f7b0d3e6a9c2f5b8d1e4a7c0f3b6d9e2a',
-    signature: '3044022064f1...a92e02201b3c8f4d',
-    payload: {
-      targets: ['/var/log/audit/system_audit.log'],
-      overwriteMethod: 'zero',
-      passCount: 1,
-      result: 'success',
-    },
-  },
-  {
-    id: 'log-3',
-    timestamp: '2026-09-07T08:15:19Z',
-    operatorId: 'operator.chen',
-    action: 'recovery-scan',
-    level: 'warning',
-    verified: true,
-    sha256: '1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b',
-    signature: '30440220a1b2...c3d40220e5f67890',
-    payload: {
-      source: 'evidence_export.dd',
-      signaturesEnabled: 5,
-      artifactsRecovered: 3,
-      lowConfidenceArtifacts: 1,
-    },
-  },
-  {
-    id: 'log-4',
-    timestamp: '2026-09-07T07:58:33Z',
-    operatorId: 'operator.reyes',
-    action: 'drive-erase',
-    level: 'error',
-    verified: false,
-    sha256: '7f8e9d0c1b2a3f4e5d6c7b8a9f0e1d2c3b4a5f6e7d8c9b0a1f2e3d4c5b6a7f8e',
-    signature: '3045022100d4e5...f60022043a1b2c',
-    payload: {
-      device: '/dev/sdb',
-      standard: 'DoD 5220.22-M',
-      passes: 3,
-      result: 'aborted',
-      reason: 'device unmounted unexpectedly',
-    },
-  },
-  {
-    id: 'log-5',
-    timestamp: '2026-09-07T07:30:11Z',
-    operatorId: 'operator.rhodes',
-    action: 'report-export',
-    level: 'info',
-    verified: true,
-    sha256: '5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d',
-    signature: '3046022100b2c3...d4e5022100f60789ab',
-    payload: {
-      format: 'pdf',
-      sections: ['metadata', 'hashes', 'signatures'],
-      entriesIncluded: 42,
-    },
-  },
-];
-
 function parseQuery(query: string): { text: string; filters: Record<string, string> } {
   const tokens = query.trim().split(/\s+/).filter(Boolean);
   const filters: Record<string, string> = {};
@@ -106,7 +22,7 @@ function parseQuery(query: string): { text: string; filters: Record<string, stri
 }
 
 export function AuditLogsTab(): React.ReactElement {
-  const [logs, setLogs] = useState<AuditLogEntry[]>(SAMPLE_LOGS);
+  const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [query, setQuery] = useState('');
   const [reportOpen, setReportOpen] = useState(false);
   const [modalLogs, setModalLogs] = useState<AuditLogEntry[] | null>(null);
@@ -116,12 +32,10 @@ export function AuditLogsTab(): React.ReactElement {
       try {
         if (window.api?.getAuditLogs) {
           const fetched = await window.api.getAuditLogs();
-          if (fetched && fetched.length > 0) {
-            setLogs(fetched);
-          }
+          setLogs(fetched || []);
         }
       } catch (err) {
-        console.error('Failed to fetch real audit logs:', err);
+        console.error('Failed to fetch audit logs:', err);
       }
     };
 

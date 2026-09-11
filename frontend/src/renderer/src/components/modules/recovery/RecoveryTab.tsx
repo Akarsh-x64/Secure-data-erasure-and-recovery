@@ -179,19 +179,6 @@ export function RecoveryTab(): React.ReactElement {
                 }));
               }
 
-              if (fetchedArtifacts.length === 0 && queuedItems.length > 0) {
-                fetchedArtifacts = queuedItems.map((item, index) => ({
-                  id: `recovered-${item.id}`,
-                  name: item.name,
-                  type: item.name.split('.').pop() ?? 'file',
-                  size: item.size,
-                  fragments: 1,
-                  confidence: item.confidence ?? 86,
-                  confidenceNote: item.confidence ? 'forensic match' : 'recovered from selected file',
-                  sectorOffset: `0x${(0x0a3f1000 + index * 0x120400).toString(16).toUpperCase()}`,
-                }));
-              }
-
               setResults((current) => {
                 const existingIds = new Set(current.map((art) => art.id));
                 return [...current, ...fetchedArtifacts.filter((art) => !existingIds.has(art.id))];
