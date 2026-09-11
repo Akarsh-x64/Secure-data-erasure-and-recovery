@@ -198,8 +198,59 @@ Secure-data-erasure-and-recovery/
 
 ## Screenshots / Prototype Photos
 
-- Important screenshots, UI views, and verification reports are stored in:
-  - `assets/screenshots/`
+Visual overview of the SanitizeX mission-control desktop interface and core operational modules:
+
+### 1. Forensic File Recovery Module
+> Non-destructive partition scanning, MFT reconstruction, raw sector signature carving, and confidence-scored file restoration under read-only guarantees.
+
+<p align="center">
+  <img src="assets/screenshots/01-RecoveryModule.png" alt="Forensic File Recovery Module" width="100%" />
+</p>
+
+---
+
+### 2. Secure Drive Erasure Module
+> Physical and logical storage device selection with compliant sanitization protocols (NIST SP 800-88 Rev. 1 Clear/Purge, DoD 5220.22-M 3-Pass).
+
+<p align="center">
+  <img src="assets/screenshots/02-SecureDriveErasureModule.png" alt="Secure Drive Erasure Module" width="100%" />
+</p>
+
+---
+
+### 3. Surgical File & Folder Erasure Module
+> Interactive filesystem tree navigation for surgical, pinpoint eradication of sensitive files and metadata across NTFS, ext4, FAT32, exFAT, and XFS.
+
+<p align="center">
+  <img src="assets/screenshots/03-FileErasureModule.png" alt="Surgical File & Folder Erasure Module" width="100%" />
+</p>
+
+---
+
+### 4. Real-Time Erasure Process & Telemetry
+> Live execution dashboard displaying multi-pass progress, sector write throughput (MB/s), elapsed time, ETA, and operational status.
+
+<p align="center">
+  <img src="assets/screenshots/04-ErasureProcessModule.png" alt="Real-Time Erasure Process & Telemetry" width="100%" />
+</p>
+
+---
+
+### 5. Adversarial Verification Mechanism
+> Multi-tier statistical audit engine testing byte randomness (Shannon Entropy, Chi-Square Goodness-of-Fit, Monte Carlo $\pi$) and signature carving to prove zero remanence.
+
+<p align="center">
+  <img src="assets/screenshots/05-VerificationMechanism.png" alt="Adversarial Verification Mechanism" width="100%" />
+</p>
+
+---
+
+### 6. Tamper-Evident Cryptographic Audit Trail
+> Immutable audit ledger recording operator metadata, drive hardware serials, timestamps, and pre/post-erasure SHA-256 verification digests.
+
+<p align="center">
+  <img src="assets/screenshots/06-AuditTrail.png" alt="Tamper-Evident Cryptographic Audit Trail" width="100%" />
+</p>
 
 ---
 
