@@ -16,7 +16,7 @@
 ## Project Information
 
 - **Project Title**: SanitizeX
-- **PS ID**: 26149
+- **PS ID**: SIH2026 - 26149
 - **PS Title**: Design and Development of an Integrated Secure Data Erasure and Advanced File Recovery Tool for Digital Forensics and Data Sanitization
 - **Category**: Software
 - **Theme**: Blockchain & Cybersecurity
