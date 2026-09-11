@@ -1,4 +1,4 @@
-# <p align="center">SanitizeX</p>
+# <p align="center">Paper Rex - SanitizeX</p>
 
 <p align="center">
   <strong>Enterprise- and Defense-Grade Multi-Filesystem Data Sanitization, Forensic Recovery, and Cryptographic Verification Platform</strong>
@@ -299,10 +299,3 @@ npm run build:win     # Windows NSIS Installer / portable .exe
 - **Machine Learning Remanence Detection**: Deploy deep neural network models on residual raw bitstreams to detect subtle magnetic or voltage patterns indicating pre-wipe data structure.
 
 ---
-
-## Important
-
-- Before submission, make sure the repository is accessible to reviewers.
-- Do not upload passwords, API keys, access tokens, `.env` files containing secrets, or other confidential credentials.
-- Ensure all storage operations are performed on test or non-critical storage devices during evaluation.
-
