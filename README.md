@@ -1,6 +1,6 @@
 <h1 align="center">
-  <img src="assets/icon/icon.png" alt="SanitizeX" width="50" align="absmiddle" style="margin-right: 10px;" />
-  SanitizeX
+  <img src="assets/icon/icon.png" alt="SanitizeX" width="50" align="absmiddle" />
+  &nbsp;&nbsp;&nbsp;SanitizeX
 </h1>
 
 <p align="center">
