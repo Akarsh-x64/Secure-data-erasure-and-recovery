@@ -1,4 +1,4 @@
-# <p align="center">Paper Rex - SanitizeX</p>
+# <p align="center">SanitizeX</p>
 
 <p align="center">
   <strong>Enterprise- and Defense-Grade Multi-Filesystem Data Sanitization, Forensic Recovery, and Cryptographic Verification Platform</strong>
@@ -7,9 +7,49 @@
 <p align="center">
   <a href="#compliance-and-standards"><img src="https://img.shields.io/badge/Compliance-NIST%20SP%20800--88%20Rev.1-007acc?style=for-the-badge&logo=security" alt="NIST SP 800-88" /></a>
   <a href="#compliance-and-standards"><img src="https://img.shields.io/badge/Standard-DoD%205220.22--M-critical?style=for-the-badge&logo=lock" alt="DoD 5220.22-M" /></a>
-  <a href="#system-architecture"><img src="https://img.shields.io/badge/Architecture-3--Layer%20Decoupled-success?style=for-the-badge" alt="3-Tier Architecture" /></a>
-  <a href="#key-capabilities"><img src="https://img.shields.io/badge/Filesystems-NTFS%20%7C%20ext4%20%7C%20FAT32%20%7C%20exFAT%20%7C%20XFS-blueviolet?style=for-the-badge" alt="Filesystem Support" /></a>
+  <a href="#architecture"><img src="https://img.shields.io/badge/Architecture-3--Layer%20Decoupled-success?style=for-the-badge" alt="3-Tier Architecture" /></a>
+  <a href="#key-features"><img src="https://img.shields.io/badge/Filesystems-NTFS%20%7C%20ext4%20%7C%20FAT32%20%7C%20exFAT%20%7C%20XFS-blueviolet?style=for-the-badge" alt="Filesystem Support" /></a>
 </p>
+
+---
+
+## Project Information
+
+- **Project Title**: 
+- **PS ID**: 
+- **PS Title**: 
+- **Category**: 
+- **Theme**: 
+
+---
+
+## Problem Statement
+
+
+
+---
+
+## Proposed Solution
+
+SanitizeX provides a defense- and enterprise-grade storage sanitization, forensic analysis, and cryptographic verification platform. Engineered with a decoupled 3-tier architecture, it couples kernel-bypassing surgical file and volume eradication across diverse storage hardware (HDD, SATA SSD, NVMe) with an immutable read-only forensic recovery subsystem, an adversarial mathematical verification loop, and a modern desktop user interface.
+
+- **Surgical Metadata Destruction**: Eradicates targeted files down to the physical sectors and cleans internal filesystem metadata structures without damaging surrounding volume geometry.
+- **Direct Hardware Access**: Bypasses operating system write caches using direct Win32 and POSIX I/O flags.
+- **Adversarial Verification Loop**: Proves data destruction using Shannon Entropy, Chi-Square Goodness-of-Fit, Serial Correlation, Monte Carlo $\pi$, and multi-signature carving.
+- **Forensic Recovery Subsystem**: Safely parses partition tables (MBR/GPT) and salvages deleted or orphaned files under strict read-only guarantees.
+- **Tamper-Evident Audit Ledger**: Generates cryptographic verification reports with pre- and post-erasure SHA-256 digests.
+
+---
+
+## Key Features
+
+- **Multi-Filesystem Surgical Erasure**: Pinpoint file and directory eradication natively implemented for NTFS, ext4, exFAT, FAT32, and XFS.
+- **Direct-to-Hardware Sanitization**: Raw physical disk and volume wiping bypassing operating system write-caching via direct Win32 (`CreateFileW` / `DeviceIoControl`) and POSIX direct I/O (`O_DIRECT` / `ioctl`).
+- **NIST SP 800-88 & DoD 5220.22-M Compliance**: Built-in sanitization routines including single-pass zero-fill, 3-pass DoD overwrite, and hardware-level NVMe Sanitize / ATA Secure Erase / TRIM.
+- **Adversarial Verification Loop**: Multi-tier statistical audit engine testing byte randomness (Shannon Entropy, Chi-Square, Serial Correlation, Monte Carlo $\pi$) and executing a 120+ format signature carver.
+- **Read-Only Forensic Recovery**: Non-destructive partition scanning, NTFS unallocated MFT reconstruction, and raw sector signature carving with confidence scoring.
+- **Tamper-Evident Audit Ledger**: Cryptographically sealed records capturing operator identity, hardware serial numbers, timestamps, SHA-256 pre/post digests, and pass/fail verdicts.
+- **Modern Desktop Shell**: Cross-platform Electron 44 desktop application with a React 19 and Tailwind CSS mission-control dashboard.
 
 ---
 
@@ -42,55 +82,48 @@
 
 ---
 
-## Key Capabilities
+## Architecture
 
-- **Multi-Filesystem Surgical Erasure**: Pinpoint file and directory eradication natively implemented for **NTFS**, **ext4**, **exFAT**, **FAT32**, and **XFS**. Overwrites targeted metadata (NTFS MFT records, FAT directory entries, ext4 inodes) and target data clusters without corrupting volume geometry.
-- **Direct-to-Hardware Sanitization**: Raw physical disk and volume wiping bypassing operating system write-caching via direct Win32 (`CreateFileW` / `DeviceIoControl`) and POSIX direct I/O (`O_DIRECT` / `ioctl`).
-- **Adversarial Verification Loop**: Mathematical and forensic validation confirming zero residual data:
-  - **Shannon Entropy Analysis**: Confirms uniform randomness ($\approx 8.000$ for PRNG random fill, $0.000$ for zero-fill).
-  - **Chi-Square ($\chi^2$) Goodness-of-Fit**: Validates byte uniformity with statistical $p$-values.
-  - **Serial Bit Correlation**: Detects linear dependencies across adjacent blocks.
-  - **Monte Carlo $\pi$ Approximation**: Evaluates pseudo-random distribution geometry.
-  - **Forensic Signature Carver**: Evaluates sectors against 120+ file header and footer signatures to confirm zero discoverable files.
-- **Forensic Data Recovery Subsystem**: Read-only forensic analysis engine featuring MBR and GPT partition discovery, NTFS unallocated MFT reconstruction, and deep raw-sector signature carving.
-- **Tamper-Evident Audit Ledger**: Cryptographically sealed audit reports complete with pre- and post-erasure SHA-256 digests, operator identifiers, timestamps, and pass-fail compliance metrics.
+See [docs/architecture.md](docs/architecture.md) for detailed technical specifications, sequence diagrams, and mathematical formulations.
 
----
-
-## System Architecture
-
-```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                              SANITIZEX DESKTOP PLATFORM                                │
-├────────────────────────────────────────────────────────────────────────────────────────┤
-│  PRESENTATION LAYER: Electron 44 + React 19 + TypeScript + Tailwind CSS                │
-│  ├── Drive Erase View    ├── File & Directory Erase View                               │
-│  ├── Recovery Workspace  └── Cryptographic Audit Ledger                                │
-└───────────────────────────────────────────┬────────────────────────────────────────────┘
-                                            │ ContextBridge / WebSocket Events
-┌───────────────────────────────────────────▼────────────────────────────────────────────┐
-│  IPC & ORCHESTRATION LAYER: Python 3 Flask + Socket.IO Server (`src/backend/main.py`)  │
-│  ├── Privileged Escalation Gatekeeper (Windows RunAs / POSIX root)                     │
-│  ├── Asynchronous Operation Workers & Real-Time Progress Emitters                      │
-│  └── Cryptographic Audit Ledger & Verification Report Generator                        │
-└───────────────────────────────────────────┬────────────────────────────────────────────┘
-                                            │ pybind11 Native C++ Bindings (`src/modules`)
-┌───────────────────────────────────────────▼────────────────────────────────────────────┐
-│  CORE C++17 ENGINES & SUBSYSTEMS (`src/build_modules/`)                                │
-│  ┌─────────────────────────┬─────────────────────────┬───────────────────────────────┐ │
-│  │  Surgical Erasure       │  Forensic Recovery      │  Adversarial Verification     │ │
-│  │  ├── NTFS Driver        │  ├── MBR / GPT Parser   │  ├── Shannon Entropy (8.00)   │ │
-│  │  ├── ext4 Driver        │  ├── MFT Reconstruction │  ├── Chi-Square & Monte Carlo │ │
-│  │  ├── exFAT / FAT32      │  ├── TSK Bridge         │  ├── Serial Correlation       │ │
-│  │  └── XFS Native Parser  │  └── Deep 120+ Carver   │  └── Raw Signature Carver     │ │
-│  └─────────────────────────┴─────────────────────────┴───────────────────────────────┘ │
-│  ┌───────────────────────────────────────────────────────────────────────────────────┐ │
-│  │  HARDWARE & OS ABSTRACTION LAYER                                                  │ │
-│  │  ├── Windows Direct I/O (Win32 CreateFileW / DeviceIoControl)                     │ │
-│  │  ├── Linux POSIX Direct I/O (O_DIRECT / ioctl / blockdev)                         │ │
-│  │  └── Hardware Commands: DoD 5220.22-M, NVMe Sanitize, ATA Secure Erase, TRIM      │ │
-│  └───────────────────────────────────────────────────────────────────────────────────┘ │
-└────────────────────────────────────────────────────────────────────────────────────────┘
+```text
+User / Security Operator
+          │
+          │ User Interaction & Configuration
+          ▼
+Electron Desktop Frontend (React 19 + TypeScript + Tailwind CSS)
+          │
+          │ Typed ContextBridge IPC / Secure WebSocket Events
+          ▼
+Backend API & Orchestration (Python 3.14.7 + Flask + Flask-SocketIO)
+          │
+          ├── Privileged Gatekeeper (Windows RunAs / POSIX root)
+          ├── Asynchronous Worker Threads (Drive Erase, File Erase, Forensic Scan)
+          │
+          ├────────────────────────────────────────┬────────────────────────────────────────┐
+          │ Dynamic Execution                      │ Audit Persistence                      │
+          ▼                                        ▼                                        ▼
+pybind11 Native Extension Bridge          Cryptographic Audit Ledger              OS & Storage Hardware
+(osdevice, hdd, ntfs, ext4,                (audit_logs.json with SHA-256           (Win32 DeviceIoControl,
+ fat32, exfat, verification, recovery)     pre/post digests & timestamps)          POSIX O_DIRECT, TRIM)
+          │
+          ▼
+Core C++17 Engines & Subsystems
+  ├── Surgical Filesystem Drivers (NTFS, ext4, exFAT, FAT32, XFS)
+  ├── Hardware Erasure Protocols (DoD 5220.22-M, NIST SP 800-88, NVMe Sanitize)
+  ├── Adversarial Verification Loop (Shannon Entropy, Chi-Square, Monte Carlo Pi, 120+ Carvers)
+  └── Read-Only Forensic Recovery Engine (MBR/GPT Parsers, MFT Reconstructor, Signature Carver)
+          │
+          │ Mathematical Verdicts, Progress Metrics & Carved Artifacts
+          ▼
+Backend Event Hub (Socket.IO Broadcast)
+          │
+          │ Real-Time Streaming Telemetry
+          ▼
+Electron Desktop Frontend (Mission Control Dashboard)
+          │
+          ▼
+User / Verification Report Export
 ```
 
 ---
@@ -106,31 +139,71 @@
 
 ---
 
-## Repository Layout
+## Repository Structure
 
 ```text
 Secure-data-erasure-and-recovery/
-├── assets/                  # Project assets, icons, and diagrams
-├── docs/                    # Architectural documents and design specifications
-├── src/
-│   ├── _externals/          # Filesystem check utilities (e2fsck, ntfsfix, fsck.*)
-│   ├── backend/             # Python Flask + Socket.IO server and audit ledger
-│   │   ├── main.py          # REST & WebSocket API, worker threads, admin checks
-│   │   └── audit_logs.json  # Cryptographic log persistence
-│   ├── build_modules/       # Native C++ core libraries
-│   │   ├── Erasure/         # File systems, OS device wrappers, verification engines
-│   │   └── Recovery/        # Forensic disk parsing, carving, recovery tools
-│   ├── frontend/            # Electron 44 + React 19 + TypeScript application
-│   │   ├── src/main/        # Electron main process & IPC bridges
-│   │   ├── src/preload/     # Secure ContextBridge APIs
-│   │   └── src/renderer/    # React 19 UI components & Tailwind styles
-│   └── modules/             # pybind11 C++ export wrappers & compiled modules (.pyd/.so)
-└── README.md
+├── README.md                # Project documentation and setup guide
+├── architecture.md          # Root reference to architecture specification
+├── requirements.txt         # Python backend dependencies
+├── LICENSE                  # License terms
+├── docs/
+│   └── architecture.md      # Comprehensive system architecture document
+├── submission/
+│   ├── PaperRex_SIH2026.pdf # Presentation deck
+│   └── PaperRex_SIH2026 - Video Demo.mp4 # Video demonstration
+├── assets/
+│   └── screenshots/         # Application screenshots and diagrams
+└── src/
+    ├── _externals/          # Filesystem check utilities (e2fsck, ntfsfix, fsck.*)
+    ├── backend/             # Python Flask + Socket.IO server & audit persistence
+    │   ├── main.py          # REST & WebSocket API, worker threads, admin checks
+    │   └── audit_logs.json  # Cryptographic audit trail ledger
+    ├── build_modules/       # Native C++17 core libraries
+    │   ├── Erasure/         # Surgical filesystem drivers, hardware I/O, verification
+    │   └── Recovery/        # Forensic disk parsing, carving, recovery tools
+    ├── frontend/            # Electron 44 + React 19 + TypeScript desktop app
+    │   ├── src/main/        # Electron main process & IPC bridges
+    │   ├── src/preload/     # Secure ContextBridge APIs
+    │   └── src/renderer/    # React 19 UI components & Tailwind styles
+    └── modules/             # pybind11 C++ export wrappers & compiled modules (.pyd/.so)
 ```
+
+### Component Placement Reference
+
+| Item | Location |
+| :--- | :--- |
+| **Source code** | `src/` |
+| **Architecture / technical documentation** | `docs/architecture.md` |
+| **Project screenshots / visual assets** | `assets/screenshots/` |
+| **Final presentation** | `submission/` |
+| **Demo video** | `submission/` |
+| **Project overview & guide** | `README.md` |
 
 ---
 
-## Build and Installation Guide
+## Final Presentation
+
+- The presentation deck is located in the `submission/` directory:
+  - `submission/PaperRex_SIH2026.pdf`
+
+---
+
+## Demo Video
+
+- The video demonstration is located in the `submission/` directory:
+  - `submission/PaperRex_SIH2026 - Video Demo.mp4`
+
+---
+
+## Screenshots / Prototype Photos
+
+- Important screenshots, UI views, and verification reports are stored in:
+  - `assets/screenshots/`
+
+---
+
+## Installation
 
 ### Prerequisites
 
@@ -139,11 +212,16 @@ Secure-data-erasure-and-recovery/
 - **Python**: Python 3.14.7 with development headers
 - **Node.js**: Node.js 20+ and `npm`
 
----
+### Step 1: Clone Repository
 
-### 1. Build C++ Native Extensions (`src/modules`)
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd Secure-data-erasure-and-recovery
+```
 
-Compile the C++17 filesystem drivers and verification routines into Python bindings:
+### Step 2: Build C++ Native Extensions (`src/modules`)
+
+Compile the high-performance C++17 filesystem drivers and verification routines into Python bindings:
 
 ```bash
 cd src/modules
@@ -157,26 +235,34 @@ cmake -B build -G "Visual Studio 17 2022" -A x64
 cmake --build build --config Release
 ```
 
-Run the module self-test harness:
+### Step 3: Configure Python Backend
+
 ```bash
-python test.py
+# Return to root directory
+cd ../..
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate       # On Windows: .\venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Step 4: Install Desktop Frontend Dependencies
+
+```bash
+cd src/frontend
+npm install
 ```
 
 ---
 
-### 2. Configure Python Backend (`src/backend`)
+## Run
 
-Install Python dependencies:
+### Step 1: Start Backend API & IPC Bridge
 
-```bash
-# Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate       # On Windows: .\venv\Scripts\activate
-
-pip install -r requirements.txt
-```
-
-Run the backend server (requires elevated administrator or root rights for low-level storage device access):
+Start the backend server (requires elevated administrator or root rights for low-level storage device access):
 
 ```bash
 # Linux (root required for raw block device access)
@@ -186,48 +272,37 @@ sudo python src/backend/main.py
 python src/backend/main.py
 ```
 
----
+### Step 2: Launch Electron & React Desktop Application
 
-### 3. Launch Desktop GUI (`src/frontend`)
-
-Install dependencies and start the Electron application with Hot Module Replacement (HMR):
+In a separate terminal:
 
 ```bash
 cd src/frontend
-
-# Install dependencies
-npm install
-
-# Start Vite local development server and launch Electron
 npm run dev
 ```
 
-To build a production standalone installer:
+### Build Production Desktop Packages
 
 ```bash
-# Package for host operating system
+cd src/frontend
 npm run build:linux   # Linux AppImage / deb
 npm run build:win     # Windows NSIS Installer / portable .exe
 ```
 
 ---
 
-## Forensic Verification and Testing
+## Future Scope
 
-SanitizeX includes an automated mathematical verification suite to validate that wiped data is irrecoverable:
-
-```bash
-cd src/modules
-python -c "import verification; print('Verification Engine Loaded Successfully')"
-```
-
-The verification engine assesses:
-1. **Entropy Metric**: Computes information density per block ($H(X) = -\sum P(x) \log_2 P(x)$).
-2. **Chi-Square Analysis**: Verifies whether byte distributions conform to uniform statistical randomness.
-3. **Known Signature Scan**: Scans sectors against 120+ standard forensic signatures (`PDF`, `PNG`, `JPEG`, `ZIP`, `ELF`, `PE`, `DOCX`, etc.) to confirm zero discoverable files.
+- **Distributed Remote Sanitization**: Extend the backend architecture to support remote fleet-wide sanitization over TLS-encrypted agent channels.
+- **Hardware Security Module (HSM) Integration**: Integrate HSM-signed cryptographic certificates of sanitization for legal and regulatory compliance.
+- **Extended Flash Translation Layer (FTL) Diagnostics**: Implement vendor-specific NVMe and SATA SMART wear-leveling block inspection to verify zero remanence in over-provisioned spare blocks.
+- **Machine Learning Remanence Detection**: Deploy deep neural network models on residual raw bitstreams to detect subtle magnetic or voltage patterns indicating pre-wipe data structure.
 
 ---
 
-## License and Ethical Usage
+## Important
 
-This software is developed for authorized system administrators, security auditors, and forensic technicians for legitimate data decommissioning and recovery operations. Unauthorized destruction of data on computer systems without explicit owner permission is strictly prohibited.
+- Before submission, make sure the repository is accessible to reviewers.
+- Do not upload passwords, API keys, access tokens, `.env` files containing secrets, or other confidential credentials.
+- Ensure all storage operations are performed on test or non-critical storage devices during evaluation.
+
