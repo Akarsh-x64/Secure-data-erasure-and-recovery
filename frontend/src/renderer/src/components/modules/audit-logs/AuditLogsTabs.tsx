@@ -109,6 +109,7 @@ export function AuditLogsTab(): React.ReactElement {
   const [logs, setLogs] = useState<AuditLogEntry[]>(SAMPLE_LOGS);
   const [query, setQuery] = useState('');
   const [reportOpen, setReportOpen] = useState(false);
+  const [modalLogs, setModalLogs] = useState<AuditLogEntry[] | null>(null);
 
   useEffect(() => {
     const fetchLogs = async (): Promise<void> => {
@@ -148,6 +149,8 @@ export function AuditLogsTab(): React.ReactElement {
     });
   }, [logs, query]);
 
+  const activeModalLogs = modalLogs ?? filteredLogs;
+
   return (
     <div className="flex min-h-full flex-col gap-4 font-sans text-text-pure">
       <header className="flex flex-wrap items-end justify-between gap-3 border-b border-ui-outline pb-4">
@@ -160,25 +163,34 @@ export function AuditLogsTab(): React.ReactElement {
         </div>
         <button
           type="button"
-          onClick={() => setReportOpen(true)}
+          onClick={() => {
+            setModalLogs(filteredLogs);
+            setReportOpen(true);
+          }}
           className="flex items-center gap-2 rounded-md border border-button-primary bg-button-primary px-3 py-2 text-sm font-medium text-button-primary-text transition-colors hover:bg-button-primary/85"
         >
           <Eye className="h-4 w-4" />
-          View Audit Report
+          View Full Audit Report
         </button>
       </header>
 
       <LogFilter value={query} onChange={setQuery} resultCount={filteredLogs.length} />
 
       <main className="min-h-0 flex-1">
-        <LogsTable entries={filteredLogs} />
+        <LogsTable
+          entries={filteredLogs}
+          onViewReport={(entry) => {
+            setModalLogs([entry]);
+            setReportOpen(true);
+          }}
+        />
       </main>
 
       <ReportGeneratorModal
         open={reportOpen}
         onClose={() => setReportOpen(false)}
-        entryCount={filteredLogs.length}
-        logs={filteredLogs}
+        entryCount={activeModalLogs.length}
+        logs={activeModalLogs}
       />
     </div>
   );

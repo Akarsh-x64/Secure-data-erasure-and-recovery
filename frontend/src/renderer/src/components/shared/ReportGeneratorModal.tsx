@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ShieldCheck,
   ShieldX,
@@ -25,6 +25,14 @@ export const ReportGeneratorModal: React.FC<ReportGeneratorModalProps> = ({
   entryCount,
   logs = []
 }) => {
+  const [generatedAt, setGeneratedAt] = useState<string>('');
+
+  useEffect(() => {
+    if (open) {
+      setGeneratedAt(new Date().toLocaleTimeString());
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const verifiedCount = logs.filter((l) => l.verified).length;
@@ -104,7 +112,7 @@ export const ReportGeneratorModal: React.FC<ReportGeneratorModalProps> = ({
               Chronological Execution Logs ({logs.length})
             </span>
             <span className="text-xs text-text-muted">
-              Generated at {new Date().toLocaleTimeString()}
+              Generated at {generatedAt || new Date().toLocaleString()}
             </span>
           </div>
 
@@ -172,7 +180,7 @@ export const ReportGeneratorModal: React.FC<ReportGeneratorModalProps> = ({
                       <KeyRound className="h-3 w-3" /> SHA-256 Digest
                     </div>
                     <p className="font-mono text-[11px] text-text-pure break-all">
-                      {log.sha256}
+                      {log.sha256 || (log.payload?.preWipeSha256 as string) || (log.payload?.postWipeSha256 as string) || 'N/A'}
                     </p>
                   </div>
 
@@ -181,7 +189,7 @@ export const ReportGeneratorModal: React.FC<ReportGeneratorModalProps> = ({
                       <KeyRound className="h-3 w-3" /> Digital Signature
                     </div>
                     <p className="font-mono text-[11px] text-text-pure break-all">
-                      {log.signature}
+                      {log.signature || (log.payload?.postWipeSha256 as string) || 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -193,19 +201,30 @@ export const ReportGeneratorModal: React.FC<ReportGeneratorModalProps> = ({
                       Execution Payload Parameters
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {Object.entries(log.payload).map(([k, v]) => (
-                        <div
-                          key={k}
-                          className="rounded border border-ui-outline/40 bg-background-sidebar px-2 py-1 text-xs"
-                        >
-                          <span className="text-[10px] text-text-muted block capitalize truncate">
-                            {k.replace(/([A-Z])/g, ' $1')}
-                          </span>
-                          <span className="font-mono text-xs text-text-pure font-medium truncate block">
-                            {Array.isArray(v) ? v.join(', ') : String(v)}
-                          </span>
-                        </div>
-                      ))}
+                      {Object.entries(log.payload).map(([k, v]) => {
+                        const isVerdictPassed = typeof log.payload?.verdict === 'string' && log.payload.verdict.startsWith('PASSED');
+                        const displayVal = k === 'passed' && isVerdictPassed
+                          ? 'true'
+                          : Array.isArray(v)
+                          ? v.join(', ')
+                          : (v === '' || v === null || v === undefined)
+                          ? 'N/A'
+                          : String(v);
+
+                        return (
+                          <div
+                            key={k}
+                            className="rounded border border-ui-outline/40 bg-background-sidebar px-2 py-1 text-xs"
+                          >
+                            <span className="text-[10px] text-text-muted block capitalize truncate">
+                              {k.replace(/([A-Z])/g, ' $1')}
+                            </span>
+                            <span className="font-mono text-xs text-text-pure font-medium truncate block">
+                              {displayVal}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

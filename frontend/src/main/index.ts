@@ -2,9 +2,37 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join, basename } from 'path'
 import fs from 'fs'
 import crypto from 'crypto'
-import { execSync } from 'child_process'
+import { spawn, execSync, type ChildProcess } from 'child_process'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+
+let backendProcess: ChildProcess | null = null
+
+function launchBackendEngine(): void {
+  if (is.dev) {
+    console.log('[Main] Running in development mode. Assuming backend main.py is managed via terminal.')
+    return
+  }
+
+  const backendExePath = join(process.resourcesPath, 'backend_engine', 'backend_engine.exe')
+  console.log('[Main] Launching production backend engine from:', backendExePath)
+  
+  if (fs.existsSync(backendExePath)) {
+    try {
+      backendProcess = spawn(backendExePath, [], {
+        windowsHide: true,
+        stdio: 'ignore'
+      })
+      backendProcess.on('error', (err) => {
+        console.error('[Main] Failed to start backend engine process:', err)
+      })
+    } catch (e) {
+      console.error('[Main] Exception launching backend engine:', e)
+    }
+  } else {
+    console.warn('[Main] Backend engine executable not found at expected path:', backendExePath)
+  }
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -14,7 +42,7 @@ function createWindow(): void {
     show: true,
     autoHideMenuBar: true,
     frame: false,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
@@ -585,6 +613,56 @@ app.whenReady().then(() => {
     return getSystemStorageDevicesDirect()
   })
 
+  // Create Custom Test Disk Image (VHD) with chosen filesystem
+  ipcMain.handle('create-test-image', async (_, options: any) => {
+    try {
+      const res = await fetch('http://127.0.0.1:5000/api/v1/create-test-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(options || {})
+      })
+      if (res.ok) {
+        return await res.json()
+      }
+    } catch (err) {
+      console.warn('[Main] Backend unreachable for test image creation, using fallback:', err)
+    }
+
+    try {
+      const fsType = (options?.filesystem || 'NTFS').toLowerCase()
+      const sizeMb = Number(options?.sizeMb) || 500
+      const label = options?.label || `Test_${fsType.toUpperCase()}`
+      const tempDir = app.getPath('temp')
+      const vhdPath = join(tempDir, `SanitizeX_Test_${fsType.toUpperCase()}.vhd`)
+      const scriptPath = join(tempDir, `create_${fsType}_script.txt`)
+
+      const fsCmd = fsType === 'fat32' ? 'format fs=fat32' : (fsType === 'exfat' ? 'format fs=exfat' : 'format fs=ntfs')
+
+      const scriptContent = [
+        `select vdisk file="${vhdPath}"`,
+        'detach vdisk',
+        `create vdisk file="${vhdPath}" maximum=${sizeMb} type=fixed`,
+        `select vdisk file="${vhdPath}"`,
+        'attach vdisk',
+        'convert mbr',
+        'create partition primary',
+        `${fsCmd} label="${label}" quick`,
+        'assign'
+      ].join('\r\n')
+
+      fs.writeFileSync(scriptPath, scriptContent, 'ascii')
+      execSync(`diskpart /s "${scriptPath}"`, { encoding: 'utf-8', timeout: 35000 })
+      return {
+        success: true,
+        message: `Test Disk Image (${sizeMb} MB ${fsType.toUpperCase()}) created and mounted successfully!`,
+        vhdPath,
+        filesystem: fsType.toUpperCase()
+      }
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Failed to create test disk image.' }
+    }
+  })
+
   // Create Virtual Test Drive (VHD) via elevated Backend / PowerShell / DiskPart
   ipcMain.handle('create-test-vhd', async () => {
     try {
@@ -723,6 +801,7 @@ app.whenReady().then(() => {
     }
   })
 
+  launchBackendEngine()
   createWindow()
 
   app.on('activate', function () {
@@ -738,6 +817,17 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
+  }
+})
+
+app.on('will-quit', () => {
+  if (backendProcess) {
+    try {
+      console.log('[Main] Terminating background engine process...')
+      backendProcess.kill()
+    } catch (e) {
+      console.error('[Main] Error killing backend process:', e)
+    }
   }
 })
 

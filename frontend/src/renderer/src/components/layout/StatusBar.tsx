@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 interface StatusBarProps {
   driveStatus?: string;
   progress?: number;
@@ -5,21 +7,65 @@ interface StatusBarProps {
   sessionTime?: string;
 }
 
+function formatSeconds(totalSeconds: number): string {
+  const hrs = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+  return [hrs, mins, secs].map((v) => String(v).padStart(2, '0')).join(':');
+}
+
 export default function StatusBar({
   driveStatus = 'READY',
   progress = 0,
-  ipcConnected = true,
-  sessionTime = '00:14:22',
+  ipcConnected,
+  sessionTime,
 }: StatusBarProps) {
+  const [seconds, setSeconds] = useState(0);
+  const [backendOk, setBackendOk] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSeconds((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        let res = await fetch('http://127.0.0.1:5000/api/v1/health');
+        if (!res.ok) {
+          res = await fetch('http://127.0.0.1:5000/api/v1/devices');
+        }
+        setBackendOk(res.ok);
+      } catch {
+        setBackendOk(false);
+      }
+    };
+    checkBackend();
+    const interval = setInterval(checkBackend, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const liveIpc = ipcConnected ?? (typeof window !== 'undefined' && Boolean(window.api) && backendOk);
+  const displayTime = sessionTime ?? formatSeconds(seconds);
+
   return (
     <footer className="h-6 w-full bg-background-icon border-t border-ui-outline px-3 flex items-center justify-between font-mono text-xs text-text-muted select-none">
       {/* Left: Connectivity & Status */}
       <div className="flex items-center gap-3">
         {/* IPC Status */}
-        <div className="flex items-center gap-1.5" title="IPC Socket Connection">
-          <div className={`status-dot ${ipcConnected ? 'bg-status-valid' : 'bg-status-error'}`} />
+        <div
+          className="flex items-center gap-1.5 cursor-help"
+          title={
+            liveIpc
+              ? 'IPC Bridge & SanitizeX Native Backend Engine Connected'
+              : 'IPC/Backend Engine Disconnected (Check backend daemon)'
+          }
+        >
+          <div className={`status-dot ${liveIpc ? 'bg-status-valid' : 'bg-status-error'}`} />
           <span className="text-[10px] tracking-wider uppercase">
-            {ipcConnected ? 'IPC: OK' : 'IPC: DISCONNECTED'}
+            {liveIpc ? 'IPC: OK' : 'IPC: DISCONNECTED'}
           </span>
         </div>
 
@@ -50,7 +96,7 @@ export default function StatusBar({
         {/* Session Uptime */}
         <div className="flex items-center gap-1">
           <span>TIME:</span>
-          <span className="text-text-pure">{sessionTime}</span>
+          <span className="text-text-pure">{displayTime}</span>
         </div>
       </div>
     </footer>
