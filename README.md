@@ -1,83 +1,233 @@
-# SanitizeX
+# <p align="center"><img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Shield.svg" width="52" height="52" alt="SanitizeX Logo" /><br/>SanitizeX</p>
 
-**Enterprise- and defense-grade, multi-filesystem data sanitization, forensic recovery, and verification engine.**
+<p align="center">
+  <strong>Enterprise- & Defense-Grade Multi-Filesystem Data Sanitization, Forensic Recovery & Cryptographic Verification Platform</strong>
+</p>
 
-## Overview
+<p align="center">
+  <a href="#-compliance--standards"><img src="https://img.shields.io/badge/Compliance-NIST%20SP%20800--88%20Rev.1-007acc?style=for-the-badge&logo=security" alt="NIST SP 800-88" /></a>
+  <a href="#-compliance--standards"><img src="https://img.shields.io/badge/Standard-DoD%205220.22--M-critical?style=for-the-badge&logo=lock" alt="DoD 5220.22-M" /></a>
+  <a href="#%EF%B8%8F-system-architecture"><img src="https://img.shields.io/badge/Architecture-3--Layer%20Decoupled-success?style=for-the-badge" alt="3-Tier Architecture" /></a>
+  <a href="#-key-capabilities"><img src="https://img.shields.io/badge/Filesystems-NTFS%20%7C%20ext4%20%7C%20FAT32%20%7C%20exFAT%20%7C%20XFS-blueviolet?style=for-the-badge" alt="Filesystem Support" /></a>
+</p>
 
-SanitizeX is a highly modular C++17 engine engineered for low-level, surgical file destruction across diverse storage hardware (HDD, SATA SSD, NVMe) and file systems. It couples deep kernel-bypassing surgical deletion with an immutable read-only forensic recovery subsystem, an adversarial mathematical verification loop, a modular pybind11 extension layer, a Python Flask/Socket.IO backend, and a modern Electron + React 19 desktop GUI.
+---
 
-## Key Features
+## ⚡ Tech Stack
 
-- **3-Layer Decoupled Architecture**: Separates OS I/O (Win32 & POSIX), Hardware erasure commands (DoD 5220.22-M 3-pass overwrite, NVMe Sanitize/TRIM, ATA Secure Erase), and Filesystem logical operations.
-- **Multi-Filesystem Surgical Erasure**: Native support for NTFS, ext4, exFAT, FAT32, and XFS. Capable of pinpoint file deletion, recursive directory eradication, and full volume wiping.
-- **Forensic Recovery Engine**: Immutable read-only storage foundation with partition parsers (MBR/GPT), NTFS unallocated MFT reconstruction, TSK bridge, and comprehensive file carving.
-- **Adversarial Verification Loop**: Validates data destruction compliance using Shannon Entropy, Chi-Square Goodness-of-Fit, Serial Correlation, Monte Carlo π, and a 120+ signature carver (NIST SP 800-88 audit).
-- **Modern Desktop Platform**: Built on an Electron 44 + React 19 UI, communicating with a Python 3 Flask + Socket.IO backend, which dynamically loads native pybind11 C++ extensions.
+<p align="center">
+  <img src="https://img.shields.io/badge/C++17-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="C++17" />
+  <img src="https://img.shields.io/badge/CMake-064F8C?style=for-the-badge&logo=cmake&logoColor=white" alt="CMake" />
+  <img src="https://img.shields.io/badge/Python%203.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" />
+  <img src="https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white" alt="Socket.io" />
+  <img src="https://img.shields.io/badge/Electron%2044-47848F?style=for-the-badge&logo=electron&logoColor=white" alt="Electron" />
+  <img src="https://img.shields.io/badge/React%2019-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript%205-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite%207-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Linux%20POSIX-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux" />
+  <img src="https://img.shields.io/badge/Windows%20Win32-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows" />
+</p>
 
-## Architecture
+### Stack Overview
+
+| Layer / Domain | Technologies & Libraries | Responsibility |
+| :--- | :--- | :--- |
+| **Core Erasure & Recovery** | `C++17`, `CMake` | Low-level surgical deletion drivers, partition parsers, mathematical verification routines, and raw sector file carvers. |
+| **Native Interop** | `pybind11` | High-throughput, zero-copy bindings bridging native C++ binaries (`.pyd` / `.so`) with the Python application layer. |
+| **IPC & Orchestration** | `Python 3.11+`, `Flask`, `Flask-SocketIO`, `Pydantic` | Async task queues, WebSocket real-time progress broadcast, UAC / sudo privilege checks, and tamper-evident audit logging. |
+| **Desktop Shell** | `Electron 44`, `Node.js` | Sandboxed multi-process desktop runtime, OS dialog management, and secure IPC routing via `ContextBridge`. |
+| **Client UI** | `React 19`, `TypeScript 5`, `Vite 7`, `Tailwind CSS`, `Lucide Icons` | Mission-control interface with drive selection, selective tree deletion, recovery scanning, and live entropy inspections. |
+
+---
+
+## 🚀 Key Capabilities
+
+- 🎯 **Multi-Filesystem Surgical Erasure**: Pinpoint file and folder eradication natively implemented for **NTFS**, **ext4**, **exFAT**, **FAT32**, and **XFS**. Overwrites targeted metadata (NTFS MFT records, FAT directory entries, ext4 inodes) and target clusters.
+- 💽 **Direct-to-Hardware Sanitization**: Raw disk and partition wiping bypassing OS cache buffers via direct Win32 (`CreateFileW` / `DeviceIoControl`) and POSIX direct I/O (`O_DIRECT` / `ioctl`).
+- 🔬 **Adversarial Verification Loop**: Mathematical and forensic validation confirming zero residual data:
+  - **Shannon Entropy Analysis**: Confirms uniform randomness ($\approx 8.000$ for PRNG random fill, $0.000$ for zero-fill).
+  - **Chi-Square ($\chi^2$) Goodness-of-Fit**: Calculates byte uniformity with statistical $p$-values.
+  - **Serial Bit Correlation**: Detects linear dependencies across adjacent blocks.
+  - **Monte Carlo $\pi$ Approximation**: Evaluates pseudo-random distribution geometry.
+  - **Forensic Signature Carver**: Evaluates sectors against 120+ file header/footer signatures to confirm zero discoverable files.
+- 🛡️ **Forensic Data Recovery Subsystem**: Read-only forensic analysis engine featuring MBR/GPT partition discovery, NTFS unallocated MFT reconstruction, and deep raw-sector signature carving.
+- 📜 **Tamper-Evident Audit Ledger**: Cryptographically sealed audit reports complete with pre- and post-erasure SHA-256 digests, operator identifiers, timestamps, and pass-fail compliance metrics.
+
+---
+
+## 🏛️ System Architecture
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                                SANITIZEX DESKTOP PLATFORM                              │
+│                              SANITIZEX DESKTOP PLATFORM                                │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│  PRESENTATION & CONTROL LAYER: ELECTRON 44 + REACT 19 + TAILWIND CSS                   │
-│                                         ▼                                              │
-│  APPLICATION & IPC LAYER: PYTHON FLASK + SOCKET.IO SERVER (`backend/main.py`)          │
-│                                         ▼                                              │
-│                         pybind11 Native C++ Extensions (`modules/`)                    │
-│                                         ▼                                              │
-│  ┌──────────────────────────────────────┴───────────────────────────────────────────┐  │
-│  │                      CORE C++17 ENGINES & SUBSYSTEMS                             │  │
-│  ├──────────────────────────────────────────┬───────────────────────────────────────┤  │
-│  │ SURGICAL ERASURE ENGINE (`Erasure/`)     │ DATA RECOVERY SUBSYSTEM (`Recovery/`) │  │
-│  ├──────────────────────────────────────────┴───────────────────────────────────────┤  │
-│  │ ADVERSARIAL VERIFICATION & AUDIT ENGINE (`Erasure/Verification/`)                 │  │
-│  └──────────────────────────────────────────────────────────────────────────────────┘  │
+│  PRESENTATION LAYER: Electron 44 + React 19 + TypeScript + Tailwind CSS                │
+│  ├─ Drive Erase Tab      ├─ File/Folder Erase Tab                                      │
+│  ├─ Recovery Workspace   └─ Cryptographic Audit Logs                                   │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ ContextBridge / WebSocket Events
+┌───────────────────────────────────────────▼────────────────────────────────────────────┐
+│  IPC & ORCHESTRATION LAYER: Python 3 Flask + Socket.IO Server (`src/backend/main.py`)  │
+│  ├─ Privileged Escalation Gatekeeper (Windows RunAs / POSIX root)                      │
+│  ├─ Asynchronous Operation Workers & Real-Time Progress Emitters                       │
+│  └─ Cryptographic Audit Ledger & Verification Report Generator                         │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ pybind11 Native C++ Bindings (`src/modules`)
+┌───────────────────────────────────────────▼────────────────────────────────────────────┐
+│  CORE C++17 ENGINES & SUBSYSTEMS (`src/build_modules/`)                                │
+│  ┌─────────────────────────┬─────────────────────────┬───────────────────────────────┐ │
+│  │  Surgical Erasure       │  Forensic Recovery      │  Adversarial Verification     │ │
+│  │  ├─ NTFS Driver         │  ├─ MBR / GPT Parser    │  ├─ Shannon Entropy (8.00)    │ │
+│  │  ├─ ext4 Driver         │  ├─ MFT Reconstruction  │  ├─ Chi-Square & Monte Carlo  │ │
+│  │  ├─ exFAT / FAT32       │  ├─ TSK Bridge          │  ├─ Serial Correlation        │ │
+│  │  └─ XFS Native Parser   │  └─ Deep 120+ Carver    │  └─ Raw Signature Carver      │ │
+│  └─────────────────────────┴─────────────────────────┴───────────────────────────────┘ │
+│  ┌───────────────────────────────────────────────────────────────────────────────────┐ │
+│  │  HARDWARE & OS ABSTRACTION LAYER                                                  │ │
+│  │  ├─ Windows Direct I/O (Win32 CreateFileW / DeviceIoControl)                      │ │
+│  │  ├─ Linux POSIX Direct I/O (O_DIRECT / ioctl / blockdev)                          │ │
+│  │  └─ Hardware Commands: DoD 5220.22-M, NVMe Sanitize, ATA Secure Erase, TRIM       │ │
+│  └───────────────────────────────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Build & Test Instructions
+---
 
-### 1. Core C++ Test Suite (Windows MinGW)
-The unified master test suite consolidates all 5 filesystem drivers and the multi-tier forensic verification suite into a single native binary.
-```powershell
-make windows
-# Run the hermetic in-memory self-test (requires zero administrative rights)
-.\Tests\main.exe --test
+## 🔒 Compliance & Standards
+
+| Standard / Algorithm | Passes / Pattern | Target Application |
+| :--- | :--- | :--- |
+| **NIST SP 800-88 Rev. 1 Clear** | 1 Pass (Logical Zero-Fill `0x00`) | Standard media sanitized for internal re-use |
+| **NIST SP 800-88 Rev. 1 Purge** | Cryptographic PRNG / Firmware Purge | Physical drives cleared for cross-classification transfer |
+| **DoD 5220.22-M** | 3 Passes (`0x00` $\rightarrow$ `0xFF` $\rightarrow$ CSPRNG Pseudo-Random) | Defense-grade magnetic and solid-state sanitization |
+| **Hardware Secure Erase** | Native ATA Secure Erase / NVMe Sanitize / TRIM | Direct controller-level flash cell eradication |
+
+---
+
+## 📂 Repository Layout
+
+```text
+Secure-data-erasure-and-recovery/
+├── assets/                  # Project assets, icons, and diagrams
+├── docs/                    # Architectural documents & design specifications
+├── src/
+│   ├── _externals/          # Filesystem check utilities (e2fsck, ntfsfix, fsck.*)
+│   ├── backend/             # Python Flask + Socket.IO server & audit ledger
+│   │   ├── main.py          # REST & WebSocket API, worker threads, admin checks
+│   │   └── audit_logs.json  # Cryptographic log persistence
+│   ├── build_modules/       # Native C++ core libraries
+│   │   ├── Erasure/         # File systems, OS device wrappers, verification engines
+│   │   └── Recovery/        # Forensic disk parsing, carving, recovery tools
+│   ├── frontend/            # Electron 44 + React 19 + TypeScript application
+│   │   ├── src/main/        # Electron main process & IPC bridges
+│   │   ├── src/preload/     # Secure ContextBridge APIs
+│   │   └── src/renderer/    # React 19 UI components & Tailwind styles
+│   └── modules/             # pybind11 C++ export wrappers & compiled modules (.pyd/.so)
+└── README.md
 ```
 
-### 2. pybind11 Native Extensions (`modules/`)
-Compile the native C++ bindings for the Python backend.
-```powershell
-cd modules
+---
+
+## 🛠️ Build & Installation Guide
+
+### Prerequisites
+
+- **C++ Compiler**: GCC 10+ / Clang 12+ (Linux) or MSVC v143 / MinGW-w64 (Windows)
+- **CMake**: Version 3.15 or newer
+- **Python**: Python 3.11+ with development headers
+- **Node.js**: Node.js 20+ and `npm`
+
+---
+
+### 1. Build C++ Native Extensions (`src/modules`)
+
+Compile the high-performance C++17 filesystem drivers and verification routines into Python bindings:
+
+```bash
+cd src/modules
+
+# On Linux
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+
+# On Windows (Visual Studio 2022 x64)
 cmake -B build -G "Visual Studio 17 2022" -A x64
 cmake --build build --config Release
-# Test the extensions
+```
+
+Run the extension test harness:
+```bash
 python test.py
 ```
 
-### 3. Python Flask Backend (`backend/`)
-Starts the local server that acts as the IPC bridge between the GUI and the C++ engine.
-```powershell
-pip install -r requirements.txt
-python backend/main.py
+---
+
+### 2. Configure Python Backend (`src/backend`)
+
+Install Python dependencies:
+
+```bash
+# Recommended: create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate       # On Windows: .\venv\Scripts\activate
+
+pip install flask flask-cors flask-socketio pydantic pybind11
 ```
 
-### 4. Electron & React Desktop Frontend (`frontend/`)
-Launch the user interface.
-```powershell
-cd frontend
+Run the backend server (requires elevated administrator/root rights for low-level drive access):
+
+```bash
+# Linux (root required for raw block access)
+sudo python src/backend/main.py
+
+# Windows (auto-prompts UAC elevation if not already elevated)
+python src/backend/main.py
+```
+
+---
+
+### 3. Launch Desktop GUI (`src/frontend`)
+
+Install dependencies and start the Electron application with Hot Module Replacement (HMR):
+
+```bash
+cd src/frontend
+
+# Install dependencies
 npm install
-# Start Vite local dev server and Electron window
+
+# Start Vite local development server and launch Electron
 npm run dev
 ```
 
-### 5. Standalone Forensic Recovery Tool (`Recovery/`)
-Build the CLI tool for scanning raw sectors and recovering data.
-```powershell
-cd Recovery
-cmake -B build
-cmake --build build --config Release
-# Deep signature carving across raw sectors
-.\build\recover --carve image.dd --out ./recovered_files/
+To build a production standalone installer:
+
+```bash
+# Package for host OS
+npm run build:linux   # Linux AppImage / deb
+npm run build:win     # Windows NSIS Installer / portable .exe
 ```
+
+---
+
+## 🧪 Forensic Verification & Self-Test
+
+SanitizeX includes an automated mathematical verification suite to validate that data is irrecoverable:
+
+```bash
+cd src/modules
+python -c "import verification; print('Verification Engine Loaded Successfully')"
+```
+
+The verification engine evaluates:
+1. **Entropy Metric**: Computes information density per block ($H(X) = -\sum P(x) \log_2 P(x)$).
+2. **Chi-Square Analysis**: Checks whether byte distributions exhibit uniform statistical randomness.
+3. **Known Signature Scan**: Scans sectors against 120+ standard forensic signatures (`PDF`, `PNG`, `JPEG`, `ZIP`, `ELF`, `PE`, `DOCX`, etc.) to confirm zero discoverable files.
+
+---
+
+## ⚖️ License & Ethical Usage
+
+This software is developed for authorized system administrators, security auditors, and forensic technicians for legitimate data decommissioning and recovery operations. Unauthorized destruction of data on computer systems without explicit owner permission is strictly prohibited.
