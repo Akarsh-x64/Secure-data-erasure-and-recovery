@@ -15,7 +15,7 @@
 
 ## Project Information
 
-- **Project Title**: SanitizeX
+- **Project Title**: SanitizeX - Integrated Solutions for Data Sanitization and Recovery
 - **PS ID**: SIH2026 - 26149
 - **PS Title**: Design and Development of an Integrated Secure Data Erasure and Advanced File Recovery Tool for Digital Forensics and Data Sanitization
 - **Category**: Software
@@ -145,7 +145,6 @@ User / Verification Report Export
 ```text
 Secure-data-erasure-and-recovery/
 ├── README.md                # Project documentation and setup guide
-├── architecture.md          # Root reference to architecture specification
 ├── requirements.txt         # Python backend dependencies
 ├── LICENSE                  # License terms
 ├── docs/
