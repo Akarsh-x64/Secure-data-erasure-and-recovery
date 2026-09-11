@@ -70,9 +70,9 @@
                                             │ ContextBridge / WebSocket Events
 ┌───────────────────────────────────────────▼────────────────────────────────────────────┐
 │  IPC & ORCHESTRATION LAYER: Python 3 Flask + Socket.IO Server (`src/backend/main.py`)  │
-│  ├── Privileged Escalation Gatekeeper (Windows RunAs / POSIX root)                      │
-│  ├── Asynchronous Operation Workers & Real-Time Progress Emitters                       │
-│  └── Cryptographic Audit Ledger & Verification Report Generator                         │
+│  ├── Privileged Escalation Gatekeeper (Windows RunAs / POSIX root)                     │
+│  ├── Asynchronous Operation Workers & Real-Time Progress Emitters                      │
+│  └── Cryptographic Audit Ledger & Verification Report Generator                        │
 └───────────────────────────────────────────┬────────────────────────────────────────────┘
                                             │ pybind11 Native C++ Bindings (`src/modules`)
 ┌───────────────────────────────────────────▼────────────────────────────────────────────┐
