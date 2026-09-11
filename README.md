@@ -1,4 +1,7 @@
-# <p align="center"><img src="assets/icon/icon.png" alt="SanitizeX" width="40" height="40" valign="middle" /> SanitizeX</p>
+<h1 align="center">
+  <img src="assets/icon/icon.png" alt="SanitizeX" width="50" height="50" style="vertical-align: middle; margin-right: 10px;" />
+  <span style="vertical-align: middle;">SanitizeX</span>
+</h1>
 
 <p align="center">
   <strong>Enterprise- and Defense-Grade Multi-Filesystem Data Sanitization, Forensic Recovery, and Cryptographic Verification Platform</strong>
