@@ -40,12 +40,19 @@ if os.name == 'nt':
 
 osdevice = hdd = exfat = ext4 = fat32 = ntfs = verification = recovery = None
 
-for mod_name in ['osdevice', 'hdd', 'exfat', 'ext4', 'fat32', 'ntfs', 'verification', 'recovery']:
+for mod_name in ['osdevice', 'hdd', 'exfat', 'ext4', 'fat32', 'ntfs', 'verification']:
     try:
         globals()[mod_name] = __import__(mod_name)
         print(f"[ENGINE] Successfully loaded native C++ module: {mod_name}")
     except Exception as e:
         print(f"[ENGINE] Warning: Could not load native C++ module '{mod_name}': {e}")
+
+try:
+    recovery = __import__('recovery_v2')
+    print(f"[ENGINE] Successfully loaded native C++ module: recovery_v2 (Subprocess Edition)")
+except Exception as e:
+    recovery = None
+    print(f"[ENGINE] Warning: Could not load native C++ module 'recovery_v2': {e}")
 
 
 
@@ -60,8 +67,10 @@ def ensure_admin():
         if not is_admin:
             print("[INFO] Requesting Windows Administrator privileges...")
             import ctypes, sys
+            script_path = os.path.abspath(sys.argv[0])
+            cwd = os.path.dirname(script_path)
             ctypes.windll.shell32.ShellExecuteW(
-                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+                None, "runas", sys.executable, f'"{script_path}"', cwd, 1
             )
             sys.exit(0)
     else:
@@ -1188,7 +1197,19 @@ def background_recovery_scan_worker(operation_id: str, disk_image: str, output_r
     socketio.emit('progress', active_operations[operation_id])
     
     try:
+        import shutil
         abs_output_root = os.path.abspath(output_root or os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Recovery', 'output'))
+        
+        # Clear old output to prevent duplicate accumulation across scans
+        carved_dir = os.path.join(abs_output_root, "carved")
+        if os.path.exists(carved_dir):
+            try: shutil.rmtree(carved_dir)
+            except Exception: pass
+        manifest_path = os.path.join(abs_output_root, "recovery_result.json")
+        if os.path.exists(manifest_path):
+            try: os.remove(manifest_path)
+            except Exception: pass
+        
         os.makedirs(abs_output_root, exist_ok=True)
         
         # Format target path for raw volume device access on Windows if needed
@@ -1366,21 +1387,50 @@ def export_recovery_artifact(artifact_id):
             break
 
     if not target_art:
+        manifest_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Recovery', 'output', 'recovery_result.json'))
+        if os.path.exists(manifest_path):
+            try:
+                with open(manifest_path, 'r', encoding='utf-8') as f:
+                    manifest_data = json.load(f)
+                    for idx, entry in enumerate(manifest_data.get("files", [])):
+                        entry_id = entry.get("id", f"art-{idx}")
+                        if entry_id == artifact_id:
+                            abs_output_root = os.path.dirname(manifest_path)
+                            rel_out = entry.get("relativeOutputPath", "")
+                            target_art = {
+                                "id": entry_id,
+                                "name": entry.get("name") or f"recovered_{idx}",
+                                "absolutePath": os.path.join(abs_output_root, rel_out) if rel_out else ""
+                            }
+                            break
+            except Exception:
+                pass
+
+    if not target_art:
         return jsonify({"error": "Artifact not found"}), 404
 
     src_file = target_art.get("absolutePath")
+    print(f"[DEBUG EXPORT] artifact_id: {artifact_id}")
+    print(f"[DEBUG EXPORT] target_art: {target_art}")
+    print(f"[DEBUG EXPORT] src_file: {src_file}")
+    print(f"[DEBUG EXPORT] exists: {os.path.exists(src_file) if src_file else False}")
     if src_file and os.path.exists(src_file):
-        os.makedirs(target_dir, exist_ok=True)
-        dest_file = os.path.join(target_dir, target_art.get("name", "exported_file"))
-        import shutil
-        shutil.copy2(src_file, dest_file)
-        return jsonify({
-            "status": "success",
-            "message": f"Exported {target_art.get('name')} to {dest_file}",
-            "exportedPath": dest_file
-        }), 200
+        try:
+            os.makedirs(target_dir, exist_ok=True)
+            dest_file = os.path.join(target_dir, target_art.get("name", "exported_file"))
+            import shutil
+            shutil.copy2(src_file, dest_file)
+            return jsonify({
+                "status": "success",
+                "message": f"Exported {target_art.get('name')} to {dest_file}",
+                "exportedPath": dest_file
+            }), 200
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": f"Failed to copy file: {str(e)}"}), 400
 
-    return jsonify({"status": "success", "message": f"Artifact {artifact_id} export metadata processed"}), 200
+    return jsonify({"status": "success", "message": f"Artifact {artifact_id} export metadata processed", "debug_src": src_file}), 200
 
 
 @app.route('/api/v1/recovery/artifacts/<artifact_id>/content', methods=['GET'])
@@ -1440,6 +1490,47 @@ def get_recovery_artifact_content(artifact_id):
         "filePath": src_path
     }), 200
 
+from flask import send_file
+
+@app.route('/api/v1/recovery/artifacts/<artifact_id>/download', methods=['GET'])
+def download_recovery_artifact(artifact_id):
+    target_art = None
+    for op in active_operations.values():
+        for art in op.get("artifacts", []):
+            if art.get("id") == artifact_id:
+                target_art = art
+                break
+        if target_art:
+            break
+
+    if not target_art:
+        manifest_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Recovery', 'output', 'recovery_result.json'))
+        if os.path.exists(manifest_path):
+            try:
+                with open(manifest_path, 'r', encoding='utf-8') as f:
+                    manifest_data = json.load(f)
+                    for idx, entry in enumerate(manifest_data.get("files", [])):
+                        entry_id = entry.get("id", f"art-{idx}")
+                        if entry_id == artifact_id:
+                            abs_output_root = os.path.dirname(manifest_path)
+                            rel_out = entry.get("relativeOutputPath", "")
+                            target_art = {
+                                "id": entry_id,
+                                "name": entry.get("name") or f"recovered_{idx}",
+                                "absolutePath": os.path.join(abs_output_root, rel_out) if rel_out else ""
+                            }
+                            break
+            except Exception:
+                pass
+
+    if not target_art:
+        return jsonify({"error": "Artifact not found"}), 404
+
+    src_file = target_art.get("absolutePath")
+    if src_file and os.path.exists(src_file):
+        return send_file(src_file, as_attachment=True, download_name=target_art.get("name", "recovered_file"))
+    else:
+        return jsonify({"error": "File not found on disk"}), 404
 
 @app.route('/api/v1/audit-logs', methods=['GET', 'POST'])
 def query_audit_logs():
@@ -1476,4 +1567,4 @@ def query_audit_logs():
 
 
 if __name__ == '__main__':
-    socketio.run(app, port=5000, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

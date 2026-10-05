@@ -6,6 +6,7 @@ export type ImageSourceMode = 'file' | 'directory';
 export interface ImageSource {
   mode: ImageSourceMode;
   fileName?: string;
+  filePath?: string;
   fileSize?: string;
   directoryPath?: string;
   directoryFiles?: File[];
@@ -33,20 +34,36 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
 
   const handleFiles = (files: FileList | null): void => {
     if (!files || files.length === 0) return;
-    const file = files[0];
+    const file = files[0] as any;
     const sizeMB = file.size / (1024 * 1024);
     const sizeLabel = sizeMB > 1024 ? `${(sizeMB / 1024).toFixed(2)} GB` : `${sizeMB.toFixed(1)} MB`;
-    onSourceChange({ mode: 'file', fileName: file.name, fileSize: sizeLabel });
+    
+    // Retrieve absolute path using Electron webUtils via IPC bridge
+    const absolutePath = window.api?.getPathForFile ? window.api.getPathForFile(file) : file.path;
+    
+    onSourceChange({ mode: 'file', fileName: file.name, filePath: absolutePath, fileSize: sizeLabel });
   };
 
   const handleDirectory = (files: FileList | null): void => {
     if (!files || files.length === 0) return;
-    const relativePath = (files[0] as File & { webkitRelativePath?: string }).webkitRelativePath;
+    const file = files[0] as any;
+    const relativePath = file.webkitRelativePath;
     const folderName = relativePath ? relativePath.split('/')[0] : `${files.length} files selected`;
+    
+    let absoluteDirPath = folderName;
+    if (file.path && relativePath) {
+      const depth = relativePath.split('/').length - 1;
+      let currentPath = file.path.replace(/\\/g, '/');
+      for (let i = 0; i < depth; i++) {
+        currentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+      }
+      absoluteDirPath = currentPath;
+    }
+
     setScanState('idle');
     onSourceChange({
       mode: 'directory',
-      directoryPath: folderName,
+      directoryPath: absoluteDirPath,
       directoryFiles: Array.from(files),
       directoryScanned: false,
     });

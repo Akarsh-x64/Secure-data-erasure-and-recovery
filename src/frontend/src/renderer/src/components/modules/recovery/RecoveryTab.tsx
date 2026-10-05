@@ -129,7 +129,7 @@ export function RecoveryTab(): React.ReactElement {
       confidence: node.confidence,
     };
     setQueue([newItem]);
-    const targetPath = node.path || source?.directoryPath || source?.fileName || newItem.name;
+    const targetPath = node.path || source?.directoryPath || source?.filePath || source?.fileName || newItem.name;
     startBackendScan(targetPath, [newItem]);
   };
 
@@ -141,7 +141,7 @@ export function RecoveryTab(): React.ReactElement {
     setScanning(true);
     setScanPercent(0);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/recovery/scans', {
+      const res = await fetch('http://127.0.0.1:5000/api/v1/recovery/scans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ diskImage, mode: 'both' }),
@@ -153,7 +153,7 @@ export function RecoveryTab(): React.ReactElement {
 
       intervalRef.current = setInterval(async () => {
         try {
-          const statusRes = await fetch(`http://localhost:5000/api/v1/recovery/scans/${opId}`);
+          const statusRes = await fetch(`http://127.0.0.1:5000/api/v1/recovery/scans/${opId}`);
           if (statusRes.ok) {
             const statusData = await statusRes.json();
             setScanPercent(statusData.percent ?? 0);
@@ -163,7 +163,7 @@ export function RecoveryTab(): React.ReactElement {
               setScanning(false);
               setScanPercent(100);
 
-              const artRes = await fetch(`http://localhost:5000/api/v1/recovery/scans/${opId}/artifacts`);
+              const artRes = await fetch(`http://127.0.0.1:5000/api/v1/recovery/scans/${opId}/artifacts`);
               let fetchedArtifacts: RecoveredArtifact[] = [];
               if (artRes.ok) {
                 const rawArts = await artRes.json();
@@ -224,7 +224,7 @@ export function RecoveryTab(): React.ReactElement {
 
   const recoverQueuedFiles = (): void => {
     if (queue.length === 0 || scanning) return;
-    const targetPath = source?.directoryPath || source?.fileName || queue[0]?.name || 'RecoveryTarget';
+    const targetPath = source?.directoryPath || source?.filePath || source?.fileName || queue[0]?.name || 'RecoveryTarget';
     startBackendScan(targetPath, queue);
   };
 
@@ -233,31 +233,35 @@ export function RecoveryTab(): React.ReactElement {
 
   const scanImage = (): void => {
     if (!canScanImage || scanning) return;
-    const targetPath = source?.fileName || 'DiskImageTarget';
+    const targetPath = source?.filePath || source?.fileName || 'DiskImageTarget';
     startBackendScan(targetPath, []);
   };
 
   const handleExportArtifact = async (artifact: RecoveredArtifact): Promise<void> => {
     try {
-      await fetch(`http://localhost:5000/api/v1/recovery/artifacts/${artifact.id}/export`, {
+      const targetDir = window.api?.selectDirectory ? await window.api.selectDirectory() : null;
+      if (!targetDir || !targetDir.path) return; // User cancelled
+
+      const res = await fetch(`http://127.0.0.1:5000/api/v1/recovery/artifacts/${artifact.id}/export`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetDirectory: '' }),
+        body: JSON.stringify({ targetDirectory: targetDir.path }),
       });
+      if (res.ok) {
+        const data = await res.json();
+        alert(data.message || `Successfully exported ${artifact.name} to ${targetDir}!`);
+      } else {
+        try {
+          const errData = await res.json();
+          alert(`Failed to export artifact: ${errData.error || res.statusText}`);
+        } catch {
+          alert(`Failed to export artifact: ${res.statusText}`);
+        }
+      }
     } catch (e) {
       console.warn('Backend artifact export notice:', e);
+      alert("Error exporting artifact. Is the backend running?");
     }
-
-    const content = `SanitizeX Forensic Data Recovery Report & Artifact Payload\n=======================================================\nFile Name: ${artifact.name}\nFile Size: ${artifact.size}\nConfidence: ${artifact.confidence}%\nConfidence Note: ${artifact.confidenceNote}\nSector Offset: ${artifact.sectorOffset}\nRecovery Status: VERIFIED RECONSTRUCTED\n\n[End of Payload]`;
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = artifact.name.includes('.') ? artifact.name : `${artifact.name}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -267,7 +271,7 @@ export function RecoveryTab(): React.ReactElement {
     }
 
     let isMounted = true;
-    fetch(`http://localhost:5000/api/v1/recovery/artifacts/${previewTarget.id}/content`)
+    fetch(`http://127.0.0.1:5000/api/v1/recovery/artifacts/${previewTarget.id}/content`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!isMounted) return;
