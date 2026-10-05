@@ -1266,6 +1266,37 @@ def background_recovery_scan_worker(operation_id: str, disk_image: str, output_r
                         abs_out = os.path.join(abs_output_root, rel_out) if rel_out else ""
                         size_bytes = entry.get("size", 0)
                         
+                        confidence_val = int(ver.get("score", 0.85) * 100) if isinstance(ver.get("score"), (int, float)) else 85
+                        confidence_note = ver.get("explanation") or ver.get("detectedType") or entry.get("status") or "forensic match"
+                        
+                        if not isinstance(ver.get("score"), (int, float)) and abs_out and os.path.exists(abs_out) and os.path.isfile(abs_out):
+                            try:
+                                with open(abs_out, "rb") as bf:
+                                    buf = bf.read(min(size_bytes, 8192))
+                                if buf:
+                                    carver = verification.SignatureCarver()
+                                    arts = carver.ScanBuffer(buf, 0, len(buf))
+                                    if arts:
+                                        confidence_val = 99
+                                        confidence_note = f"Verified signature: {arts[0].signatureName}"
+                                    else:
+                                        stats = verification.StatisticalTests.RunFullAudit(buf)
+                                        entropy = float(stats.shannonEntropy)
+                                        if entropy > 7.8:
+                                            confidence_val = 75
+                                            confidence_note = "High entropy (likely encrypted/compressed)"
+                                        elif entropy > 4.0:
+                                            confidence_val = 85
+                                            confidence_note = "Valid data distribution"
+                                        elif entropy > 1.0:
+                                            confidence_val = 50
+                                            confidence_note = "Low entropy data"
+                                        else:
+                                            confidence_val = 20
+                                            confidence_note = "Sparse/corrupt data (mostly zeros)"
+                            except Exception as e:
+                                pass
+
                         artifacts.append({
                             "id": entry.get("id", f"art-{idx}"),
                             "name": entry.get("name") or f"recovered_{idx}",
@@ -1273,8 +1304,8 @@ def background_recovery_scan_worker(operation_id: str, disk_image: str, output_r
                             "size": format_storage_size(size_bytes),
                             "sizeBytes": size_bytes,
                             "fragments": 1,
-                            "confidence": int(ver.get("score", 0.85) * 100) if isinstance(ver.get("score"), (int, float)) else 85,
-                            "confidenceNote": ver.get("explanation") or ver.get("detectedType") or entry.get("status") or "forensic match",
+                            "confidence": confidence_val,
+                            "confidenceNote": confidence_note,
                             "sectorOffset": f"0x{(0x0A3F1000 + idx * 0x1000):08X}",
                             "relativePath": rel_out,
                             "absolutePath": abs_out,

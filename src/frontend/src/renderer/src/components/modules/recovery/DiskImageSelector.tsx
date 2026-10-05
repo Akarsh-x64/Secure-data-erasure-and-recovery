@@ -22,7 +22,13 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
   onSourceChange,
   disabled = false,
 }) => {
-  const [mode, setMode] = useState<ImageSourceMode>(source?.mode ?? 'file');
+  const [mode, setMode] = useState<ImageSourceMode>(source?.mode ?? 'directory');
+
+  React.useEffect(() => {
+    if (source?.mode && source.mode !== mode) {
+      setMode(source.mode);
+    }
+  }, [source?.mode]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const directoryInputRef = useRef<HTMLInputElement>(null);
@@ -117,7 +123,7 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
               <button
                 type="button"
                 disabled={disabled}
-                onClick={() => onSourceChange(null)}
+                onClick={() => onSourceChange({ mode: 'file' })}
                 title="Remove image"
                 className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-status-error/15 hover:text-status-error disabled:cursor-not-allowed"
               >
