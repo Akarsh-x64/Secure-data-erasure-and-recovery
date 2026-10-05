@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   CheckCircle2,
   FolderSearch,
@@ -8,64 +8,12 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react';
-import { FileSystemTree } from '../../filetree/FileSystemTree';
-import type { ForensicNode } from '../../filetree/TreeNode';
 import { DiskImageSelector, type ImageSource } from './DiskImageSelector';
 import { ResultsTable, type RecoveredArtifact } from './ResultsTable';
 import { CreateTestImageModal, type FilesystemChoice } from './CreateTestImageModal';
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
-}
-
-function createDirectoryTree(files: File[], rootName: string, scanned: boolean): ForensicNode[] {
-  const root: ForensicNode = {
-    id: `directory-${rootName}`,
-    name: rootName,
-    isDirectory: true,
-    children: [],
-  };
-
-  files.forEach((file) => {
-    const relativePath = (file as File & { webkitRelativePath?: string }).webkitRelativePath;
-    const parts = (relativePath || file.name).split('/').filter(Boolean);
-    const pathParts = parts[0] === rootName ? parts.slice(1) : parts;
-    let current = root;
-
-    pathParts.forEach((part, index) => {
-      const isFile = index === pathParts.length - 1;
-      const existing = current.children?.find((child) => child.name === part);
-      if (existing) {
-        current = existing;
-        return;
-      }
-
-      const next: ForensicNode = {
-        id: `${current.id}/${part}`,
-        name: part,
-        isDirectory: !isFile,
-        ...(isFile
-          ? {
-              size: formatFileSize(file.size),
-              isCorrupted: scanned,
-              statusLabel: scanned ? 'Scan result' : undefined,
-            }
-          : { children: [] }),
-      };
-      current.children?.push(next);
-      current = next;
-    });
-  });
-
-  return [root];
-}
-
 export function RecoveryTab(): React.ReactElement {
   const [source, setSource] = useState<ImageSource | null>(null);
-  const [selectedNode, setSelectedNode] = useState<ForensicNode | null>(null);
   const [scanning, setScanning] = useState(false);
   const [scanPercent, setScanPercent] = useState(0);
   const [results, setResults] = useState<RecoveredArtifact[]>([]);
@@ -78,20 +26,11 @@ export function RecoveryTab(): React.ReactElement {
       fileName: imagePath,
       fileSize: `Test ${filesystem}`
     });
-    setSelectedNode(null);
     setResults([]);
   };
 
   const isDirectory = source?.mode === 'directory';
-  const selectedFile = selectedNode && !selectedNode.isDirectory ? selectedNode : null;
-  const canScanImage = source?.mode === 'file' && Boolean(source.fileName);
-
-  const directoryNodes = useMemo(
-    () => source?.mode === 'directory'
-      ? createDirectoryTree(source.directoryFiles ?? [], source.directoryPath ?? 'Selected directory', Boolean(source.directoryScanned))
-      : [],
-    [source?.directoryFiles, source?.directoryPath, source?.directoryScanned]
-  );
+  const canScanImage = Boolean(source && (source.mode === 'directory' ? !!source.directoryPath : (!!source.filePath || !!source.fileName)));
 
   useEffect(() => {
     return () => {
@@ -101,18 +40,11 @@ export function RecoveryTab(): React.ReactElement {
 
   const handleSourceChange = (nextSource: ImageSource | null): void => {
     setSource(nextSource);
-    setSelectedNode(null);
     setResults([]);
     setScanPercent(0);
   };
 
-  const addSelectedFile = (node: ForensicNode = selectedFile!): void => {
-    if (!node || node.isDirectory) return;
-    const targetPath = node.path || source?.directoryPath || source?.filePath || source?.fileName || node.name;
-    startBackendScan(targetPath, node);
-  };
-
-  const startBackendScan = async (diskImage: string, nodeToRecover?: ForensicNode): Promise<void> => {
+  const startBackendScan = async (diskImage: string): Promise<void> => {
     setScanning(true);
     setScanPercent(0);
     try {
@@ -176,16 +108,16 @@ export function RecoveryTab(): React.ReactElement {
           intervalRef.current = null;
           setScanning(false);
           
-          if (nodeToRecover) {
+          if (source?.directoryPath) {
             const fallbackArt = {
-              id: `recovered-${nodeToRecover.id}`,
-              name: nodeToRecover.name,
-              type: nodeToRecover.name.split('.').pop() ?? 'file',
-              size: nodeToRecover.size ?? 'Unknown size',
+              id: `recovered-dir-source`,
+              name: `RecoveredFrom_${source.directoryPath.split(/[/\\]/).pop() || 'Directory'}`,
+              type: 'directory',
+              size: 'Multiple files',
               fragments: 1,
-              confidence: nodeToRecover.confidence ?? 86,
+              confidence: 90,
               confidenceNote: 'forensic match',
-              sectorOffset: `0x${(0x0a3f1000).toString(16).toUpperCase()}`,
+              sectorOffset: `0x00000000`,
             };
             setResults((current) => [...current, fallbackArt]);
           } else if (source?.fileName) {
@@ -211,7 +143,7 @@ export function RecoveryTab(): React.ReactElement {
 
   const scanImage = (): void => {
     if (!canScanImage || scanning) return;
-    const targetPath = source?.filePath || source?.fileName || 'DiskImageTarget';
+    const targetPath = source?.directoryPath || source?.filePath || source?.fileName || 'DiskImageTarget';
     startBackendScan(targetPath);
   };
 
@@ -310,45 +242,22 @@ export function RecoveryTab(): React.ReactElement {
 
       <main className="grid min-h-0 flex-1 grid-cols-1 gap-4 xl:grid-cols-[minmax(20rem,1.1fr)_minmax(0,1.6fr)]">
         <div className="flex min-h-0 flex-col gap-4">
-          {isDirectory && source.directoryScanned ? (
-            <section className="flex min-h-[28rem] min-w-0 flex-1 flex-col rounded-lg border border-ui-outline bg-background-sidebar">
-              <div className="flex items-center justify-between border-b border-ui-outline px-4 py-3">
-                <div>
-                  <h2 className="text-sm font-medium text-text-pure">Recovery explorer</h2>
-                  <p className="mt-0.5 text-xs text-text-muted">Choose one file to carve</p>
-                </div>
-                <FolderSearch className="h-4 w-4 text-status-valid" />
-              </div>
-              <div className="min-h-0 flex-1 overflow-hidden p-2">
-                <FileSystemTree
-                  key={`${source.directoryPath}-${source.directoryScanned ? 'scanned' : 'ready'}`}
-                  panel
-                  nodes={directoryNodes}
-                  actionMode="recovery"
-                  scanned={Boolean(source.directoryScanned)}
-                  onSelectNode={setSelectedNode}
-                  onAction={addSelectedFile}
-                />
-              </div>
-            </section>
-          ) : isDirectory ? (
+          {isDirectory && (
             <section className="flex min-h-[12rem] flex-col items-center justify-center rounded-lg border border-dashed border-ui-outline bg-background-sidebar p-6 text-center">
               <FolderSearch className="mb-3 h-7 w-7 text-text-muted" />
-              <p className="text-sm text-text-pure">Scan the selected directory to open its recovery explorer.</p>
+              <p className="text-sm text-text-pure">The selected directory is ready for deep recovery.</p>
             </section>
-          ) : null}
-
-          {!isDirectory && (
-            <button
-              type="button"
-              disabled={!canScanImage || scanning}
-              onClick={scanImage}
-              className="flex items-center justify-center gap-2 rounded-md border border-button-primary bg-button-primary px-3 py-3 text-sm font-medium text-button-primary-text transition-colors hover:bg-button-primary/85 disabled:cursor-not-allowed disabled:border-ui-outline disabled:bg-ui-selection disabled:text-text-muted"
-            >
-              <Search className="h-4 w-4" />
-              {scanning ? 'Scanning image...' : 'Scan image'}
-            </button>
           )}
+
+          <button
+            type="button"
+            disabled={!canScanImage || scanning}
+            onClick={scanImage}
+            className="flex items-center justify-center gap-2 rounded-md border border-button-primary bg-button-primary px-3 py-3 text-sm font-medium text-button-primary-text transition-colors hover:bg-button-primary/85 disabled:cursor-not-allowed disabled:border-ui-outline disabled:bg-ui-selection disabled:text-text-muted"
+          >
+            <Search className="h-4 w-4" />
+            {scanning ? 'Recovering...' : (isDirectory ? 'Recover drive' : 'Scan image')}
+          </button>
         </div>
 
         <ResultsTable artifacts={results} onPreview={setPreviewTarget} onExport={handleExportArtifact} />

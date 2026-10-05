@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { FileArchive, FolderSearch, Loader2, UploadCloud, X } from 'lucide-react';
+import { FileArchive, FolderSearch, UploadCloud, X } from 'lucide-react';
 
 export type ImageSourceMode = 'file' | 'directory';
 
@@ -9,8 +9,6 @@ export interface ImageSource {
   filePath?: string;
   fileSize?: string;
   directoryPath?: string;
-  directoryFiles?: File[];
-  directoryScanned?: boolean;
 }
 
 interface DiskImageSelectorProps {
@@ -19,8 +17,6 @@ interface DiskImageSelectorProps {
   disabled?: boolean;
 }
 
-type ScanState = 'idle' | 'scanning' | 'scanned';
-
 export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
   source,
   onSourceChange,
@@ -28,7 +24,6 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
 }) => {
   const [mode, setMode] = useState<ImageSourceMode>(source?.mode ?? 'file');
   const [isDragging, setIsDragging] = useState(false);
-  const [scanState, setScanState] = useState<ScanState>('idle');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const directoryInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,33 +55,18 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
       absoluteDirPath = currentPath;
     }
 
-    setScanState('idle');
     onSourceChange({
       mode: 'directory',
       directoryPath: absoluteDirPath,
-      directoryFiles: Array.from(files),
-      directoryScanned: false,
     });
   };
 
-  const runScan = (): void => {
-    setScanState('scanning');
-    setTimeout(() => {
-      setScanState('scanned');
-      if (source?.directoryPath) {
-        onSourceChange({ ...source, directoryScanned: true });
-      }
-    }, 1600);
-  };
-
   const resetDirectory = (): void => {
-    setScanState('idle');
-    onSourceChange({ mode: 'directory', directoryScanned: false });
+    onSourceChange({ mode: 'directory' });
   };
 
   const switchMode = (next: ImageSourceMode): void => {
     setMode(next);
-    setScanState('idle');
     onSourceChange({ mode: next });
   };
 
@@ -96,7 +76,7 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
         <div>
           <h2 className="text-sm font-medium text-text-pure">Image source</h2>
           <p className="mt-0.5 text-xs text-text-muted">
-            Raw disk dump or a directory to scan for corrupted files
+            Raw disk dump or a directory to recover
           </p>
         </div>
         <div className="flex items-center rounded-md border border-ui-outline bg-background-icon p-0.5 text-xs">
@@ -185,61 +165,21 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
               />
             </div>
           )
-        ) : scanState === 'scanned' ? (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between rounded-md border border-ui-outline bg-background-main px-3 py-2.5">
-              <div className="flex min-w-0 items-center gap-2.5">
-                <FolderSearch className="h-4 w-4 shrink-0 text-status-valid" />
-                <span className="truncate text-sm text-text-pure">{source?.directoryPath}</span>
-                <span className="shrink-0 rounded-full border border-status-valid/40 bg-status-valid/10 px-2 py-0.5 text-xs text-status-valid">
-                  Scan complete
-                </span>
-              </div>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={resetDirectory}
-                title="Choose a different directory"
-                className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-status-error/15 hover:text-status-error disabled:cursor-not-allowed"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <p className="text-xs text-text-muted">
-              The directory is ready. Select a file from the recovery explorer below to add it to
-              the carving queue.
-            </p>
-          </div>
         ) : source?.directoryPath ? (
           <div className="flex items-center justify-between rounded-md border border-ui-outline bg-background-main px-3 py-3">
             <div className="flex min-w-0 items-center gap-2.5">
               <FolderSearch className="h-4 w-4 shrink-0 text-text-muted" />
               <span className="truncate text-sm text-text-pure">{source.directoryPath}</span>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                disabled={disabled || scanState === 'scanning'}
-                onClick={runScan}
-                className="flex items-center gap-1.5 rounded-md bg-status-valid px-3 py-1.5 text-xs font-medium text-background-main transition-colors hover:bg-status-valid/85 disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted"
-              >
-                {scanState === 'scanning' ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <FolderSearch className="h-3.5 w-3.5" />
-                )}
-                {scanState === 'scanning' ? 'Scanning...' : 'Scan for corrupted files'}
-              </button>
-              <button
-                type="button"
-                disabled={disabled || scanState === 'scanning'}
-                onClick={resetDirectory}
-                title="Remove directory"
-                className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-status-error/15 hover:text-status-error disabled:cursor-not-allowed"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={resetDirectory}
+              title="Remove directory"
+              className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-status-error/15 hover:text-status-error disabled:cursor-not-allowed"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-ui-outline bg-background-main px-4 py-10 text-center">
@@ -253,7 +193,7 @@ export const DiskImageSelector: React.FC<DiskImageSelectorProps> = ({
               >
                 Choose a directory
               </button>{' '}
-              to scan for corrupted or recoverable files
+              to recover drive
             </p>
             <p className="text-xs text-text-muted">
               Scans the folder tree without depending on file system metadata
