@@ -1418,6 +1418,12 @@ def export_recovery_artifact(artifact_id):
         try:
             os.makedirs(target_dir, exist_ok=True)
             dest_file = os.path.join(target_dir, target_art.get("name", "exported_file"))
+            base, ext = os.path.splitext(dest_file)
+            counter = 1
+            while os.path.exists(dest_file):
+                dest_file = f"{base}_{counter}{ext}"
+                counter += 1
+                
             import shutil
             shutil.copy2(src_file, dest_file)
             return jsonify({

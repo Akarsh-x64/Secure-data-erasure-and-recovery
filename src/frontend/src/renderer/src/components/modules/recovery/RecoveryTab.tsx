@@ -1,11 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   CheckCircle2,
-  FileArchive,
   FolderSearch,
   Loader2,
   PlusCircle,
-  Scissors,
   Search,
   ShieldCheck,
   X,
@@ -13,16 +11,8 @@ import {
 import { FileSystemTree } from '../../filetree/FileSystemTree';
 import type { ForensicNode } from '../../filetree/TreeNode';
 import { DiskImageSelector, type ImageSource } from './DiskImageSelector';
-import { RecoveryOptions, DEFAULT_SIGNATURES, type FileSignatureDef } from './RecoveryOptions';
 import { ResultsTable, type RecoveredArtifact } from './ResultsTable';
 import { CreateTestImageModal, type FilesystemChoice } from './CreateTestImageModal';
-
-interface QueueItem {
-  id: string;
-  name: string;
-  size: string;
-  confidence?: number;
-}
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -75,9 +65,7 @@ function createDirectoryTree(files: File[], rootName: string, scanned: boolean):
 
 export function RecoveryTab(): React.ReactElement {
   const [source, setSource] = useState<ImageSource | null>(null);
-  const [signatures, setSignatures] = useState<FileSignatureDef[]>(DEFAULT_SIGNATURES);
   const [selectedNode, setSelectedNode] = useState<ForensicNode | null>(null);
-  const [queue, setQueue] = useState<QueueItem[]>([]);
   const [scanning, setScanning] = useState(false);
   const [scanPercent, setScanPercent] = useState(0);
   const [results, setResults] = useState<RecoveredArtifact[]>([]);
@@ -91,14 +79,13 @@ export function RecoveryTab(): React.ReactElement {
       fileSize: `Test ${filesystem}`
     });
     setSelectedNode(null);
-    setQueue([]);
     setResults([]);
   };
 
-  const enabledCount = signatures.filter((signature) => signature.enabled).length;
   const isDirectory = source?.mode === 'directory';
   const selectedFile = selectedNode && !selectedNode.isDirectory ? selectedNode : null;
-  const canScanImage = source?.mode === 'file' && Boolean(source.fileName) && enabledCount > 0;
+  const canScanImage = source?.mode === 'file' && Boolean(source.fileName);
+
   const directoryNodes = useMemo(
     () => source?.mode === 'directory'
       ? createDirectoryTree(source.directoryFiles ?? [], source.directoryPath ?? 'Selected directory', Boolean(source.directoryScanned))
@@ -115,29 +102,17 @@ export function RecoveryTab(): React.ReactElement {
   const handleSourceChange = (nextSource: ImageSource | null): void => {
     setSource(nextSource);
     setSelectedNode(null);
-    setQueue([]);
     setResults([]);
     setScanPercent(0);
   };
 
   const addSelectedFile = (node: ForensicNode = selectedFile!): void => {
     if (!node || node.isDirectory) return;
-    const newItem: QueueItem = {
-      id: node.id,
-      name: node.name,
-      size: node.size ?? 'Unknown size',
-      confidence: node.confidence,
-    };
-    setQueue([newItem]);
-    const targetPath = node.path || source?.directoryPath || source?.filePath || source?.fileName || newItem.name;
-    startBackendScan(targetPath, [newItem]);
+    const targetPath = node.path || source?.directoryPath || source?.filePath || source?.fileName || node.name;
+    startBackendScan(targetPath, node);
   };
 
-  const removeFromQueue = (id: string): void => {
-    setQueue((items) => items.filter((item) => item.id !== id));
-  };
-
-  const startBackendScan = async (diskImage: string, queuedItems: QueueItem[] = []): Promise<void> => {
+  const startBackendScan = async (diskImage: string, nodeToRecover?: ForensicNode): Promise<void> => {
     setScanning(true);
     setScanPercent(0);
     try {
@@ -183,7 +158,6 @@ export function RecoveryTab(): React.ReactElement {
                 const existingIds = new Set(current.map((art) => art.id));
                 return [...current, ...fetchedArtifacts.filter((art) => !existingIds.has(art.id))];
               });
-              setQueue([]);
             }
           }
         } catch (err) {
@@ -201,31 +175,35 @@ export function RecoveryTab(): React.ReactElement {
           if (intervalRef.current) clearInterval(intervalRef.current);
           intervalRef.current = null;
           setScanning(false);
-          if (queuedItems.length > 0) {
-            const fallbackArts = queuedItems.map((item, index) => ({
-              id: `recovered-${item.id}`,
-              name: item.name,
-              type: item.name.split('.').pop() ?? 'file',
-              size: item.size,
+          
+          if (nodeToRecover) {
+            const fallbackArt = {
+              id: `recovered-${nodeToRecover.id}`,
+              name: nodeToRecover.name,
+              type: nodeToRecover.name.split('.').pop() ?? 'file',
+              size: nodeToRecover.size ?? 'Unknown size',
               fragments: 1,
-              confidence: item.confidence ?? 86,
+              confidence: nodeToRecover.confidence ?? 86,
               confidenceNote: 'forensic match',
-              sectorOffset: `0x${(0x0a3f1000 + index * 0x120400).toString(16).toUpperCase()}`,
-            }));
-            setResults((current) => [...current, ...fallbackArts]);
-            setQueue([]);
+              sectorOffset: `0x${(0x0a3f1000).toString(16).toUpperCase()}`,
+            };
+            setResults((current) => [...current, fallbackArt]);
           } else if (source?.fileName) {
-            setQueue([{ id: 'image-source', name: source.fileName, size: source.fileSize ?? 'Unknown size' }]);
+            const fallbackArt = {
+              id: `recovered-image-source`,
+              name: source.fileName,
+              type: 'file',
+              size: source.fileSize ?? 'Unknown size',
+              fragments: 1,
+              confidence: 90,
+              confidenceNote: 'forensic match',
+              sectorOffset: `0x00000000`,
+            };
+            setResults((current) => [...current, fallbackArt]);
           }
         }
       }, 300);
     }
-  };
-
-  const recoverQueuedFiles = (): void => {
-    if (queue.length === 0 || scanning) return;
-    const targetPath = source?.directoryPath || source?.filePath || source?.fileName || queue[0]?.name || 'RecoveryTarget';
-    startBackendScan(targetPath, queue);
   };
 
   const [previewTarget, setPreviewTarget] = useState<RecoveredArtifact | null>(null);
@@ -234,7 +212,7 @@ export function RecoveryTab(): React.ReactElement {
   const scanImage = (): void => {
     if (!canScanImage || scanning) return;
     const targetPath = source?.filePath || source?.fileName || 'DiskImageTarget';
-    startBackendScan(targetPath, []);
+    startBackendScan(targetPath);
   };
 
   const handleExportArtifact = async (artifact: RecoveredArtifact): Promise<void> => {
@@ -249,7 +227,7 @@ export function RecoveryTab(): React.ReactElement {
       });
       if (res.ok) {
         const data = await res.json();
-        alert(data.message || `Successfully exported ${artifact.name} to ${targetDir}!`);
+        alert(data.message || `Successfully exported ${artifact.name} to ${targetDir.path}!`);
       } else {
         try {
           const errData = await res.json();
@@ -302,7 +280,7 @@ export function RecoveryTab(): React.ReactElement {
         <div>
           <h1 className="text-xl font-semibold text-text-pure">File carving and recovery</h1>
           <p className="mt-1 text-sm text-text-muted">
-            Select a recoverable file, add it to the queue, then recover it into the artifacts list.
+            Select a recoverable file and recover it into the artifacts list.
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-text-muted">
@@ -358,9 +336,7 @@ export function RecoveryTab(): React.ReactElement {
               <FolderSearch className="mb-3 h-7 w-7 text-text-muted" />
               <p className="text-sm text-text-pure">Scan the selected directory to open its recovery explorer.</p>
             </section>
-          ) : (
-            <RecoveryOptions signatures={signatures} onChange={setSignatures} disabled={scanning} />
-          )}
+          ) : null}
 
           {!isDirectory && (
             <button
@@ -370,34 +346,9 @@ export function RecoveryTab(): React.ReactElement {
               className="flex items-center justify-center gap-2 rounded-md border border-button-primary bg-button-primary px-3 py-3 text-sm font-medium text-button-primary-text transition-colors hover:bg-button-primary/85 disabled:cursor-not-allowed disabled:border-ui-outline disabled:bg-ui-selection disabled:text-text-muted"
             >
               <Search className="h-4 w-4" />
-              {scanning ? 'Scanning image...' : `Scan image with ${enabledCount} signature${enabledCount === 1 ? '' : 's'}`}
+              {scanning ? 'Scanning image...' : 'Scan image'}
             </button>
           )}
-
-          <section className="rounded-lg border border-ui-outline bg-background-sidebar">
-            <div className="flex items-center justify-between border-b border-ui-outline px-4 py-3">
-              <div>
-                <h2 className="text-sm font-medium text-text-pure">Recovery queue</h2>
-                <p className="mt-0.5 text-xs text-text-muted">{queue.length} file{queue.length === 1 ? '' : 's'} ready</p>
-              </div>
-              <ShieldCheck className="h-4 w-4 text-text-muted" />
-            </div>
-            <div className="space-y-1.5 p-2">
-              {queue.map((item) => (
-                <div key={item.id} className="flex items-center gap-2 rounded-md border border-ui-outline bg-background-main px-2.5 py-2">
-                  <FileArchive className="h-4 w-4 shrink-0 text-status-valid" />
-                  <span className="min-w-0 flex-1 truncate text-xs text-text-pure">{item.name}</span>
-                  <button type="button" onClick={() => removeFromQueue(item.id)} disabled={scanning} title={`Remove ${item.name}`} className="rounded p-1 text-text-muted hover:bg-status-error/15 hover:text-status-error disabled:cursor-not-allowed">
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
-              {queue.length === 0 && <p className="px-2 py-3 text-xs text-text-muted">Your selected files will appear here.</p>}
-              <button type="button" disabled={queue.length === 0 || scanning} onClick={recoverQueuedFiles} className="mt-1 flex w-full items-center justify-center gap-2 rounded-md bg-status-valid px-3 py-2.5 text-sm font-medium text-background-main hover:bg-status-valid/85 disabled:cursor-not-allowed disabled:bg-ui-selection disabled:text-text-muted">
-                <Scissors className="h-4 w-4" /> Recover queued files
-              </button>
-            </div>
-          </section>
         </div>
 
         <ResultsTable artifacts={results} onPreview={setPreviewTarget} onExport={handleExportArtifact} />
@@ -479,4 +430,3 @@ export function RecoveryTab(): React.ReactElement {
     </div>
   );
 }
-
