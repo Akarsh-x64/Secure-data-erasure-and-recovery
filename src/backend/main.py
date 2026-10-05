@@ -1416,8 +1416,13 @@ def export_recovery_artifact(artifact_id):
     print(f"[DEBUG EXPORT] exists: {os.path.exists(src_file) if src_file else False}")
     if src_file and os.path.exists(src_file):
         try:
-            os.makedirs(target_dir, exist_ok=True)
-            dest_file = os.path.join(target_dir, target_art.get("name", "exported_file"))
+            name = target_art.get("name", "exported_file")
+            # Strip drive letter and leading slashes to prevent absolute path overriding target_dir
+            if os.name == 'nt':
+                name = os.path.splitdrive(name)[1]
+            name = name.lstrip("\\/")
+            dest_file = os.path.join(target_dir, name)
+            os.makedirs(os.path.dirname(dest_file), exist_ok=True)
             base, ext = os.path.splitext(dest_file)
             counter = 1
             while os.path.exists(dest_file):
@@ -1436,7 +1441,7 @@ def export_recovery_artifact(artifact_id):
             traceback.print_exc()
             return jsonify({"error": f"Failed to copy file: {str(e)}"}), 400
 
-    return jsonify({"status": "success", "message": f"Artifact {artifact_id} export metadata processed", "debug_src": src_file}), 200
+    return jsonify({"error": f"Source file not found on disk: {src_file}"}), 404
 
 
 @app.route('/api/v1/recovery/artifacts/<artifact_id>/content', methods=['GET'])
