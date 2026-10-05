@@ -1092,3 +1092,1083 @@ Total: 2 files found
 
 53080 sectors contain unknown data, 0 invalid files found and rejected.
 PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 17:28:04 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 27 MB / 26 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 27 MB / 26 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3  82  7      53368
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3  82  7      53368
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009291.mft	 9291-9292
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019696.png	 19696-19902
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/1 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+53080 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 17:29:24 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 27 MB / 26 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 27 MB / 26 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3  82  7      53368
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3  82  7      53368
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009291.mft	 9291-9292
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019696.png	 19696-19902
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/1 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+53080 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 17:33:11 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 27 MB / 26 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 27 MB / 26 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3  82  7      53368
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3  82  7      53368
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009291.mft	 9291-9292
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019696.png	 19696-19902
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/1 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+53080 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 17:35:25 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 27 MB / 26 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 27 MB / 26 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3  82  7      53368
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3  82  7      53368
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m01s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013184.mft	 13184-13185
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013186.mft	 13186-13187
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013188.mft	 13188-13189
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019912.png	 19912-20222
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m01s
+Pass 1 +2 files
+png: 1/1 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+52968 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 17:37:53 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009271.mft	 9271-9272
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013184.mft	 13184-13185
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013186.mft	 13186-13187
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013188.mft	 13188-13189
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013190.mft	 13190-13191
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019912.png	 19912-20188
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/2 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+57102 sectors contain unknown data, 1 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 17:45:19 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013184.mft	 13184-13185
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013186.mft	 13186-13187
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013188.mft	 13188-13189
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013190.mft	 13190-13191
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019912.png	 19912-20188
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/2 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+57104 sectors contain unknown data, 1 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 17:54:00 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013184.mft	 13184-13185
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013186.mft	 13186-13187
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013188.mft	 13188-13189
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013190.mft	 13190-13191
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019912.png	 19912-20188
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/2 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+57104 sectors contain unknown data, 1 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 18:06:37 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013184.mft	 13184-13185
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013186.mft	 13186-13187
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013188.mft	 13188-13189
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013190.mft	 13190-13191
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019912.png	 19912-20188
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/2 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+57104 sectors contain unknown data, 1 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 18:11:38 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009291.mft	 9291-9292
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019704.png	 19704-20464
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/1 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+56626 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 18:13:14 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009291.mft	 9291-9292
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019704.png	 19704-20464
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/1 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+56626 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 18:13:19 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009291.mft	 9291-9292
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019704.png	 19704-20464
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+Elapsed time 0h00m00s
+Pass 1 +2 files
+png: 1/1 recovered
+mov: 1/1 recovered
+Total: 2 files found
+
+56626 sectors contain unknown data, 0 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 18:15:08 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013184.mft	 13184-13185
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013186.mft	 13186-13187
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013188.mft	 13188-13189
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013190.mft	 13190-13191
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013192.mft	 13192-13193
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013194.mft	 13194-13195
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013196.mft	 13196-13197
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019712.png	 19712-20331
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0054952.png	 54952-55372
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0055376.png	 55376-55816
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0055824.png	 55824-56187
+Elapsed time 0h00m00s
+Pass 1 +5 files
+png: 4/5 recovered
+mov: 1/1 recovered
+Total: 5 files found
+
+55529 sectors contain unknown data, 1 invalid files found and rejected.
+PhotoRec exited normally.
+
+Using locale 'C.UTF-8'.
+
+
+Mon Oct  5 18:38:02 2026
+Command line: PhotoRec /log /d C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered /cmd C:\temp\photorec_test\test.vhd partition_none,search
+
+PhotoRec 7.3-WIP, Data Recovery Utility, September 2025
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Windows 8 (9200)
+Compiler: GCC 13.4, Cygwin32 3003.3
+ext2fs lib: 1.45.3, ntfs lib: available, ewf lib: 20140608, libjpeg: libjpeg-turbo-1.5.3, curses lib: ncurses 6.1
+Hard disk list
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB - CHS 4 255 63 (RO), sector size=512
+
+Partition table type defaults to None
+Disk C:\temp\photorec_test\test.vhd - 29 MB / 28 MiB (RO)
+Partition table type: None
+   P Unknown                  0   0  1     3 147 16      57472
+758 first-level signatures enabled
+
+Analyse
+   P Unknown                  0   0  1     3 147 16      57472
+Pass 0 (blocksize=512) STATUS_FIND_OFFSET
+blocksize=512, offset=0
+Elapsed time 0h00m00s
+Pass 1 (blocksize=512) STATUS_EXT2_OFF
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000160.mft	 160-161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000162.mft	 162-163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000164.mft	 164-165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0000166.mft	 166-167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0009163.mft	 9163-9164
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013096.mft	 13096-13097
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013098.mft	 13098-13099
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013100.mft	 13100-13101
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013102.mft	 13102-13103
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013104.mft	 13104-13105
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013106.mft	 13106-13107
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013108.mft	 13108-13109
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013110.mft	 13110-13111
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013112.mft	 13112-13113
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013114.mft	 13114-13115
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013116.mft	 13116-13117
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013118.mft	 13118-13119
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013120.mft	 13120-13121
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013122.mft	 13122-13123
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013124.mft	 13124-13125
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013126.mft	 13126-13127
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013144.mft	 13144-13145
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013146.mft	 13146-13147
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013148.mft	 13148-13149
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013150.mft	 13150-13151
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013152.mft	 13152-13153
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013154.mft	 13154-13155
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013156.mft	 13156-13157
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013158.mft	 13158-13159
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013160.mft	 13160-13161
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013162.mft	 13162-13163
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013164.mft	 13164-13165
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013166.mft	 13166-13167
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013168.mft	 13168-13169
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013170.mft	 13170-13171
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013172.mft	 13172-13173
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013174.mft	 13174-13175
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013176.mft	 13176-13177
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013178.mft	 13178-13179
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013180.mft	 13180-13181
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013182.mft	 13182-13183
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013184.mft	 13184-13185
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013186.mft	 13186-13187
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013188.mft	 13188-13189
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013190.mft	 13190-13191
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013192.mft	 13192-13193
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013194.mft	 13194-13195
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0013196.mft	 13196-13197
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0019712.png	 19712-20331
+file_mov.c: unknown atom 0x7064696e at 64
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0021688.mp4	 21688-21688
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0054952.png	 54952-55372
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0055376.png	 55376-55816
+C:\Users\Sudhit\Documents\Study Material\Projects\SIH v2 temp\Secure-data-erasure-and-recovery\src\Recovery\output\carved\recovered.1/f0055824.png	 55824-56187
+Elapsed time 0h00m01s
+Pass 1 +5 files
+png: 4/5 recovered
+mov: 1/1 recovered
+Total: 5 files found
+
+55529 sectors contain unknown data, 1 invalid files found and rejected.
+PhotoRec exited normally.

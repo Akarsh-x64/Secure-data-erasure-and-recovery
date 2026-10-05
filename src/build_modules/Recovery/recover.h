@@ -5,16 +5,14 @@
 
 namespace Recovery {
 
+// Run TSK (tsk_recover.exe) via subprocess and format output
 bool RecoverMetadata(
     const std::string& diskImage,
-    const std::filesystem::path& outputRoot =
-        std::filesystem::path("Recovery") / "output");
+    const std::filesystem::path& outputRoot = std::filesystem::path("Recovery") / "output");
 
+// Run PhotoRec (photorec_win.exe) via subprocess and format output
 bool RecoverCarving(
     const std::string& diskImage,
-    const std::filesystem::path& outputRoot =
-        std::filesystem::path("Recovery") / "output");
-
-int RunRecoveryCommand(int argc, char** argv);
+    const std::filesystem::path& outputRoot = std::filesystem::path("Recovery") / "output");
 
 } // namespace Recovery
