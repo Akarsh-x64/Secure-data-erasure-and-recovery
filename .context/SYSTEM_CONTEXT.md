@@ -778,9 +778,9 @@ Phase 12 implements the production desktop interface using **Electron 44**, **el
    - Standard selection: DoD 3-pass, NIST SP 800-88 Clear, NIST SP 800-88 Purge.
    - Safety lockout requiring typing `CONFIRM_WIPE`.
 3. **Forensic Recovery Tab (`RecoveryTab.tsx`)**:
-   - Registers raw forensic disk images (`.dd`, `.raw`).
-   - Toggleable 120+ file signature checklist.
-   - Live results table with recovery confidence scores and exportable artifacts.
+   - Registers raw forensic disk images (`.dd`, `.raw`) or targeted directories.
+   - Deep forensic volume scanning triggers directly on entire directories/drives without intermediate file tree selection.
+   - Live results table with dynamic heuristic/entropy-based confidence scores and exportable artifacts.
 4. **Audit Logs Tab (`AuditLogsTabs.tsx`)**:
    - Live inspection of cryptographic pre-wipe and post-wipe SHA-256 digests.
    - Real-time Shannon Entropy visual graphs and Chi-Square distribution histograms.
